@@ -3,28 +3,28 @@ name: Validate NextJS Pull Request
 on:
   pull_request:
     types: [opened, synchronize, reopened]
-  workflow_dispatch:
+
 jobs:
   build-and-test:
     name: Build and Test NextJS Project
     runs-on: ubuntu-latest
     
     permissions:
-      statuses: write
+      checks: write
       contents: read
       
     steps:
-      - name: Create Initial Status
+      - name: Create Status Check
         uses: actions/github-script@v6
         with:
           script: |
-            await github.rest.repos.createCommitStatus({
+            await github.rest.checks.create({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              sha: context.payload.pull_request.head.sha,
-              state: 'pending',
-              context: 'Validate NextJS Pull Request',
-              description: 'Build and test in progress'
+              name: 'Validate NextJS Pull Request',
+              head_sha: context.payload.pull_request.head.sha,
+              status: 'in_progress',
+              started_at: new Date()
             });
 
       - uses: actions/checkout@v3
@@ -51,30 +51,32 @@ jobs:
           path: |
             npm-debug.log
             
-      - name: Update Status (Success)
+      - name: Update Status Check (Success)
         if: success()
         uses: actions/github-script@v6
         with:
           script: |
-            await github.rest.repos.createCommitStatus({
+            await github.rest.checks.create({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              sha: context.payload.pull_request.head.sha,
-              state: 'success',
-              context: 'Validate NextJS Pull Request',
-              description: 'All checks passed'
+              name: 'Validate NextJS Pull Request',
+              head_sha: context.payload.pull_request.head.sha,
+              status: 'completed',
+              conclusion: 'success',
+              completed_at: new Date()
             });
             
-      - name: Update Status (Failure)
+      - name: Update Status Check (Failure)
         if: failure()
         uses: actions/github-script@v6
         with:
           script: |
-            await github.rest.repos.createCommitStatus({
+            await github.rest.checks.create({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              sha: context.payload.pull_request.head.sha,
-              state: 'failure',
-              context: 'Validate NextJS Pull Request',
-              description: 'Build or tests failed'
+              name: 'Validate NextJS Pull Request',
+              head_sha: context.payload.pull_request.head.sha,
+              status: 'completed',
+              conclusion: 'failure',
+              completed_at: new Date()
             });
