@@ -9,18 +9,15 @@ jobs:
     name: Build and Test NextJS Project
     runs-on: ubuntu-latest
     
-    # Add this to ensure the status check is always reported
     permissions:
       checks: write
       contents: read
       
     steps:
-      # Add initial status check
       - name: Create Status Check
         uses: actions/github-script@v6
         with:
           script: |
-            const { context } = require('@actions/github');
             await github.rest.checks.create({
               owner: context.repo.owner,
               repo: context.repo.repo,
@@ -54,13 +51,11 @@ jobs:
           path: |
             npm-debug.log
             
-      # Add final status update
       - name: Update Status Check (Success)
         if: success()
         uses: actions/github-script@v6
         with:
           script: |
-            const { context } = require('@actions/github');
             await github.rest.checks.create({
               owner: context.repo.owner,
               repo: context.repo.repo,
@@ -76,7 +71,6 @@ jobs:
         uses: actions/github-script@v6
         with:
           script: |
-            const { context } = require('@actions/github');
             await github.rest.checks.create({
               owner: context.repo.owner,
               repo: context.repo.repo,
