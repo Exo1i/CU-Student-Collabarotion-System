@@ -1,36 +1,155 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# 🚀 Learning Management System
 
-## Getting Started
+A modern, feature-rich learning management system built with Next.js, focusing on collaborative learning and project-based education.
 
-First, run the development server:
+## ✨ Features
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+- **Authentication & User Management**
+  - Secure login and registration
+  - Password reset functionality
+  - Role-based access control (Student/Instructor/Admin)
+  - Profile management with badges
+
+- **Team Collaboration**
+  - Team formation and management
+  - Real-time chat integration
+  - Project phase tracking
+  - Peer review system
+
+- **Course Management**
+  - Course creation and enrollment
+  - Assignment submission
+  - Project management
+  - Progress tracking
+
+- **Communication**
+  - Real-time messaging
+  - Channel-based discussions
+  - File sharing capabilities
+  - Notification system
+
+## 🛠️ Tech Stack
+
+- **Frontend**: Next.js
+- **Database**: PostgreSQL
+- **Authentication**: Clerk
+- **Real-time**: WebSocket
+
+## 📋 API Endpoints
+
+### Authentication
+```
+POST /api/auth/login
+POST /api/auth/register
+POST /api/auth/reset-password
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### User Management
+```
+GET /api/users/:id
+PATCH /api/users/:id
+GET /api/users/:id/badges
+GET /api/users/:id/teams
+```
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+### Teams & Projects
+```
+POST /api/teams
+GET /api/teams/:id
+POST /api/projects
+GET /api/projects/:id/phases
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+[View full API documentation](./docs/api.md)
 
-## Learn More
+## 🗂️ Project Structure
 
-To learn more about Next.js, take a look at the following resources:
+```
+/
+├── src/
+│   ├── app/          # Next.js pages
+│   ├── components/   # Reusable components
+│   ├── lib/         # Database, auth, utilities
+│   ├── api/         # API routes
+│   └── hooks/       # Custom hooks
+├── public/          # Static assets
+├── tests/          # Test files
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 🚀 Getting Started
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/Exo1i/CUStudentCollabSystem.git
+   cd CUStudentCollabSystem
+   ```
 
-## Deploy on Vercel
+2. **Install dependencies**
+   ```bash
+   npm install
+   ```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+3. **Set up environment variables**
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+    ```env
+    DATABASE_URL=your_database_url
+    NEXTAUTH_SECRET=your_auth_secret
+    NEXTAUTH_URL=http://localhost:3000
+    ```  
+  
+
+5. **Set up the database**
+   ```bash
+   npm run schema
+   ```
+
+6. **Start the development server**
+   ```bash
+   npm run dev
+   ```
+
+   The application will be available at `http://localhost:3000`
+
+## 🤝 Contributing
+1. Fork the repository
+2. Create a new branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+## 👥 Team
+
+Built with ❤️ by 
+<table>
+<tr>
+    <td align="center">
+        <a href="https://github.com/exo1i">
+            <img src="https://github.com/exo1i.png" width="100px;" alt="Youssef Noser"/><br />
+            <sub><b>Youssef Noser</b></sub>
+        </a><br />
+        <sub>Full Stack Developer</sub>
+    </td>
+   <td align="center">
+        <a href="https://github.com/Hussein-Mohamed1">
+            <img src="https://github.com/Hussein-Mohamed1.png" width="100px;" alt="Developer Name 3"/><br />
+            <sub><b>Hussien Mohamed</b></sub>
+        </a><br />
+        <sub>Frontend Developer</sub>
+    </td>
+    <td align="center">
+          <a href="https://github.com/xx-Tasneem-Ahmed-xx">
+              <img src="https://github.com/xx-Tasneem-Ahmed-xx.png" width="100px;" alt="Developer Name 3"/><br />
+              <sub><b>Tasneem Ahmad</b></sub>
+          </a><br />
+          <sub>Frontend Developer</sub>
+      </td>
+    <td align="center">
+        <a href="https://github.com/Doha-Ahmed-E">
+            <img src="https://github.com/Doha-Ahmed-E.png" width="100px;" alt="Doha Ahmad"/><br />
+            <sub><b>Doha Ahmad</b></sub>
+        </a><br />
+        <sub>Backend Developer</sub>
+    </td>
+   
+</tr>
+</table>
