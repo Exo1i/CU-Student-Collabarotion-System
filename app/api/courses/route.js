@@ -27,7 +27,7 @@ export async function POST(request) {
     return NextResponse.json({ message: "Course created" }, { status: 201 });
   } catch (error) {
     return NextResponse.json(
-      { error: "Failed to create user" },
+      { error: "Failed to create course" },
       {
         status: 500,
       }

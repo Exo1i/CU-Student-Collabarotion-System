@@ -1,10 +1,6 @@
-"use server";
-import LandingPage from "./components/LandingPage";
-import fecthUser from "./fetchUsers";
+import LandingPage from "@/app/components/LandingPage";
 
-export default async function Home() {
-  const resp = await fecthUser();
-  console.log(resp);
+export default function Home() {
   return (
     <>
       <LandingPage />

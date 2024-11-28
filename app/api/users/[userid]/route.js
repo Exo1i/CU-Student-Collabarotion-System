@@ -4,8 +4,9 @@ import { NextResponse } from "next/server";
 //get a user given their ID
 export async function GET(request, { params }) {
   try {
+    const par = await params;
     const resp = await pool.query("SELECT * FROM Users WHERE User_ID = $1", [
-      params.userid,
+      par.userid,
     ]);
     if (resp.rows.length === 0) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
@@ -23,10 +24,11 @@ export async function GET(request, { params }) {
 // Update a row in the users table given the users's ID
 export async function PUT(request, { params }) {
   try {
+    const par = await params;
     const { fname, lname, role } = await request.json();
     await pool.query(
       "UPDATE Users SET Fname = $1, Lname = $2, Role = $3 WHERE User_ID = $4",
-      [fname, lname, role, params.userid]
+      [fname, lname, role, par.userid]
     );
     return NextResponse.json({ message: "User updated" }, { status: 200 });
   } catch (err) {
@@ -41,7 +43,8 @@ export async function PUT(request, { params }) {
 //delete a specific user given their ID
 export async function DELETE(request, { params }) {
   try {
-    await pool.query("DELETE FROM Users WHERE User_ID = $1", [params.userid]);
+    const par = await params;
+    await pool.query("DELETE FROM Users WHERE User_ID = $1", [par.userid]);
     return NextResponse.json({ message: "User deleted" }, { status: 200 });
   } catch (err) {
     console.error("Error deleting user: ", err);
@@ -55,11 +58,12 @@ export async function DELETE(request, { params }) {
 // edit specific values for a certain user given their ID
 export async function PATCH(request, { params }) {
   try {
+    const par = await params;
     const updates = await request.json();
     const updateFields = Object.keys(updates) //Reads the update fields from the request body.
       .map((key, index) => `${key} = $${index + 1}`) //preparing the query updates
       .join(", ");
-    const updateValues = [...Object.values(updates), params.userid];
+    const updateValues = [...Object.values(updates), par.userid];
     await pool.query(
       `UPDATE Users SET ${updateFields} WHERE User_ID = $${updateValues.length}`,
       updateValues
