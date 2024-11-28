@@ -1,22 +1,49 @@
-import pool from "../../../../../../lib/db";
+import pool from "../../../../../lib/db";
 import { NextResponse } from "next/server";
 
-//get a channel given the chatgroup id and the channel number
+//get channel's info and last 50 messages given the chatgroup id and the channel number
 export async function GET(request, { params }) {
   try {
     const par = await params;
-    const resp = await pool.query(
+    const channelinfo = await pool.query(
       "SELECT * FROM Channel WHERE Group_ID = $1 AND Channel_Num = $2",
       [par.groupid, par.channelnum]
     );
-    if (resp.rows.length === 0) {
+    if (channelinfo.rows.length === 0) {
       return NextResponse.json({ error: "channel not found" }, { status: 404 });
     }
-    return NextResponse.json(resp.rows[0], { status: 200 });
+    const channelmessages = await pool.query(
+      "SELECT * FROM Message WHERE Group_ID = $1 AND Channel_Num = $2 ORDER BY Time_Stamp DESC LIMIT 50",
+      [par.groupid, par.channelnum]
+    );
+    const resp = {
+      ...channelinfo.rows[0],
+      messages: channelmessages.rows.reverse(),
+    };
+    return NextResponse.json(resp, { status: 200 });
   } catch (err) {
     console.error("Error fetching channel:", err);
     return NextResponse.json(
       { error: "Failed to fetch channel" },
+      { status: 500 }
+    );
+  }
+}
+
+// Create a new message within a channel
+export async function POST(request, { params }) {
+  try {
+    const par = await params;
+    const { content, senderid, type } = await request.json();
+    const resp = await pool.query(
+      "INSERT INTO Message (Group_ID, Channel_Num, Content, Sender_ID, Type) VALUES ($1, $2, $3, $4, $5) RETURNING *",
+      [par.groupid, par.channelnum, content, senderid, type]
+    );
+    return NextResponse.json(resp.rows[0], { status: 201 });
+  } catch (error) {
+    console.error("Error creating message:", error);
+    return NextResponse.json(
+      { error: "Failed to create message" },
       { status: 500 }
     );
   }
