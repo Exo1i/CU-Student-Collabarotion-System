@@ -63,11 +63,12 @@ async function initializeDB() {
         Group_Name TEXT
       );
 
+      CREATE TYPE channel_access AS ENUM ('open', 'restricted');
       CREATE TABLE IF NOT EXISTS channel (
         Channel_Name TEXT,
         Channel_Num INT,
         Group_ID INT,
-        Channel_Type TEXT,
+        Channel_Type channel-access,
         PRIMARY KEY (Channel_Num, Group_ID),
         FOREIGN KEY (Group_ID) REFERENCES Chat_Group(Group_ID)
       );
