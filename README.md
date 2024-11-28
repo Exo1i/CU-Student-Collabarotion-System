@@ -1,32 +1,33 @@
 # 🚀 Learning Management System
 
-A modern, feature-rich learning management system built with Next.js, focusing on collaborative learning and project-based education.
+A modern, feature-rich learning management system built with Next.js, focusing on collaborative learning and
+project-based education.
 
 ## ✨ Features
 
 - **Authentication & User Management**
-  - Secure login and registration
-  - Password reset functionality
-  - Role-based access control (Student/Instructor/Admin)
-  - Profile management with badges
+    - Secure login and registration
+    - Password reset functionality
+    - Role-based access control (Student/Instructor/Admin)
+    - Profile management with badges
 
 - **Team Collaboration**
-  - Team formation and management
-  - Real-time chat integration
-  - Project phase tracking
-  - Peer review system
+    - Team formation and management
+    - Real-time chat integration
+    - Project phase tracking
+    - Peer review system
 
 - **Course Management**
-  - Course creation and enrollment
-  - Assignment submission
-  - Project management
-  - Progress tracking
+    - Course creation and enrollment
+    - Assignment submission
+    - Project management
+    - Progress tracking
 
 - **Communication**
-  - Real-time messaging
-  - Channel-based discussions
-  - File sharing capabilities
-  - Notification system
+    - Real-time messaging
+    - Channel-based discussions
+    - File sharing capabilities
+    - Notification system
 
 ## 🛠️ Tech Stack
 
@@ -38,6 +39,7 @@ A modern, feature-rich learning management system built with Next.js, focusing o
 ## 📋 API Endpoints
 
 ### Authentication
+
 ```
 POST /api/auth/login
 POST /api/auth/register
@@ -45,6 +47,7 @@ POST /api/auth/reset-password
 ```
 
 ### User Management
+
 ```
 GET /api/users/:id
 PATCH /api/users/:id
@@ -53,6 +56,7 @@ GET /api/users/:id/teams
 ```
 
 ### Teams & Projects
+
 ```
 POST /api/teams
 GET /api/teams/:id
@@ -96,7 +100,7 @@ GET /api/projects/:id/phases
     NEXTAUTH_SECRET=your_auth_secret
     NEXTAUTH_URL=http://localhost:3000
     ```  
-  
+
 
 5. **Set up the database**
    ```bash
@@ -111,6 +115,7 @@ GET /api/projects/:id/phases
    The application will be available at `http://localhost:3000`
 
 ## 🤝 Contributing
+
 1. Fork the repository
 2. Create a new branch (`git checkout -b feature/amazing-feature`)
 3. Commit your changes (`git commit -m 'Add amazing feature'`)
@@ -119,7 +124,7 @@ GET /api/projects/:id/phases
 
 ## 👥 Team
 
-Built with ❤️ by 
+Built with ❤️ by
 <table>
 <tr>
     <td align="center">
@@ -150,6 +155,6 @@ Built with ❤️ by
         </a><br />
         <sub>Backend Developer</sub>
     </td>
-   
+
 </tr>
 </table>
