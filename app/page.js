@@ -6,8 +6,8 @@ export default async function Home() {
   const resp = await fecthUser();
   console.log(resp);
   return (
-      <>
-          <LandingPage />
-      </>
+    <>
+      <LandingPage />
+    </>
   );
 }
