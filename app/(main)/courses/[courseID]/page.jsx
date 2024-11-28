@@ -1,10 +1,11 @@
-import { notFound } from "next/navigation";
-import { PaperClipIcon, UserGroupIcon } from "@heroicons/react/20/solid";
+import {notFound} from "next/navigation";
+import {PaperClipIcon, UserGroupIcon} from "@heroicons/react/20/solid";
 import Image from "next/image";
-import { CalendarIcon, ClockIcon } from "lucide-react";
-import CustomLink from "@/app/components/MycustemLink";
-export default async function CoursePage({ params }) {
-    const { courseID } = await params;
+import {CalendarIcon, ClockIcon} from "lucide-react";
+import CustomLink from "@/app/components/MyCustomLink";
+
+export default async function CoursePage({params}) {
+    const {courseID} = await params;
     const course = await getCourseById(courseID);
     if (!course) {
         return notFound();
@@ -13,7 +14,8 @@ export default async function CoursePage({ params }) {
     return (
         <div className="container mx-auto px-4 py-12 space-y-12">
             {/* Course Header */}
-            <div className="bg-gradient-to-br from-indigo-500 to-purple-600 text-white shadow-2xl rounded-3xl p-8 transition-all duration-300 hover:shadow-indigo-500/50">
+            <div
+                className="bg-gradient-to-br from-indigo-500 to-purple-600 text-white shadow-2xl rounded-3xl p-8 transition-all duration-300 hover:shadow-indigo-500/50">
                 <div className="flex flex-col md:flex-row items-center space-y-6 md:space-y-0 md:space-x-8">
                     {/* Course Image */}
                     <div className="w-full md:w-1/3 aspect-video relative overflow-hidden rounded-2xl shadow-lg">
@@ -82,7 +84,8 @@ export default async function CoursePage({ params }) {
                                         <PaperClipIcon className="h-5 w-5 mr-2" />
                                         Add Attachment
                                     </label>
-                                    <button className="px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-md transition-colors duration-300 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                                    <button
+                                        className="px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-md transition-colors duration-300 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
                                         Submit
                                     </button>
                                 </div>
@@ -103,7 +106,8 @@ export default async function CoursePage({ params }) {
                 <h2 className="text-3xl font-bold text-gray-800 mb-6">
                     Project
                 </h2>
-                <div className="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-100 transition-all duration-300 hover:shadow-xl hover:border-indigo-300">
+                <div
+                    className="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-100 transition-all duration-300 hover:shadow-xl hover:border-indigo-300">
                     <div className="p-8 space-y-6">
                         <h3 className="text-2xl font-semibold text-gray-900">
                             {course.project.projectName}
@@ -123,7 +127,7 @@ export default async function CoursePage({ params }) {
                                 End: {course.project.endDate}
                             </div>
                             <div className="flex items-center">
-                                <CustomLink href={`/courses/${course.id}/${course.project.projectId}`} >
+                                <CustomLink href={`/courses/${course.id}/${course.project.projectId}`}>
                                     see project teams
                                 </CustomLink>
                             </div>
@@ -134,7 +138,6 @@ export default async function CoursePage({ params }) {
         </div>
     );
 }
-
 
 
 function getCourseById(id) {

@@ -1,7 +1,7 @@
 import Link from "next/link";
-import { ArrowRight } from 'lucide-react';
+import {ArrowRight} from 'lucide-react';
 
-export default function CustomLink({ href, children }) {
+export default function CustomLink({href, children}) {
     return (
         <Link
             href={href}
@@ -10,7 +10,8 @@ export default function CustomLink({ href, children }) {
             <span className="border-b-2 border-transparent group-hover:border-indigo-600 transition-all duration-300">
                 {children}
             </span>
-            <ArrowRight className="w-4 h-4 transform translate-x-0 group-hover:translate-x-1 transition-transform duration-300" />
+            <ArrowRight
+                className="w-4 h-4 transform translate-x-0 group-hover:translate-x-1 transition-transform duration-300" />
         </Link>
     );
 }

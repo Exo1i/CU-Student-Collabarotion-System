@@ -1,10 +1,9 @@
-import { notFound } from "next/navigation";
-import { motion, AnimatePresence } from 'framer-motion'
+import {notFound} from "next/navigation";
 import ProjectTeamCard from "@/app/components/ProjectTeamCard";
 
 
-export default async function projectPage({ params }) {
-    const { projectID } = await params
+export default async function projectPage({params}) {
+    const {projectID} = await params
     const Teams = getTeams(projectID);
     if (!Teams) {
         return notFound();
