@@ -17,7 +17,16 @@ export async function GET(request, { params }) {
       [par.projectid]
     );
 
-    const resp = { ...projectinfo.rows[0], phases: projectphases.rows };
+    const projectteams = await pool.query(
+      "SELECT * FROM Team WHERE Project_ID = $1",
+      [par.projectid]
+    );
+
+    const resp = {
+      ...projectinfo.rows[0],
+      phases: projectphases.rows,
+      teams: projectteams.rows,
+    };
     return NextResponse.json(resp, { status: 200 });
   } catch (error) {
     console.error("Error fetching Project:", error);
