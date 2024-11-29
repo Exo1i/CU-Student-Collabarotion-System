@@ -1,7 +1,7 @@
 import pool from "@/lib/db";
 import { NextResponse } from "next/server";
 
-//get a Project and all its phases given its id
+//get a Project and all its phases and teams given its id
 export async function GET(request, { params }) {
   try {
     const par = await params;
