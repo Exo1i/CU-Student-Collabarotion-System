@@ -14,9 +14,21 @@ export async function POST(request) {
     const bodyText = await request.text();
     const body = JSON.parse(bodyText);
     const { course_code, course_name, instructor_ID, max_Grade } = body;
+
     if (!course_code) {
       return NextResponse.json(
         { error: "Course code is required" },
+        { status: 400 }
+      );
+    }
+
+    const instructorCheck = await pool.query(
+      "SELECT Role FROM Users WHERE User_ID = $1 AND Role = 'instructor'",
+      [instructor_ID]
+    );
+    if (instructorCheck.rows.length === 0) {
+      return NextResponse.json(
+        { error: "Instructor_ID must have the role of instructor" },
         { status: 400 }
       );
     }
