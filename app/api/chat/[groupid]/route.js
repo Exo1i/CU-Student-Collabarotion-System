@@ -53,7 +53,6 @@ export async function PUT(request, { params }) {
 export async function DELETE(request, { params }) {
   try {
     const par = await params;
-    await pool.query("DELETE FROM Channel WHERE Group_ID = $1", [par.groupid]);
     await pool.query("DELETE FROM Chat_Group WHERE Group_ID = $1", [
       par.groupid,
     ]);
