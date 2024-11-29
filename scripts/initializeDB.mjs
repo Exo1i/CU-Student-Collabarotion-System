@@ -1,9 +1,14 @@
-import pool from "../lib/db";
 import dotenv from "dotenv";
+import pkg from "pg";
 
-dotenv.config({ path: "./.env.local" });
+dotenv.config({path: "./.env.local"});
+const {Pool} = pkg;
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL, ssl: false, // Adjust based on your database settings
+});
 
-console.log("DATABASE_URL:", process.env.DATABASE_URL); // Verify this line is working
+
+console.log("DATABASE_URL:", process.env.DATABASE_URL);
 
 async function initializeDB() {
   try {
@@ -68,7 +73,7 @@ async function initializeDB() {
         Channel_Name TEXT,
         Channel_Num INT,
         Group_ID INT,
-        Channel_Type channel-access,
+        Channel_Type channel_access,
         PRIMARY KEY (Channel_Num, Group_ID),
         FOREIGN KEY (Group_ID) REFERENCES Chat_Group(Group_ID)
       );
