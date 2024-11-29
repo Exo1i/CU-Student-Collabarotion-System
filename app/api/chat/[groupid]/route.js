@@ -5,17 +5,22 @@ import { NextResponse } from "next/server";
 export async function GET(request, { params }) {
   try {
     const par = await params;
-    const resp = await pool.query(
+    const groupinfo = await pool.query(
       "SELECT * FROM Chat_Group WHERE Group_ID = $1",
       [par.groupid]
     );
-    if (resp.rows.length === 0) {
+    if (groupinfo.rows.length === 0) {
       return NextResponse.json(
         { error: "Chatgroup not found" },
         { status: 404 }
       );
     }
-    return NextResponse.json(resp.rows[0], { status: 200 });
+    const groupchannels = await pool.query(
+      "SELECT * FROM channel WHERE Group_ID = $1",
+      [par.groupid]
+    );
+    const resp = { ...groupinfo.rows[0], channels: groupchannels.rows };
+    return NextResponse.json(resp, { status: 200 });
   } catch (err) {
     console.error("Error fetching chatgroup:", err);
     return NextResponse.json(
@@ -48,14 +53,37 @@ export async function PUT(request, { params }) {
 export async function DELETE(request, { params }) {
   try {
     const par = await params;
+    await pool.query("DELETE FROM Channel WHERE Group_ID = $1", [par.groupid]);
     await pool.query("DELETE FROM Chat_Group WHERE Group_ID = $1", [
       par.groupid,
     ]);
-    return NextResponse.json({ message: "Chatgroup deleted" }, { status: 200 });
+    return NextResponse.json(
+      { message: "Chatgroup and its channels deleted" },
+      { status: 200 }
+    );
   } catch (err) {
     console.error("Error deleting chatgroup: ", err);
     return NextResponse.json(
       { error: "Failed to delete chatgroup" },
+      { status: 500 }
+    );
+  }
+}
+
+//create a new channel in a chatgroup
+export async function POST(request, { params }) {
+  try {
+    const par = await params;
+    const { channelnum, name, type } = await request.json();
+
+    await pool.query(
+      "INSERT INTO Channel (Channel_Name, Channel_Num, Group_ID, Channel_Type) VALUES ($1, $2, $3, $4)",
+      [name, channelnum, par.groupid, type]
+    );
+    return NextResponse.json({ message: "Channel created" }, { status: 201 });
+  } catch (error) {
+    return NextResponse.json(
+      { error: "Failed to create channel" },
       { status: 500 }
     );
   }
