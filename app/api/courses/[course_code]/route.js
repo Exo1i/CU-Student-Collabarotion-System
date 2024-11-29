@@ -17,7 +17,16 @@ export async function GET(request, { params }) {
       [par.course_code]
     );
 
-    const resp = { ...couseinfo.rows[0], proects: courseprojects.rows };
+    const courseassignments = await pool.query(
+      "SELECT * FROM Assignment WHERE course_code = $1",
+      [par.course_code]
+    );
+
+    const resp = {
+      ...couseinfo.rows[0],
+      proects: courseprojects.rows,
+      assignments: courseassignments.rows,
+    };
     return NextResponse.json(resp, { status: 200 });
   } catch (error) {
     console.error("Error fetching course:", error);
