@@ -51,7 +51,7 @@ async function initializeDB() {
         Project_ID SERIAL PRIMARY KEY,
         Project_Name TEXT NOT NULL,
         Course_Code VARCHAR(10),
-        Start_Date DATE,
+        Start_Date DATE default CURRENT_DATE,
         End_Date DATE,
         Description TEXT,
         Max_team_size INTEGER,
