@@ -1,17 +1,24 @@
 import pool from "../../../../lib/db";
 import { NextResponse } from "next/server";
 
-//get a course given course code
+//get a course and its projects given course code
 export async function GET(request, { params }) {
   try {
     const par = await params;
-    const resp = await pool.query(
+    const couseinfo = await pool.query(
       "SELECT * FROM Course WHERE Course_Code = $1",
       [par.course_code]
     );
-    if (resp.rowCount === 0)
+    if (couseinfo.rowCount === 0)
       return NextResponse.json("Course not found", { status: 404 });
-    return NextResponse.json(resp.rows[0], { status: 200 });
+
+    const courseprojects = await pool.query(
+      "SELECT * FROM Project WHERE Course_Code = $1",
+      [par.course_code]
+    );
+
+    const resp = { ...couseinfo.rows[0], proects: courseprojects.rows };
+    return NextResponse.json(resp, { status: 200 });
   } catch (error) {
     console.error("Error fetching course:", error);
     return NextResponse.json(
