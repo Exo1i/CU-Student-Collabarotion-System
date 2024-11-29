@@ -5,6 +5,17 @@ import { NextResponse } from "next/server";
 export async function GET(request, { params }) {
   try {
     const par = await params;
+    const req = await request;
+    const url = new URL(req.url);
+    const startDate = url.searchParams.get("startDate");
+    const endDate = url.searchParams.get("endDate");
+    console.log("Received Parameters: ", {
+      groupid: par.groupid,
+      channelnum: par.channelnum,
+      startDate,
+      endDate,
+    });
+
     const channelinfo = await pool.query(
       "SELECT * FROM Channel WHERE Group_ID = $1 AND Channel_Num = $2",
       [par.groupid, par.channelnum]
@@ -12,10 +23,26 @@ export async function GET(request, { params }) {
     if (channelinfo.rows.length === 0) {
       return NextResponse.json({ error: "channel not found" }, { status: 404 });
     }
-    const channelmessages = await pool.query(
-      "SELECT * FROM Message WHERE Group_ID = $1 AND Channel_Num = $2 ORDER BY Time_Stamp DESC LIMIT 50",
-      [par.groupid, par.channelnum]
-    );
+
+    let channelmessages;
+    if (startDate && endDate) {
+      channelmessages = await pool.query(
+        "SELECT * FROM Message WHERE Group_ID = $1 AND Channel_Num = $2 AND Time_Stamp >= $3 AND Time_Stamp <= $4 ORDER BY Time_Stamp DESC",
+        [par.groupid, par.channelnum, startDate, endDate]
+      );
+      console.log("Running Date Range Query: ", {
+        groupid: par.groupid,
+        channelnum: par.channelnum,
+        startdate: req.startDate,
+        enddate: req.endDate,
+      });
+    } else {
+      channelmessages = await pool.query(
+        "SELECT * FROM Message WHERE Group_ID = $1 AND Channel_Num = $2 ORDER BY Time_Stamp DESC LIMIT 50",
+        [par.groupid, par.channelnum]
+      );
+      console.log("Running Default Query");
+    }
     const resp = {
       ...channelinfo.rows[0],
       messages: channelmessages.rows.reverse(),
