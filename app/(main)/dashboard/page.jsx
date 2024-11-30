@@ -1,5 +1,4 @@
+"use client";
 export default function Page() {
-    return (<>
-        Hello World
-    </>);
+  return <>Hello World</>;
 }
