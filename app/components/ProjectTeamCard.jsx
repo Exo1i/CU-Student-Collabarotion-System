@@ -1,17 +1,19 @@
 'use client'
 
-import {useState} from 'react'
-import {AnimatePresence, motion} from 'framer-motion'
-import {Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle} from "@/components/ui/card"
-import {CheckCircle, ChevronDown, ChevronUp, Crown, Send, XCircle} from 'lucide-react'
-import {Avatar, AvatarFallback, AvatarImage} from "@/components/ui/avatar"
-import {Badge} from "@/components/ui/badge"
-import {Button} from "@/components/ui/button"
-import {Progress} from "@/components/ui/progress"
-import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from "@/components/ui/tooltip"
+import { useState } from 'react'
+import { AnimatePresence, motion } from 'framer-motion'
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { CheckCircle, ChevronDown, ChevronUp, Crown, Send, XCircle } from 'lucide-react'
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import { Progress } from "@/components/ui/progress"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import CustomLink from './MyCustomLink'
+import { usePathname } from 'next/navigation'
 
-export default function ProjectTeamCard({Team}) {
+export default function ProjectTeamCard({ Team }) {
+    const currentRoute = usePathname();
     const [joinReq, setjoinReq] = useState(false);
     const [isExpanded, setIsExpanded] = useState(false);
 
@@ -28,6 +30,11 @@ export default function ProjectTeamCard({Team}) {
                 <CardDescription className="text-purple-100 text-center">
                     {Team.description}
                 </CardDescription>
+                <div className="text-center">
+                    <CustomLink className="text-center" href={`${currentRoute}/phases`}>
+                        View phases
+                    </CustomLink>
+                </div>
             </CardHeader>
             <CardContent className="p-6 lg-w-full">
                 <div className="flex flex-col sm:flex-row justify-between items-center gap-6">
@@ -74,8 +81,8 @@ export default function ProjectTeamCard({Team}) {
                         <Tooltip>
                             <TooltipTrigger>
                                 <motion.div
-                                    whileHover={{scale: 1.1}}
-                                    whileTap={{scale: 0.9}}
+                                    whileHover={{ scale: 1.1 }}
+                                    whileTap={{ scale: 0.9 }}
                                     className="relative"
                                 >
                                     <Avatar className="w-12 h-12">
@@ -109,10 +116,10 @@ export default function ProjectTeamCard({Team}) {
             </CardContent>
             <AnimatePresence>
                 {isExpanded && (<motion.div
-                    initial={{opacity: 0, height: 0}}
-                    animate={{opacity: 1, height: 'auto'}}
-                    exit={{opacity: 0, height: 0}}
-                    transition={{duration: 0.3}}
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: 'auto' }}
+                    exit={{ opacity: 0, height: 0 }}
+                    transition={{ duration: 0.3 }}
                 >
                     <CardFooter className="flex flex-col gap-4 p-6 bg-gray-50">
                         {Team.members.map((member) => (
@@ -126,9 +133,9 @@ export default function ProjectTeamCard({Team}) {
                                         <p className="font-semibold">{member.name}</p>
                                         <p className="text-sm text-gray-500">
                                             {member.role === 'leader' ? (<span className="flex items-center">
-                                                        <Crown className="w-4 h-4 text-yellow-500 mr-1" />
-                                                        Team Leader
-                                                    </span>) : member.role}
+                                                <Crown className="w-4 h-4 text-yellow-500 mr-1" />
+                                                Team Leader
+                                            </span>) : member.role}
                                         </p>
                                     </div>
                                 </div>
