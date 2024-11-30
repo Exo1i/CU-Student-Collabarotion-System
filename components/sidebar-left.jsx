@@ -47,7 +47,7 @@ const data = {
     {
       title: "Teachers",
       url: "/",
-      icon: armchair,
+      icon: Armchair,
       isActive: true,
     },
     {
