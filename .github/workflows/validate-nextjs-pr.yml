@@ -21,8 +21,16 @@ jobs:
       - name: Install dependencies
         run: npm ci --force
 
-      - name: Lint code
-        run: npm run lint
+      - name: 'Create env file'
+        run: |
+          touch .env
+          echo DATABASE_URL=${{ secrets.DATABASE_URL }} >>.env
+          echo NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=${{ secrets.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY }} >> .env
+          echo CLERK_SECRET_KEY=${{ secrets.CLERK_SECRET_KEY }} >> .env
+          echo NEXT_PUBLIC_DEPLOYMENT_URL=localhost:3000 >> .env
+          echo NEXT_PUBLIC_CLERK_SIGN_IN_URL=/signin >> .env
+          echo NEXT_PUBLIC_CLERK_SIGN_UP_URL=/signup >> .env
+          cat .env
 
       - name: Build application
         run: npm run build

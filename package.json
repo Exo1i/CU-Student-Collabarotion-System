@@ -6,7 +6,11 @@
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "clearDBState": "node ./scripts/cleardata.mjs",
+    "insertSampleData": "node ./scripts/sampledata.mjs",
+    "wipeDB": "node ./scripts/deleteDB.mjs",
+    "initializeDB": "node ./scripts/initializeDB.mjs"
   },
   "dependencies": {
     "@clerk/nextjs": "^6.5.1",

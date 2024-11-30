@@ -1,17 +1,33 @@
 import pool from "../../../../lib/db";
 import { NextResponse } from "next/server";
 
-//get a course given course code
+//get a course and its projects given course code
 export async function GET(request, { params }) {
   try {
     const par = await params;
-    const resp = await pool.query(
+    const couseinfo = await pool.query(
       "SELECT * FROM Course WHERE Course_Code = $1",
       [par.course_code]
     );
-    if (resp.rowCount === 0)
+    if (couseinfo.rowCount === 0)
       return NextResponse.json("Course not found", { status: 404 });
-    return NextResponse.json(resp.rows[0], { status: 200 });
+
+    const courseprojects = await pool.query(
+      "SELECT * FROM Project WHERE Course_Code = $1",
+      [par.course_code]
+    );
+
+    const courseassignments = await pool.query(
+      "SELECT * FROM Assignment WHERE course_code = $1",
+      [par.course_code]
+    );
+
+    const resp = {
+      ...couseinfo.rows[0],
+      proects: courseprojects.rows,
+      assignments: courseassignments.rows,
+    };
+    return NextResponse.json(resp, { status: 200 });
   } catch (error) {
     console.error("Error fetching course:", error);
     return NextResponse.json(
@@ -28,7 +44,7 @@ export async function DELETE(request, { params }) {
     const resp = await pool.query("DELETE FROM Course WHERE Course_Code = $1", [
       par.course_code,
     ]);
-    return resp.json("Course deleted successfully", { status: 200 });
+    return NextResponse.json("Course deleted successfully", { status: 200 });
   } catch (error) {
     console.error("Error deleting course: ", error);
     return NextResponse.json(
@@ -43,6 +59,18 @@ export async function PUT(request, { params }) {
   try {
     const par = await params;
     const { name, instructor, grade } = await request.json();
+
+    const instructorCheck = await pool.query(
+      "SELECT Role FROM Users WHERE User_ID = $1 AND Role = 'instructor'",
+      [instructor]
+    );
+    if (instructorCheck.rows.length === 0) {
+      return NextResponse.json(
+        { error: "Instructor_ID must have the role of instructor" },
+        { status: 400 }
+      );
+    }
+
     await pool.query(
       "UPDATE Course SET Course_Name = $1, Instructor_ID = $2, max_Grade = $3 WHERE Course_Code = $4",
       [name, instructor, grade, par.course_code]
