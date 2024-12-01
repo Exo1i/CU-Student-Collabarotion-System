@@ -55,6 +55,7 @@ async function initializeDB() {
         End_Date DATE,
         Description TEXT,
         Max_team_size INTEGER,
+        max_grade INTEGER,
         FOREIGN KEY (Course_Code) REFERENCES Course(Course_Code) ON DELETE SET NULL
       );
     `);
