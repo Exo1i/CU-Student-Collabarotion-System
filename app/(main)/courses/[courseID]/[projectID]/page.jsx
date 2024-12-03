@@ -1,10 +1,22 @@
-import {notFound} from "next/navigation";
+import { notFound } from "next/navigation";
 import ProjectTeamCard from "@/app/components/ProjectTeamCard";
 
 
-export default async function projectPage({params}) {
-    const {projectID} = await params
+export default async function projectPage({ params }) {
+    const { projectID } = await params
     const Teams = getTeams(projectID);
+    let Testproject = null;
+    try {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/projects/${projectID}`);
+        if (!res.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        Testproject = await res.json();
+        console.log(Testproject)
+    } catch (err) {
+        console.log(err);
+        // return <div>Error loading course. Please try again later.</div>;
+    }
     if (!Teams) {
         return notFound();
     }

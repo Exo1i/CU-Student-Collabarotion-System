@@ -13,12 +13,6 @@ import { CalendarIcon, UsersIcon, ClockIcon, CheckCircleIcon, CodeIcon, RocketIc
 
 export default function ProjectPhasesPage({ params }) {
     const [projectID, setProjectID] = useState(null);
-    const [project, setProject] = useState({ phases: [] });
-    const [progress, setProgress] = useState(0);
-    const [submittedphases, setsubmittedphases] = useState([]);
-    function handellersubmitted(phasenum) {
-        setsubmittedphases(prev => [...prev, phasenum]);
-    }
     useEffect(() => {
         params.then(((resolvedparams) => {
             setProjectID(resolvedparams.projectID);
@@ -26,11 +20,52 @@ export default function ProjectPhasesPage({ params }) {
             setProject(getProject(projectID)
             ))
     }, [params, projectID])
+    const [Testproject, setTestproject] = useState(null);
+    const [Loading, setLoading] = useState(false);
+    const [error, seterror] = useState(null);
+    // useEffect(() => {
+    //     async function fetchprojectdata() {
+    //         if (!projectID) return;
+    //         console.log(projectID);
+    //         try {
+    //             const res = await fetch('http://localhost:3000/api/projects/1');
+    //             if (!res.ok) {
+    //                 throw new Error(`HTTP error! status: ${response.status}`);
+    //             }
+    //             let data = await res.json();
+    //             console.log(res);
+    //             console.log(data);
+    //             setTestproject(data)
+    //             seterror(null);
+    //         } catch (err) {
+    //             console.log(err);
+    //             seterror(err);
+    //             setTestproject(null);
+    //             // return <div>Error loading course. Please try again later.</div>;
+    //         } finally {
+    //             setLoading(false);
+    //         }
+    //     }
+    //     fetchprojectdata();
+    //     console.log(Testproject)
+    // }, [projectID])
+    const [project, setProject] = useState({ phases: [] });
+    const [progress, setProgress] = useState(0);
+    const [submittedphases, setsubmittedphases] = useState([]);
+    function handellersubmitted(phasenum) {
+        setsubmittedphases(prev => [...prev, phasenum]);
+    }
     useEffect(() => {
         const completedload = project.phases.filter(phase => submittedphases.includes(phase.phaseNumber))
             .reduce((sum, phase) => sum + phase.phaseLoad, 0)
         setProgress(completedload);
     }, [submittedphases])
+    if (Loading) {
+        return <div>Loading...</div>
+    }
+    if (error) {
+        return <div>Error: {error.message}</div>;
+    }
     if (!projectID || !project) {
         return <div>Loading...</div>;
     } else {

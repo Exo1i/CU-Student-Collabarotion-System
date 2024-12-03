@@ -27,9 +27,6 @@ export default function ProjectTeamCard({ Team }) {
                 <CardTitle className="text-2xl text-center font-bold">
                     {Team.name}
                 </CardTitle>
-                <CardDescription className="text-purple-100 text-center">
-                    {Team.description}
-                </CardDescription>
                 <div className="text-center">
                     <CustomLink className="text-center" href={`${currentRoute}/phases`}>
                         View phases
