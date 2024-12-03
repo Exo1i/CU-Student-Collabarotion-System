@@ -10,9 +10,10 @@ import {Input} from "@/components/ui/input";
 import Image from "next/image";
 import {useEffect, useState} from "react";
 import VerifyingEmailView from "@/app/(auth)/signup/VerifyingEmailView";
+import {Checkbox} from "@/components/ui/checkbox";
 
 const formSchema = z.object({
-    username: z.string().min(2, {message: "Username must be at least 2 characters."}),
+    username: z.string().min(2, {message: "Username must be at least 4 characters."}),
     firstName: z.string().min(1, {message: "First name is required."}),
     lastName: z.string().min(1, {message: "Last name is required."}),
     emailAddress: z.string().email({message: "Invalid email address."}),
@@ -21,7 +22,7 @@ const formSchema = z.object({
 
 export default function SignInPage() {
 
-
+    const [isInstructor, setIsInstructor] = useState(false)
     const {isLoaded, signUp, setActive} = useSignUp();
     const [clerkError, setClerkError] = useState("");
     const router = useRouter();
@@ -68,7 +69,6 @@ export default function SignInPage() {
                 await signUp.prepareVerification({strategy: "email_code"}).then(() => {
                     setWaitingForCode(true);
                 });
-
             } else {
                 setClerkError(resp.errors?.[0]?.message || "Something went wrong.");
             }
@@ -77,7 +77,8 @@ export default function SignInPage() {
         }
     }
 
-    return (isWaitingForCode ? <VerifyingEmailView signUp={signUp} /> :
+    return (isWaitingForCode ?
+            <VerifyingEmailView signUp={signUp} isInstructor={isInstructor} setActive={setActive} /> :
             <div className="flex flex-col justify-center items-center h-screen w-screen">
                 <div className="text-3xl font-bold text-center">Sign Up</div>
                 <div className="flex flex-row items-center justify-center">
@@ -151,18 +152,47 @@ export default function SignInPage() {
                                         </FormItem>
                                     )}
                                 />
-                                <FormField
-                                    control={signUpform.control}
-                                    name="password"
-                                    render={({field}) => (
-                                        <FormItem>
-                                            <FormLabel>Password</FormLabel>
-                                            <FormControl>
-                                                <Input {...field} autoComplete="new-password" />
-                                            </FormControl>
-                                        </FormItem>
-                                    )}
-                                />
+                                <div className={"flex flex-row items-center justify-between"}>
+                                    <FormField
+                                        control={signUpform.control}
+                                        name="password"
+                                        render={({field}) => (
+                                            <FormItem>
+                                                <FormLabel>Password</FormLabel>
+                                                <FormControl>
+                                                    <Input {...field} autoComplete="new-password" />
+                                                </FormControl>
+                                            </FormItem>
+                                        )}
+                                    />
+
+                                    <FormField
+                                        control={signUpform.control}
+                                        name="mobile"
+                                        render={({field}) => (
+                                            <FormItem
+                                                className="flex flex-col space-x-3 space-y-0  p-4">
+                                                <FormLabel>Instructor</FormLabel>
+                                                <div className="flex flex-row space-x-3 space-y-0  p-4">
+                                                    <FormControl>
+                                                        <Checkbox
+                                                            checked={isInstructor}
+                                                            onCheckedChange={(val) => {
+                                                                setIsInstructor(val)
+                                                            }}
+                                                        />
+                                                    </FormControl>
+                                                    <div className="space-y-1 leading-none">
+                                                        <FormLabel>
+                                                            Yes, I am an instructor
+                                                        </FormLabel>
+                                                    </div>
+                                                </div>
+                                            </FormItem>
+                                        )}
+                                    />
+
+                                </div>
                                 {clerkError && <p className="text-red-500 text-sm">{clerkError}</p>}
                                 <Button type="submit">Create Account</Button>
                             </form>
