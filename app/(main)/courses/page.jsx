@@ -1,11 +1,11 @@
 'use client'
 
-import {useState} from 'react'
-import {Card, CardContent, CardFooter, CardHeader} from "@/components/ui/card"
-import {Button} from "@/components/ui/button"
+import { useEffect, useState } from 'react'
+import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
 import Image from "next/image"
 import Link from "next/link"
-import {motion} from 'framer-motion'
+import { motion } from 'framer-motion'
 
 const courses = [
     {
@@ -40,24 +40,52 @@ export default function CoursesPage() {
 
 
     const [filter, setFilter] = useState("All")
+    const [Testcourses , setcourses] = useState(null);
+    const [error, seterror] = useState(null);
+    const [loading, setloading] = useState(true);
     const filterdCourses = filter === "All" ? courses : courses.filter(course => course.category === filter);
-
+    useEffect(() => {
+        async function fetchCourseData() {
+            try {
+                let res = await fetch("/api/courses");
+                if (!res.ok) {
+                    throw new Error(`Failed to fetch: ${res.status} ${res.statusText}`)
+                }
+                let Testcourses = await res.json();
+                setcourses(Testcourses);
+                seterror(null);
+            } catch (error) {
+                seterror(error);
+                setcourses(null)
+            } finally {
+                setloading(false);
+            }
+        }
+        fetchCourseData();
+        console.log(Testcourses)
+    }, [])
+    if (loading) {
+        return <div>Loading...</div>
+    }
+    if (error) {
+        return <div>Error: {error}</div>; 
+    }
     return (
         <div className="container mx-auto py-12 px-4">
             <motion.h1
                 className="text-4xl font-bold text-center mb-8 bg-gradient-to-r from-blue-600 to-purple-600 text-transparent bg-clip-text"
-                initial={{opacity: 0, y: -20}}
-                animate={{opacity: 1, y: 0}}
-                transition={{duration: 0.5}}
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5 }}
             >
                 Discover Our Courses
             </motion.h1>
 
             <motion.div
                 className="flex justify-center space-x-4 mb-8"
-                initial={{opacity: 0, y: 20}}
-                animate={{opacity: 1, y: 0}}
-                transition={{duration: 0.5, delay: 0.2}}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.2 }}
             >
                 {categories.map((category) => (
                     <Button
@@ -73,18 +101,18 @@ export default function CoursesPage() {
 
             <motion.div
                 className="grid grid-cols-1 sm:grid-cols-2 gap-8"
-                initial={{opacity: 0}}
-                animate={{opacity: 1}}
-                transition={{duration: 0.5, delay: 0.4}}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.5, delay: 0.4 }}
             >
                 {filterdCourses.map((course) => (
                     <motion.div
                         key={course.id}
                         layout
-                        initial={{opacity: 0, scale: 0.9}}
-                        animate={{opacity: 1, scale: 1}}
-                        exit={{opacity: 0, scale: 0.9}}
-                        transition={{duration: 0.3}}
+                        initial={{ opacity: 0, scale: 0.9 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0, scale: 0.9 }}
+                        transition={{ duration: 0.3 }}
                     >
                         <Card
                             className="group overflow-hidden bg-white dark:bg-gray-800 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 ease-in-out transform hover:-translate-y-2">
@@ -115,14 +143,14 @@ export default function CoursesPage() {
                                     />
                                     <span
                                         className="text-sm font-semibold text-gray-700 dark:text-gray-300 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors duration-300">
-                    {course.instructorName}
-                  </span>
+                                        {course.instructorName}
+                                    </span>
                                 </div>
                             </CardContent>
 
                             <CardFooter className="p-6 pt-0">
                                 <Button asChild
-                                        className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white transition-all duration-300 ease-in-out transform hover:scale-105">
+                                    className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white transition-all duration-300 ease-in-out transform hover:scale-105">
                                     <Link href={`/courses/${course.id}`}>
                                         View Course
                                     </Link>
