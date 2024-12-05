@@ -39,7 +39,9 @@ async function initializeDB() {
       CREATE TABLE IF NOT EXISTS Course (
         Course_Code VARCHAR(10) PRIMARY KEY,
         Course_Name TEXT NOT NULL,
-        Instructor_ID VARCHAR(32),
+        Course_img TEXT 
+        course_description TEXT
+        Instructor_ID VARCHAR(32) unique,
         max_Grade INTEGER NOT NULL,
         FOREIGN KEY (Instructor_ID) REFERENCES Users (User_ID) ON DELETE SET NULL
       );
@@ -50,7 +52,7 @@ async function initializeDB() {
       CREATE TABLE IF NOT EXISTS Project (
         Project_ID SERIAL PRIMARY KEY,
         Project_Name TEXT NOT NULL,
-        Course_Code VARCHAR(10),
+        Course_Code VARCHAR(10) unique,
         Start_Date DATE default CURRENT_DATE,
         End_Date DATE,
         Description TEXT,
