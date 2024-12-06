@@ -12,6 +12,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { addProject } from "@/actions/add-project";
 
 const CreateProjectProps = {
   onCreateProject: (project) => {},
@@ -24,6 +25,7 @@ export default function CreateProject(onCreateProject) {
     description: "",
     teamSize: 1,
     grade: 0,
+    startDate: "",
     dueDate: "",
   });
 
@@ -35,12 +37,22 @@ export default function CreateProject(onCreateProject) {
   const handleSubmit = (e) => {
     e.preventDefault();
     onCreateProject(project);
+    addProject(
+      1,
+      project.name,
+      project.startDate,
+      project.dueDate,
+      project.description,
+      project.teamSize,
+      project.grade
+    );
     // Reset form after submission
     setProject({
       name: "",
       description: "",
       teamSize: 1,
       grade: 0,
+      startDate: "",
       dueDate: "",
     });
     setIsOpen(false);
@@ -99,6 +111,17 @@ export default function CreateProject(onCreateProject) {
                 onChange={handleChange}
                 min="0"
                 max="100"
+                required
+              />
+            </div>
+            <div className="grid grid-cols-3 items-center gap-4">
+              <Label htmlFor="deadLine">Start Date</Label>
+              <Input
+                id="startDate"
+                name="startDate"
+                type="date"
+                value={project.startDate}
+                onChange={handleChange}
                 required
               />
             </div>
