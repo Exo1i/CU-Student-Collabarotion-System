@@ -5,7 +5,7 @@ dotenv.config({ path: "./.env.local" });
 const { Pool } = pkg;
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
-  ssl: false,
+  ssl: false, // Adjust based on your database settings
 });
 
 console.log("DATABASE_URL:", process.env.DATABASE_URL);
@@ -23,15 +23,15 @@ async function insertSampleData() {
 
     // Insert sample data into Course table
     await pool.query(`
-      INSERT INTO Course (Course_Code, Course_Name, Instructor_ID, max_Grade) VALUES 
-      ('CMP2020', 'Computer Science 101', 'user001', 100);
+      INSERT INTO Course (Course_Code, Course_Name, Course_img, course_description, Instructor_ID, max_Grade) VALUES 
+      ('CMP2020', 'Computer Science 101', 'img_url', 'Introduction to Computer Science', 'user001', 100);
     `);
     console.log("Sample data inserted into Course table");
 
     // Insert sample data into Project table
     await pool.query(`
-      INSERT INTO Project (Project_Name, Course_Code, Start_Date, End_Date, Description, Max_team_size) VALUES 
-      ('Project Alpha', 'CMP2020', '2024-01-01', '2024-03-01', 'Introduction to Algorithms', 4);
+      INSERT INTO Project (Project_Name, Course_Code, Start_Date, End_Date, Description, Max_team_size, max_grade) VALUES 
+      ('Project Alpha', 'CMP2020', '2024-01-01', '2024-03-01', 'Introduction to Algorithms', 4, 100);
     `);
     console.log("Sample data inserted into Project table");
 
@@ -59,13 +59,13 @@ async function insertSampleData() {
     `);
     console.log("Sample data inserted into Chat_Group table");
 
-    // Insert sample data into channel table
+    // Insert sample data into Channel table
     await pool.query(`
-      INSERT INTO channel (Channel_Name, Channel_Num, Group_ID, Channel_Type) VALUES 
+      INSERT INTO Channel (Channel_Name, Channel_Num, Group_ID, Channel_Type) VALUES 
       ('General', 1, 1, 'open'),
       ('Random', 2, 1, 'open');
     `);
-    console.log("Sample data inserted into channel table");
+    console.log("Sample data inserted into Channel table");
 
     // Insert sample data into Message table
     await pool.query(`
@@ -85,7 +85,8 @@ async function insertSampleData() {
     // Insert sample data into Submission table
     await pool.query(`
       INSERT INTO Submission (Type, Student_ID, Grade, Submission_date) VALUES 
-      ('phase', 'user002', 90, '2024-01-18');
+      ('phase', 'user002', 90, '2024-01-18'),
+      ('assignment', 'user002', 85, '2024-01-20');
     `);
     console.log("Sample data inserted into Submission table");
 
@@ -107,8 +108,8 @@ async function insertSampleData() {
     // Insert sample data into participation table
     await pool.query(`
       INSERT INTO participation (student_ID, Project_ID, Team_Num, Leader) VALUES 
-      ('user002', 1, 1, true),
-      ('user003', 1, 1, false);
+      ('user002', 1, 1, TRUE),
+      ('user003', 1, 1, FALSE);
     `);
     console.log("Sample data inserted into participation table");
 
@@ -151,7 +152,7 @@ async function insertSampleData() {
     // Insert sample data into AssignmentSubmission table
     await pool.query(`
       INSERT INTO AssignmentSubmission (Submission_ID, Assignment_ID) VALUES 
-      (1, 1);
+      (2, 1); -- Ensure this is a submission of type 'assignment'
     `);
     console.log("Sample data inserted into AssignmentSubmission table");
 
