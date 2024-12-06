@@ -1,31 +1,41 @@
+
 import { notFound } from "next/navigation";
 import ProjectTeamCard from "@/app/components/ProjectTeamCard";
-
+import CreateTeamButton from "@/app/components/CreateTeamButtom";
 
 export default async function projectPage({ params }) {
     const { projectID } = await params
-    const Teams = getTeams(projectID);
+    const project = getTeams(projectID);;
+    const Teams = project.teams;
     let Testproject = null;
-    try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/projects/${projectID}`);
-        if (!res.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        Testproject = await res.json();
-        console.log(Testproject)
-    } catch (err) {
-        console.log(err);
-        // return <div>Error loading course. Please try again later.</div>;
-    }
+    // try {
+    //     const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/projects/${projectID}`);
+    //     if (!res.ok) {
+    //         throw new Error(`HTTP error! status: ${response.status}`);
+    //     }
+    //     Testproject = await res.json();
+    //     console.log(Testproject)
+    // } catch (err) {
+    //     console.log(err);
+    //     // return <div>Error loading course. Please try again later.</div>;
+    // }
     if (!Teams) {
         return notFound();
     }
     return (
-        <div className="grid grid-cols-1 gap-8">
-            {Teams.map((team) => (
-                <ProjectTeamCard key={team.name} Team={team} />
-            ))}
+
+        <div className="container mx-auto px-4 py-8">
+            {Teams.length < parseInt(project.maxSize) ? <div className="flex justify-between items-center mb-8">
+                <h1 className="text-3xl font-bold">Project Teams</h1>
+                <CreateTeamButton projectID={projectID} TeamNum={Teams.length + 1} />
+            </div> : null}
+            <div className="grid grid-cols-1 gap-8">
+                {Teams.map((team) => (
+                    <ProjectTeamCard key={team.name} Team={team} />
+                ))}
+            </div>
         </div>
+        // add Buttom "create team" when click it pop-up appear include input to take team name and buttom to create then pop-up if created successfully or error 
     )
 }
 
@@ -178,6 +188,6 @@ function getTeams(projectID) {
     const project = projects.find(project => project.id === projectID);
 
     // If project is found, return its teams, else return an empty array
-    return project ? project.teams : [];
+    return project;
 }
 
