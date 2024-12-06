@@ -5,16 +5,20 @@ export async function GET(request, { params }) {
   try {
     const par = await params;
     const teams = await pool.query(
-      ` SELECT t.Team_Num, t.Team_Name, t.Project_ID, pr.project_name
+      ` SELECT t.Team_Num, t.Team_Name, t.Project_ID, pr.project_name, pr.course_code
         FROM participation p
         join Team t on p.Project_ID = t.Project_ID AND p.Team_Num = t.Team_Num
-        join project pr on pr.project_id = p.project_id
+        join project pr on pr.project_id = p.project_id       
         WHERE p.student_ID = $1;
        `,
       [par.studentid]
     );
 
     for (const team of teams.rows) {
+      const course = await pool.query(
+        `select course_name from course where course_code = $1`,
+        [team.course_code]
+      );
       const teamMembers = await pool.query(
         ` SELECT u.User_ID AS member_id, u.fname AS member_fname, u.lname AS member_lname
           FROM participation ppart
@@ -41,6 +45,7 @@ export async function GET(request, { params }) {
          `,
         [team.project_id, teamLeader.rows[0].leader_id]
       );
+      team.course = course.rows[0].course_name;
       team.members = teamMembers.rows;
       team.leader = teamLeader.rows[0];
       team.progress = teamProgress.rows[0].progress;
