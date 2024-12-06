@@ -39,8 +39,8 @@ async function initializeDB() {
       CREATE TABLE IF NOT EXISTS Course (
         Course_Code VARCHAR(10) PRIMARY KEY,
         Course_Name TEXT NOT NULL,
-        Course_img TEXT 
-        course_description TEXT
+        Course_img TEXT, 
+        course_description TEXT,
         Instructor_ID VARCHAR(32) unique,
         max_Grade INTEGER NOT NULL,
         FOREIGN KEY (Instructor_ID) REFERENCES Users (User_ID) ON DELETE SET NULL
