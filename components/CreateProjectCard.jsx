@@ -34,19 +34,40 @@ export default function CreateProject(onCreateProject) {
     setProject((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    onCreateProject(project);
-    addProject(
-      1,
-      project.name,
-      project.startDate,
-      project.dueDate,
-      project.description,
-      project.teamSize,
-      project.grade
-    );
+    // onCreateProject(project);
+    // try {
+    //   const result = await addProject(
+    //     project.name,
+    //     project.startDate,
+    //     project.dueDate,
+    //     project.description,
+    //     project.teamSize,
+    //     project.grade
+    //   );
+    // } catch (e) {
+    //   console.log("💥💥", e);
+    // }
     // Reset form after submission
+
+    try {
+      const response = await fetch("/api/add-project", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(project),
+      });
+
+      const data = await response.json();
+      console.log("Server response:", data);
+      // Handle success or error messages here
+    } catch (error) {
+      console.error("Error communicating with the server:", error);
+      // Handle unexpected errors
+    }
+
     setProject({
       name: "",
       description: "",

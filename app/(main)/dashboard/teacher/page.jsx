@@ -10,6 +10,7 @@ import StudentSubmissions from "@/components/Submission";
 import CurrentProject from "@/components/CurrentProject";
 import CreateAssignment from "@/components/CreateAssignment";
 import AssignmentList from "@/components/AssignmentList";
+
 export default function Page() {
   const [course, setcourse] = useState({
     id: 1,
