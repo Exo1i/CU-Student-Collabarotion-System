@@ -5,7 +5,7 @@ import { NextResponse } from "next/server";
 //get all courses
 export async function GET(request) {
   const resp = await pool.query(
-    `select course_code, course_name, course_pic, instructor_id, fname, lname
+    `select course_code, course_name, course_img, instructor_id, fname, lname
      from course join users on instructor_id = user_id;
     `
   );

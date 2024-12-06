@@ -1,24 +1,25 @@
 import { notFound } from "next/navigation";
-import { PaperClipIcon, UserGroupIcon } from "@heroicons/react/20/solid";
+import { UserGroupIcon } from "@heroicons/react/20/solid";
 import Image from "next/image";
 import { CalendarIcon, ClockIcon } from "lucide-react";
 import CustomLink from "@/app/components/MyCustomLink";
-import { addAssignmentSubmission } from "@/actions/add-assignmentsubmission";
+import SubmissionAssignment from "@/app/components/SubmissionAssignment";
 export default async function CoursePage({ params }) {
     const { courseID } = await params;
     const course = await getCourseById(courseID);
-    try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/courses/CMP2020`)
-        console.log(res);
-        if (!res.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`)
-        }
-        const Testcourse = await res.json();
-        console.log(Testcourse);
-    } catch (err) {
-        console.log(err);
-        return <div>Error loading course. Please try again later.</div>;
-    }
+    console.log(courseID)
+    // try {
+    //     const res = await fetch(`/api/courses/CMP2020`)
+    //     console.log(res);
+    //     if (!res.ok) {
+    //         throw new Error(`HTTP error! status: ${res.status}`)
+    //     }
+    //     const Testcourse = await res.json();
+    //     // console.log(Testcourse);
+    // } catch (err) {
+    //     console.log(err);
+    //     return <div>Error loading course. Please try again later.</div>;
+    // }
     if (!course) {
         return notFound();
     }
@@ -85,29 +86,7 @@ export default async function CoursePage({ params }) {
                                     </span>
                                 </div>
                             </div>
-                            <div className="bg-gray-50 px-6 py-4">
-                                <div className="flex items-center justify-between">
-                                    <label
-                                        htmlFor={`attachment-${assignment.ID}`}
-                                        className="flex items-center text-sm font-medium text-indigo-600 cursor-pointer transition-colors duration-300 hover:text-indigo-800"
-                                    >
-                                        <PaperClipIcon className="h-5 w-5 mr-2" />
-                                        Add Attachment
-                                    </label>
-                                    <button
-                                        className="px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-md transition-colors duration-300 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                                        
-                                    >
-                                        Submit
-                                    </button>
-                                </div>
-                                <input
-                                    type="file"
-                                    id={`attachment-${assignment.ID}`}
-                                    name="attachment"
-                                    className="hidden"
-                                />
-                            </div>
+                            <SubmissionAssignment assignment={assignment} />
                         </div>
                     ))}
                 </div>

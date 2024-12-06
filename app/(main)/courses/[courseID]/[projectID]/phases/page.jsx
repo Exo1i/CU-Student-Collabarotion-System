@@ -4,11 +4,11 @@ import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { Progress } from "@/components/ui/progress"
 import { Separator } from "@/components/ui/separator"
 import { CalendarIcon, UsersIcon, ClockIcon, CheckCircleIcon, CodeIcon, RocketIcon } from 'lucide-react'
-
+import { Button } from "@/components/ui/button"
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
+import { CheckCircledIcon, CrossCircledIcon } from "@radix-ui/react-icons"
 
 
 export default function ProjectPhasesPage({ params }) {
@@ -52,14 +52,44 @@ export default function ProjectPhasesPage({ params }) {
     const [project, setProject] = useState({ phases: [] });
     const [progress, setProgress] = useState(0);
     const [submittedphases, setsubmittedphases] = useState([]);
-    function handellersubmitted(phasenum) {
-        setsubmittedphases(prev => [...prev, phasenum]);
+    const [notification, setNotification] = useState(null)
+    const handellersubmitted = async (e, phasenum) => {
+        e.preventDefault();
+        if (phasenum) {
+            console.log(projectID + ": " + phasenum);
+        }
+        try {
+            // todo Here i will add call for server component
+            await new Promise(resolve => setTimeout(resolve, 1000))
+            setsubmittedphases(prev => [...prev, phasenum]);
+            setNotification({
+                type: "success",
+                title: "phase submitted successfully",
+            })
+        } catch (error) {
+            console.log(error)
+            setNotification({
+                type: "error",
+                title: "Error submitting phase",
+                message: "There was a problem submitting the phase. Please try again."
+            })
+        }
     }
+    useEffect(() => {
+        if (notification) {
+            const timer = setTimeout(() => {
+                setNotification(null)
+            }, 5000)
+
+            return () => clearTimeout(timer)
+        }
+    }, [notification])
     useEffect(() => {
         const completedload = project.phases.filter(phase => submittedphases.includes(phase.phaseNumber))
             .reduce((sum, phase) => sum + phase.phaseLoad, 0)
         setProgress(completedload);
     }, [submittedphases])
+
     if (Loading) {
         return <div>Loading...</div>
     }
@@ -174,12 +204,29 @@ export default function ProjectPhasesPage({ params }) {
                                                                 exit={{ opacity: 0 }}
                                                             >
                                                                 <Button
-                                                                    onClick={() => handellersubmitted(phase.phaseNumber)}
+                                                                    onClick={(e) => handellersubmitted(e, phase.phaseNumber)}
                                                                     className="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white"
                                                                 >
                                                                     <RocketIcon className="w-4 h-4 mr-2" />
                                                                     Submit Phase
                                                                 </Button>
+                                                                {
+                                                                    notification && (
+                                                                        <Alert
+                                                                            variant={notification.type === "success" ? "default" : "destructive"}
+                                                                            className={`z-[9999] fixed bottom-4 right-4 w-96 animate-in fade-in slide-in-from-bottom-5 ${notification.type === "success" ? "bg-green-100 border-green-500 text-green-800" : "bg-red-100 border-red-500 text-red-800"
+                                                                                }`}
+                                                                        >
+                                                                            {notification.type === "success" ? (
+                                                                                <CheckCircledIcon className="h-4 w-4" />
+                                                                            ) : (
+                                                                                <CrossCircledIcon className="h-4 w-4" />
+                                                                            )}
+                                                                            <AlertTitle>{notification.title}</AlertTitle>
+                                                                            <AlertDescription>{notification.message}</AlertDescription>
+                                                                        </Alert>
+                                                                    )
+                                                                }
                                                             </motion.div>
                                                         }
                                                     </AnimatePresence>
