@@ -7,14 +7,15 @@ import SubmissionAssignment from "@/app/components/SubmissionAssignment";
 export default async function CoursePage({ params }) {
     const { courseID } = await params;
     const course = await getCourseById(courseID);
+    console.log(courseID)
     try {
         const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/courses/CMP2020`)
         console.log(res);
         if (!res.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`)
+            throw new Error(`HTTP error! status: ${res.status}`)
         }
         const Testcourse = await res.json();
-        console.log(Testcourse);
+        // console.log(Testcourse);
     } catch (err) {
         console.log(err);
         return <div>Error loading course. Please try again later.</div>;

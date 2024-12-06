@@ -57,6 +57,7 @@ export default function CoursesPage() {
                 seterror(null);
             } catch (error) {
                 seterror(error);
+                console.log(error);
                 setcourses(null)
             } finally {
                 setloading(false);
