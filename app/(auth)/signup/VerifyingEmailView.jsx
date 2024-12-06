@@ -6,8 +6,10 @@ import {REGEXP_ONLY_DIGITS} from "input-otp";
 import {Button} from "@/components/ui/button";
 import {Alert, AlertDescription, AlertTitle} from "@/components/ui/alert";
 import {AlertCircle} from "lucide-react";
+import {addUser} from "@/actions/add-user";
+import {instructor, student} from "@/constants";
 
-export default function VerifyingEmailView({signUp}) {
+export default function VerifyingEmailView({signUp, isInstructor, setActive}) {
     const [value, setValue] = useState("");
     const [error, setError] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
@@ -21,8 +23,33 @@ export default function VerifyingEmailView({signUp}) {
             setIsLoading(true);
             try {
                 await signUp.attemptEmailAddressVerification({code: newVal});
-                router.push('/dashboard');
+
+                const userRole = isInstructor ? instructor : student;
+
+                console.log('Adding user with details:', {
+                    userId: signUp.createdUserId,
+                    firstName: signUp.firstName,
+                    lastName: signUp.lastName,
+                    role: userRole
+                });
+
+                const response = await addUser(
+                    signUp.createdUserId,
+                    signUp.firstName,
+                    signUp.lastName,
+                    userRole
+                );
+
+                console.log('Add user response:', response);
+
+                if (response && response.status === 200) {
+                    await setActive({session: signUp.createdSessionId});
+                    router.push('/dashboard');
+                } else {
+                    setError(response ? response.message : 'Failed to add user');
+                }
             } catch (error) {
+                console.error('Full error details:', error);
                 setError(
                     error instanceof Error
                         ? error.message
@@ -33,91 +60,76 @@ export default function VerifyingEmailView({signUp}) {
             }
         }
     }
-
     const handleResendVerification = async () => {
         try {
             await signUp.prepareEmailAddressVerification();
-            alert("Verification email resent. Please check your inbox.");
+            alert("A new OTP has been sent to your inbox");
         } catch (error) {
             setError(
                 error instanceof Error
                     ? error.message
-                    : "Failed to resend verification email."
+                    : "Failed to resend otp"
             );
         }
     }
 
     return (
-        <div
-            className="relative h-screen w-screen bg-gradient-to-br from-violet-50 to-indigo-100 flex items-center justify-center overflow-hidden">
-            {/* Background gradient stripes */}
-            <div className="absolute inset-0 overflow-hidden pointer-events-none">
-                {[...Array(5)].map((_, index) => (
-                    <div
-                        key={index}
-                        className="absolute top-0 left-0 w-[15%] transform -rotate-45 origin-top-left"
-                        style={{
-                            left: `${index * 80}px`,
-                            backgroundColor: `rgba(99, 80, 250, ${0.1 * (index + 1)})`,
-                            height: '200vh'
-                        }}
-                    />
-                ))}
-            </div>
+        <div className="min-h-screen w-full flex items-center justify-center bg-white p-4">
+            {/* @TODO: TASNEEM, add an image Here -Yn*/}
+            <div className="w-full max-w-md px-6">
+                <div className="m-8 space-y-6">
+                    <div className="text-center">
+                        <h1 className="text-4xl font-extrabold text-violet-800 mb-4">
+                            Verify Email
+                        </h1>
 
-            <div className="text-center relative z-10 w-full max-w-md mx-auto px-6">
-                <div className="bg-white rounded-xl shadow-2xl p-8">
-                    <h1 className="text-4xl font-extrabold text-violet-800 mb-4">
-                        Verify Email
-                    </h1>
+                        <p className="text-xl text-gray-600 font-medium mb-6">
+                            Please check your email to complete the verification process.
+                        </p>
+                    </div>
 
                     {error && (
-                        <Alert variant="destructive" className="mb-4">
+                        <Alert variant="destructive">
                             <AlertCircle className="h-4 w-4" />
                             <AlertTitle>Verification Error</AlertTitle>
                             <AlertDescription>{error}</AlertDescription>
                         </Alert>
                     )}
 
-                    <div className="text-xl text-gray-600 font-medium mb-6">
-                        Please check your email to complete the verification process.
-                    </div>
-
-                    <InputOTP
-                        className="flex justify-center mb-6"
-                        maxLength={6}
-                        pattern={REGEXP_ONLY_DIGITS}
-                        value={value}
-                        onChange={handleChange}
-                        disabled={isLoading}
-                    >
-                        <InputOTPGroup>
-                            <InputOTPSlot index={0} />
-                            <InputOTPSlot index={1} />
-                            <InputOTPSlot index={2} />
-                        </InputOTPGroup>
-                        <InputOTPGroup>
-                            <InputOTPSlot index={3} />
-                            <InputOTPSlot index={4} />
-                            <InputOTPSlot index={5} />
-                        </InputOTPGroup>
-                    </InputOTP>
-
-                    <div className="mt-6 flex justify-center">
-                        <div className="w-16 h-1 bg-violet-500 rounded-full"></div>
-                    </div>
-
-                    <p className="mt-4 text-sm text-gray-500">
-                        Didn&#39;t receive an email?
-                        <Button
-                            variant="link"
-                            className="text-violet-600 ml-1"
-                            onClick={handleResendVerification}
+                    <div className="flex justify-center">
+                        <InputOTP
+                            maxLength={6}
+                            pattern={REGEXP_ONLY_DIGITS}
+                            value={value}
+                            onChange={handleChange}
                             disabled={isLoading}
                         >
-                            Resend verification
-                        </Button>
-                    </p>
+                            <InputOTPGroup className="space-x-2">
+                                <InputOTPSlot index={0} />
+                                <InputOTPSlot index={1} />
+                                <InputOTPSlot index={2} />
+                                <InputOTPSlot index={3} />
+                                <InputOTPSlot index={4} />
+                                <InputOTPSlot index={5} />
+                            </InputOTPGroup>
+                        </InputOTP>
+                    </div>
+
+                    <div className="text-center">
+                        <div className="w-16 h-1 bg-violet-500 rounded-full mx-auto my-4"></div>
+
+                        <p className="text-sm text-gray-500">
+                            Didn&#39;t receive an email?
+                            <Button
+                                variant="link"
+                                className="text-violet-600 ml-1"
+                                onClick={handleResendVerification}
+                                disabled={isLoading}
+                            >
+                                Resend verification
+                            </Button>
+                        </p>
+                    </div>
                 </div>
             </div>
         </div>

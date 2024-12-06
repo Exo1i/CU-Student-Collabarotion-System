@@ -1,12 +1,24 @@
-import {notFound} from "next/navigation";
-import {PaperClipIcon, UserGroupIcon} from "@heroicons/react/20/solid";
+import { notFound } from "next/navigation";
+import { PaperClipIcon, UserGroupIcon } from "@heroicons/react/20/solid";
 import Image from "next/image";
-import {CalendarIcon, ClockIcon} from "lucide-react";
+import { CalendarIcon, ClockIcon } from "lucide-react";
 import CustomLink from "@/app/components/MyCustomLink";
-
-export default async function CoursePage({params}) {
-    const {courseID} = await params;
+import { addAssignmentSubmission } from "@/actions/add-assignmentsubmission";
+export default async function CoursePage({ params }) {
+    const { courseID } = await params;
     const course = await getCourseById(courseID);
+    try {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/courses/CMP2020`)
+        console.log(res);
+        if (!res.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`)
+        }
+        const Testcourse = await res.json();
+        console.log(Testcourse);
+    } catch (err) {
+        console.log(err);
+        return <div>Error loading course. Please try again later.</div>;
+    }
     if (!course) {
         return notFound();
     }
@@ -28,7 +40,6 @@ export default async function CoursePage({params}) {
                         />
                     </div>
 
-                    {/* Course Info */}
                     <div className="w-full md:w-2/3 space-y-4">
                         <h1 className="text-4xl font-bold tracking-tight">{course.name}</h1>
                         <p className="text-xl text-indigo-100">{course.description}</p>
@@ -48,7 +59,6 @@ export default async function CoursePage({params}) {
                 </div>
             </div>
 
-            {/* Assignments Section */}
             <section>
                 <h2 className="text-3xl font-bold text-gray-800 mb-6">
                     Assignments
@@ -85,7 +95,9 @@ export default async function CoursePage({params}) {
                                         Add Attachment
                                     </label>
                                     <button
-                                        className="px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-md transition-colors duration-300 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                                        className="px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-md transition-colors duration-300 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                                        
+                                    >
                                         Submit
                                     </button>
                                 </div>

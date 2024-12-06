@@ -16,18 +16,18 @@ async function initializeDB() {
     await pool.connect();
     console.log("Connected to database");
 
-    // // create needed enum types
-    // await pool.query(`
-    //   CREATE TYPE user_role AS ENUM ('student', 'instructor', 'admin');
-    //   CREATE TYPE channel_access AS ENUM ('open', 'restricted');
-    //   CREATE TYPE message_type AS ENUM ('message', 'announcement');
-    //   CREATE TYPE submission_type AS ENUM ('assignment', 'phase');
-    // `);
+    // create needed enum types
+    await pool.query(`
+      CREATE TYPE user_role AS ENUM ('student', 'instructor', 'admin');
+      CREATE TYPE channel_access AS ENUM ('open', 'restricted');
+      CREATE TYPE message_type AS ENUM ('message', 'announcement');
+      CREATE TYPE submission_type AS ENUM ('assignment', 'phase');
+    `);
 
     // Create users table
     await pool.query(`
       CREATE TABLE IF NOT EXISTS Users (
-        User_ID VARCHAR(7) PRIMARY KEY,
+        User_ID VARCHAR(32) PRIMARY KEY,
         Fname TEXT NOT NULL, 
         Lname TEXT NOT NULL,
         Role user_role NOT NULL
@@ -39,7 +39,9 @@ async function initializeDB() {
       CREATE TABLE IF NOT EXISTS Course (
         Course_Code VARCHAR(10) PRIMARY KEY,
         Course_Name TEXT NOT NULL,
-        Instructor_ID VARCHAR(7),
+        Course_img TEXT 
+        course_description TEXT
+        Instructor_ID VARCHAR(32) unique,
         max_Grade INTEGER NOT NULL,
         FOREIGN KEY (Instructor_ID) REFERENCES Users (User_ID) ON DELETE SET NULL
       );
@@ -50,11 +52,12 @@ async function initializeDB() {
       CREATE TABLE IF NOT EXISTS Project (
         Project_ID SERIAL PRIMARY KEY,
         Project_Name TEXT NOT NULL,
-        Course_Code VARCHAR(10),
+        Course_Code VARCHAR(10) unique,
         Start_Date DATE default CURRENT_DATE,
         End_Date DATE,
         Description TEXT,
         Max_team_size INTEGER,
+        max_grade INTEGER,
         FOREIGN KEY (Course_Code) REFERENCES Course(Course_Code) ON DELETE SET NULL
       );
     `);
@@ -112,7 +115,7 @@ async function initializeDB() {
         Time_Stamp TIMESTAMP DEFAULT NOW(),
         Type message_type NOT NULL,
         Content TEXT NOT NULL,
-        sender_ID VARCHAR(7),
+        sender_ID VARCHAR(32),
         FOREIGN KEY (sender_ID) REFERENCES Users(User_ID) ON DELETE CASCADE,
         FOREIGN KEY (Channel_Num, Group_ID) REFERENCES channel(Channel_Num, Group_ID) ON DELETE CASCADE
       );
@@ -136,7 +139,7 @@ async function initializeDB() {
       CREATE TABLE IF NOT EXISTS Submission (
         Submission_ID SERIAL PRIMARY KEY,
         Type submission_type NOT NULL,
-        Student_ID VARCHAR(7) NOT NULL,
+        Student_ID VARCHAR(32) NOT NULL,
         Grade INTEGER,
         Submission_date DATE DEFAULT NOW(),
         FOREIGN KEY (Student_ID) REFERENCES Users(User_ID) ON DELETE CASCADE
@@ -165,7 +168,7 @@ async function initializeDB() {
     // Create participation table
     await pool.query(`
       CREATE TABLE IF NOT EXISTS participation (
-        student_ID VARCHAR(7),
+        student_ID VARCHAR(32),
         Project_ID INT,
         Team_Num INT,
         Leader BOOLEAN,
@@ -178,7 +181,7 @@ async function initializeDB() {
     // Create enrollment table
     await pool.query(`
       CREATE TABLE IF NOT EXISTS enrollment (
-        student_ID VARCHAR(7), 
+        student_ID VARCHAR(32), 
         Course_Code VARCHAR(10),
         PRIMARY KEY (student_ID, Course_Code),
         FOREIGN KEY (Course_Code) REFERENCES Course(Course_Code) ON DELETE CASCADE,
@@ -190,7 +193,7 @@ async function initializeDB() {
     await pool.query(`
       CREATE TABLE IF NOT EXISTS messageRead (
         lastMessageRead_ID INT,
-        user_ID VARCHAR(7),
+        user_ID VARCHAR(32),
         readAt TIMESTAMP,
         PRIMARY KEY (lastMessageRead_ID, user_ID),
         FOREIGN KEY (lastMessageRead_ID) REFERENCES Message(Message_ID) ON DELETE SET NULL,
@@ -246,8 +249,8 @@ async function initializeDB() {
     // Create reviews table
     await pool.query(`
       CREATE TABLE IF NOT EXISTS review (
-        reviewer_ID VARCHAR(7),
-        reviewee_ID VARCHAR(7),
+        reviewer_ID VARCHAR(32),
+        reviewee_ID VARCHAR(32),
         Project_ID INT,
         content TEXT,
         rating INTEGER,
@@ -261,7 +264,7 @@ async function initializeDB() {
     // Create earnedbadges table
     await pool.query(`
       CREATE TABLE IF NOT EXISTS earnedBadges (
-        student_ID VARCHAR(7),
+        student_ID VARCHAR(32),
         Badge_ID INT,
         earned_at DATE,
         PRIMARY KEY (student_ID, Badge_ID),
