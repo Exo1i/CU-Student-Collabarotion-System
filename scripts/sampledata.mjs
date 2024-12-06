@@ -4,9 +4,9 @@ import pkg from "pg";
 dotenv.config({ path: "./.env.local" });
 const { Pool } = pkg;
 const pool = new Pool({
-  connectionString: process.env.DATABASE_URL, ssl: false, // Adjust based on your database settings
+  connectionString: process.env.DATABASE_URL,
+  ssl: false,
 });
-
 
 console.log("DATABASE_URL:", process.env.DATABASE_URL);
 
@@ -84,8 +84,8 @@ async function insertSampleData() {
 
     // Insert sample data into Submission table
     await pool.query(`
-      INSERT INTO Submission (Submission_ID,Type, Student_ID, Grade, Submission_date) VALUES 
-      (1,'phase', 'user002', 90, '2024-01-18');
+      INSERT INTO Submission (Type, Student_ID, Grade, Submission_date) VALUES 
+      ('phase', 'user002', 90, '2024-01-18');
     `);
     console.log("Sample data inserted into Submission table");
 
