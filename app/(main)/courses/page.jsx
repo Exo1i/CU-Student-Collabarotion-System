@@ -69,7 +69,8 @@ export default function CoursesPage() {
         return <div>Loading...</div>
     }
     if (error) {
-        return <div>Error: {error}</div>;
+        { console.error(error); }
+        return <div>Error...</div>;
     }
     return (
         <div className="container mx-auto py-12 px-4">
