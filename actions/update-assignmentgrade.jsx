@@ -1,32 +1,32 @@
 "use server";
 import pool from "@/lib/db";
 
-export async function addUser(userId, fname, lname, role) {
-  console.log("Received parameters:", { userId, fname, lname, role });
+export async function addAssignmentGrade(subID, submittedGrade) {
+  console.log("Received parameters:", { subID });
 
   // Validate input more rigorously
-  if (!userId || !fname || !lname || !role) {
+  if (!subID) {
     console.error("Missing required parameters");
     return {
       status: 422,
-      message: "Invalid user data",
+      message: "Invalid submission ID data",
     };
   }
 
   try {
     const result = await pool.query(
       `
-            INSERT INTO users (user_id, fname, lname, role) 
-            VALUES ($1, $2, $3, $4)
+           UPDATE submission SET grade = $1
+           WHERE submission_id = $2 and type = 'assignment';
         `,
-      [userId, fname, lname, role]
+      [submittedGrade, subID]
     );
 
     console.log("Database insertion result:", result);
 
     return {
       status: 200,
-      message: "User added successfully",
+      message: "grade updated successfully",
     };
   } catch (err) {
     console.error("Detailed error:", {
@@ -35,14 +35,6 @@ export async function addUser(userId, fname, lname, role) {
       detail: err.detail,
       stack: err.stack,
     });
-
-    if (err.code === "23505") {
-      // Unique constraint violation
-      return {
-        status: 409, // Conflict
-        message: "User already exists",
-      };
-    }
 
     return {
       status: 500,
