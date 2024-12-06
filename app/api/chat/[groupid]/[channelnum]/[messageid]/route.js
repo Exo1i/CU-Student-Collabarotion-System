@@ -31,38 +31,23 @@ export async function GET(request, { params }) {
   }
 }
 
-// Update the content of a message
-export async function PATCH(request, { params }) {
-  try {
-    const par = await params;
-    const { content } = await request.json();
-    await pool.query("UPDATE Message SET Content = $1 WHERE Message_ID = $2", [
-      content,
-      par.messageid,
-    ]);
-    return NextResponse.json({ message: "Message updated" }, { status: 200 });
-  } catch (err) {
-    console.error("Error updating Message:", err);
-    return NextResponse.json(
-      { error: "Failed to update Message" },
-      { status: 500 }
-    );
-  }
-}
 
-//delete a specific message given its number and group id
-export async function DELETE(request, { params }) {
-  try {
-    const par = await params;
-    await pool.query("DELETE FROM Message WHERE Message_ID = $1", [
-      par.messageid,
-    ]);
-    return NextResponse.json({ message: "Message deleted" }, { status: 200 });
-  } catch (err) {
-    console.error("Error deleting Message: ", err);
-    return NextResponse.json(
-      { error: "Failed to delete Message" },
-      { status: 500 }
-    );
-  }
-}
+// @TODO: Idk about this option, ill rethink it later
+// // Update the content of a message
+// export async function PATCH(request, { params }) {
+//   try {
+//     const par = await params;
+//     const { content } = await request.json();
+//     await pool.query("UPDATE Message SET Content = $1 WHERE Message_ID = $2", [
+//       content,
+//       par.messageid,
+//     ]);
+//     return NextResponse.json({ message: "Message updated" }, { status: 200 });
+//   } catch (err) {
+//     console.error("Error updating Message:", err);
+//     return NextResponse.json(
+//       { error: "Failed to update Message" },
+//       { status: 500 }
+//     );
+//   }
+// }

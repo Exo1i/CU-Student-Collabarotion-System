@@ -1,4 +1,6 @@
 'use server'
+// import 'server-only'
+
 import pool from "@/lib/db";
 
 export async function addUser(userId, fname, lname, role) {
@@ -39,4 +41,16 @@ export async function addUser(userId, fname, lname, role) {
             status: 500, message: 'Database insertion failed', error: err.message
         };
     }
+}
+
+export async function fetchUserData(user_id) {
+    // Validate input more rigorously
+    if (!user_id) {
+        console.error('Missing required parameter, user_id');
+        return {
+            status: 422, message: 'user_id is required'
+        };
+    }
+
+    return await fetch(`/api/users/${user_id}`)
 }

@@ -1,31 +1,30 @@
 import dotenv from "dotenv";
 import pkg from "pg";
 
-dotenv.config({ path: "./.env.local" });
-const { Pool } = pkg;
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-  ssl: false, // Adjust based on your database settings
+dotenv.config({path: "./.env.local"});
+const {Client} = pkg;
+const pool = new Client({
+    connectionString: process.env.DATABASE_URL, ssl: false, // Adjust based on your database settings
 });
 
 console.log("DATABASE_URL:", process.env.DATABASE_URL);
 
 async function initializeDB() {
-  try {
-    console.log("Connecting to database...");
-    await pool.connect();
-    console.log("Connected to database");
+    try {
+        console.log("Connecting to database...");
+        await pool.connect();
+        console.log("Connected to database");
 
-    // create needed enum types
-    await pool.query(`
+        // create needed enum types
+        await pool.query(`
       CREATE TYPE user_role AS ENUM ('student', 'instructor', 'admin');
       CREATE TYPE channel_access AS ENUM ('open', 'restricted');
       CREATE TYPE message_type AS ENUM ('message', 'announcement');
       CREATE TYPE submission_type AS ENUM ('assignment', 'phase');
     `);
 
-    // Create users table
-    await pool.query(`
+        // Create users table
+        await pool.query(`
       CREATE TABLE IF NOT EXISTS Users (
         User_ID VARCHAR(32) PRIMARY KEY,
         Fname TEXT NOT NULL, 
@@ -34,8 +33,8 @@ async function initializeDB() {
       );
     `);
 
-    // Create courses table
-    await pool.query(`
+        // Create courses table
+        await pool.query(`
       CREATE TABLE IF NOT EXISTS Course (
         Course_Code VARCHAR(10) PRIMARY KEY,
         Course_Name TEXT NOT NULL,
@@ -45,8 +44,8 @@ async function initializeDB() {
       );
     `);
 
-    // Create projects table
-    await pool.query(`
+        // Create projects table
+        await pool.query(`
       CREATE TABLE IF NOT EXISTS Project (
         Project_ID SERIAL PRIMARY KEY,
         Project_Name TEXT NOT NULL,
@@ -55,12 +54,13 @@ async function initializeDB() {
         End_Date DATE,
         Description TEXT,
         Max_team_size INTEGER,
+        max_grade INTEGER,
         FOREIGN KEY (Course_Code) REFERENCES Course(Course_Code) ON DELETE SET NULL
       );
     `);
 
-    // Create phase table
-    await pool.query(`
+        // Create phase table
+        await pool.query(`
       CREATE TABLE IF NOT EXISTS Phase (
         Project_ID INT,
         Phase_Num INT,
@@ -72,8 +72,8 @@ async function initializeDB() {
       );
     `);
 
-    // Create team table
-    await pool.query(`
+        // Create team table
+        await pool.query(`
       CREATE TABLE IF NOT EXISTS Team (
         Project_ID INT,
         Team_Num INT,
@@ -83,16 +83,16 @@ async function initializeDB() {
       );
     `);
 
-    // Create chat_group table
-    await pool.query(`
+        // Create chat_group table
+        await pool.query(`
       CREATE TABLE IF NOT EXISTS Chat_Group (
-        Group_ID INTEGER PRIMARY KEY,
+        Group_ID SERIAL PRIMARY KEY,
         Group_Name TEXT NOT NULL
       );
     `);
 
-    // Create channel table
-    await pool.query(`
+        // Create channel table
+        await pool.query(`
       CREATE TABLE IF NOT EXISTS channel (
         Channel_Name TEXT NOT NULL,
         Channel_Num INT,
@@ -103,8 +103,8 @@ async function initializeDB() {
       );
     `);
 
-    // Create message table
-    await pool.query(`
+        // Create message table
+        await pool.query(`
       CREATE TABLE IF NOT EXISTS Message (
         Message_ID SERIAL PRIMARY KEY,
         Channel_Num INT,
@@ -118,8 +118,8 @@ async function initializeDB() {
       );
     `);
 
-    // Create assignment table
-    await pool.query(`
+        // Create assignment table
+        await pool.query(`
       CREATE TABLE IF NOT EXISTS Assignment (
         Assignment_ID SERIAL PRIMARY KEY,
         Title TEXT NOT NULL,
@@ -131,8 +131,8 @@ async function initializeDB() {
       );
     `);
 
-    // Create submission table
-    await pool.query(`
+        // Create submission table
+        await pool.query(`
       CREATE TABLE IF NOT EXISTS Submission (
         Submission_ID SERIAL PRIMARY KEY,
         Type submission_type NOT NULL,
@@ -143,8 +143,8 @@ async function initializeDB() {
       );
     `);
 
-    // Create attachment table
-    await pool.query(`
+        // Create attachment table
+        await pool.query(`
       CREATE TABLE IF NOT EXISTS Attachment (
         Attachment_ID SERIAL PRIMARY KEY,
         URL TEXT NOT NULL,
@@ -152,8 +152,8 @@ async function initializeDB() {
       );
     `);
 
-    // Create badge table
-    await pool.query(`
+        // Create badge table
+        await pool.query(`
       CREATE TABLE IF NOT EXISTS Badge (
         Badge_ID SERIAL PRIMARY KEY,
         Picture TEXT NOT NULL,
@@ -162,8 +162,8 @@ async function initializeDB() {
       );
     `);
 
-    // Create participation table
-    await pool.query(`
+        // Create participation table
+        await pool.query(`
       CREATE TABLE IF NOT EXISTS participation (
         student_ID VARCHAR(32),
         Project_ID INT,
@@ -175,8 +175,8 @@ async function initializeDB() {
       );
     `);
 
-    // Create enrollment table
-    await pool.query(`
+        // Create enrollment table
+        await pool.query(`
       CREATE TABLE IF NOT EXISTS enrollment (
         student_ID VARCHAR(32), 
         Course_Code VARCHAR(10),
@@ -186,20 +186,20 @@ async function initializeDB() {
       );
     `);
 
-    // Create messageRead table
-    await pool.query(`
+        // Create messageRead table
+        await pool.query(`
       CREATE TABLE IF NOT EXISTS messageRead (
         lastMessageRead_ID INT,
         user_ID VARCHAR(32),
-        readAt TIMESTAMP,
+        readAt TIMESTAMP DEFAULT NOW(),
         PRIMARY KEY (lastMessageRead_ID, user_ID),
         FOREIGN KEY (lastMessageRead_ID) REFERENCES Message(Message_ID) ON DELETE SET NULL,
         FOREIGN KEY (user_ID) REFERENCES Users(User_ID) ON DELETE CASCADE
       );
     `);
 
-    // Create messageAttachment table
-    await pool.query(`
+        // Create messageAttachment table
+        await pool.query(`
       CREATE TABLE IF NOT EXISTS messageAttachment (
         Message_ID INT,
         Attachment_ID INT,
@@ -209,8 +209,8 @@ async function initializeDB() {
       );
     `);
 
-    // Create submission attachment table
-    await pool.query(`
+        // Create submission attachment table
+        await pool.query(`
       CREATE TABLE IF NOT EXISTS submissionAttachment (
         Attachment_ID INT,
         Submission_ID INT,
@@ -220,8 +220,8 @@ async function initializeDB() {
       );
     `);
 
-    // Create phaseSubmission table
-    await pool.query(`
+        // Create phaseSubmission table
+        await pool.query(`
       CREATE TABLE IF NOT EXISTS phaseSubmission (
         Submission_ID INT,
         Project_ID INT,
@@ -232,8 +232,8 @@ async function initializeDB() {
       );
     `);
 
-    // Create assignmentSubmission table
-    await pool.query(`
+        // Create assignmentSubmission table
+        await pool.query(`
       CREATE TABLE IF NOT EXISTS AssignmentSubmission (
         Submission_ID INT,
         Assignment_ID INT,
@@ -243,8 +243,8 @@ async function initializeDB() {
       );
     `);
 
-    // Create reviews table
-    await pool.query(`
+        // Create reviews table
+        await pool.query(`
       CREATE TABLE IF NOT EXISTS review (
         reviewer_ID VARCHAR(32),
         reviewee_ID VARCHAR(32),
@@ -258,8 +258,8 @@ async function initializeDB() {
       );
     `);
 
-    // Create earnedbadges table
-    await pool.query(`
+        // Create earnedbadges table
+        await pool.query(`
       CREATE TABLE IF NOT EXISTS earnedBadges (
         student_ID VARCHAR(32),
         Badge_ID INT,
@@ -270,12 +270,12 @@ async function initializeDB() {
       );
     `);
 
-    console.log("Tables created");
-    await pool.end();
-    console.log("Disconnected from database");
-  } catch (err) {
-    console.error("Error initializing database:", err);
-  }
+        console.log("Tables created");
+        await pool.end();
+        console.log("Disconnected from database");
+    } catch (err) {
+        console.error("Error initializing database:", err);
+    }
 }
 
 initializeDB();

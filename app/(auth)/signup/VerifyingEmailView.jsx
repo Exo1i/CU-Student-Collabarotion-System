@@ -6,7 +6,7 @@ import {REGEXP_ONLY_DIGITS} from "input-otp";
 import {Button} from "@/components/ui/button";
 import {Alert, AlertDescription, AlertTitle} from "@/components/ui/alert";
 import {AlertCircle} from "lucide-react";
-import {addUser} from "@/actions/add-user";
+import {addUser} from "@/actions/user-actions";
 import {instructor, student} from "@/constants";
 
 export default function VerifyingEmailView({signUp, isInstructor, setActive}) {
