@@ -1,4 +1,5 @@
-"use client";
-export default function Page() {
-  return <>Hello World</>;
+import React from "react";
+
+export default function page() {
+  return <div>page</div>;
 }
