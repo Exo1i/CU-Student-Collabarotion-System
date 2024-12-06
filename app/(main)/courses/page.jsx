@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button"
 import Image from "next/image"
 import Link from "next/link"
 import { motion } from 'framer-motion'
+import { addAssignmentSubmission } from '@/actions/add-assignmentsubmission'
 
 const courses = [
     {
@@ -40,7 +41,7 @@ export default function CoursesPage() {
 
 
     const [filter, setFilter] = useState("All")
-    const [Testcourses , setcourses] = useState(null);
+    const [Testcourses, setcourses] = useState(null);
     const [error, seterror] = useState(null);
     const [loading, setloading] = useState(true);
     const filterdCourses = filter === "All" ? courses : courses.filter(course => course.category === filter);
@@ -56,6 +57,7 @@ export default function CoursesPage() {
                 seterror(null);
             } catch (error) {
                 seterror(error);
+                console.log(error);
                 setcourses(null)
             } finally {
                 setloading(false);
@@ -68,7 +70,8 @@ export default function CoursesPage() {
         return <div>Loading...</div>
     }
     if (error) {
-        return <div>Error: {error}</div>; 
+        { console.error(error); }
+        return <div>Error...</div>;
     }
     return (
         <div className="container mx-auto py-12 px-4">
@@ -163,4 +166,5 @@ export default function CoursesPage() {
         </div>
     )
 }
+
 

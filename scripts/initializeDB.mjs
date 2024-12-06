@@ -137,7 +137,7 @@ async function initializeDB() {
     // Create submission table
     await pool.query(`
       CREATE TABLE IF NOT EXISTS Submission (
-        Submission_ID SERIAL PRIMARY KEY,
+        Submission_ID INT PRIMARY KEY,
         Type submission_type NOT NULL,
         Student_ID VARCHAR(32) NOT NULL,
         Grade INTEGER,
