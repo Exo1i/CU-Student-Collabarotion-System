@@ -168,5 +168,3 @@ export default function CoursesPage() {
 }
 
 
-if (window)
-    window.addAssignmentSubmission = addAssignmentSubmission;
