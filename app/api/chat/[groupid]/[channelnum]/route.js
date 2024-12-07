@@ -38,7 +38,7 @@ export async function GET(request, { params }) {
       });
     } else {
       channelmessages = await pool.query(
-        "SELECT * FROM Message WHERE Group_ID = $1 AND Channel_Num = $2 ORDER BY Time_Stamp DESC LIMIT 50",
+        "SELECT * FROM Message M,users U WHERE Group_ID = $1 AND Channel_Num = $2 AND M.sender_id = U.user_id  ORDER BY Time_Stamp DESC LIMIT 50",
         [par.groupid, par.channelnum]
       );
       console.log("Running Default Query");

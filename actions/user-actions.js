@@ -2,9 +2,15 @@
 // import 'server-only'
 
 import pool from "@/lib/db";
+import {clerkClient} from "@clerk/nextjs/server";
 
-export async function addUser(userId, fname, lname, role) {
-    console.log('Received parameters:', {userId, fname, lname, role});
+const clerkclient = await clerkClient();
+
+export async function addUser(userId, username, fname, lname, role) {
+    let userObj = await clerkclient.users.getUser(userId)
+    let img_url = userObj.imageUrl;
+
+    console.log('Received parameters:', {userId, username, fname, lname, role, img_url});
 
     // Validate input more rigorously
     if (!userId || !fname || !lname || !role) {
@@ -16,9 +22,9 @@ export async function addUser(userId, fname, lname, role) {
 
     try {
         const result = await pool.query(`
-            INSERT INTO users (user_id, fname, lname, role) 
-            VALUES ($1, $2, $3, $4)
-        `, [userId, fname, lname, role]);
+            INSERT INTO users (user_id,username ,fname, lname, role,img_url) 
+            VALUES ($1,$2, $3, $4, $5,$6)
+        `, [userId, username, fname, lname, role, img_url]);
 
         console.log('Database insertion result:', result);
 

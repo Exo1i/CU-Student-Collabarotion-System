@@ -35,9 +35,11 @@ export default function VerifyingEmailView({signUp, isInstructor, setActive}) {
 
                 const response = await addUser(
                     signUp.createdUserId,
+                    signUp.username,
                     signUp.firstName,
                     signUp.lastName,
-                    userRole
+                    userRole,
+                    signUp.image_url
                 );
 
                 console.log('Add user response:', response);

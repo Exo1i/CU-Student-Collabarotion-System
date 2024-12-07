@@ -1,10 +1,9 @@
 "use client"
 
-import { BadgeCheck, Bell, ChevronsUpDown, CreditCard, LogOut, Sparkles, } from "lucide-react"
-import { EditProfile } from "@/app/components/EditProfile"
+import {Bell, ChevronsUpDown, CreditCard, LogOut, Sparkles,} from "lucide-react"
 
 
-import { Avatar, AvatarFallback, AvatarImage, } from "@/components/ui/avatar"
+import {Avatar, AvatarFallback, AvatarImage,} from "@/components/ui/avatar"
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -14,14 +13,14 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar, } from "@/components/ui/sidebar"
-import { useClerk } from "@clerk/nextjs";
-import { useRouter } from "next/navigation";
+import {SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar,} from "@/components/ui/sidebar"
+import {useClerk} from "@clerk/nextjs";
+import {useRouter} from "next/navigation";
 
-export function NavUser({ avatar, name, email }) {
+export function NavUser({avatar, name, email}) {
     const router = useRouter()
-    const { isMobile } = useSidebar()
-    const { signOut } = useClerk()
+    const {isMobile} = useSidebar()
+    const {signOut} = useClerk()
     return ((<SidebarMenu>
         <SidebarMenuItem>
             <DropdownMenu>
@@ -68,7 +67,7 @@ export function NavUser({ avatar, name, email }) {
                     <DropdownMenuGroup>
                         <DropdownMenuItem>
                             <div onClick={(e) => e.stopPropagation()}>
-                                <EditProfile />
+
                             </div>
                         </DropdownMenuItem>
                         <DropdownMenuItem>

@@ -19,20 +19,25 @@ import {
     useSidebar,
 } from "@/components/ui/sidebar"
 import Link from "next/link";
+import useChatStore from "@/hooks/useChatStore";
 
-export function NavChat({chats}) {
+
+export function NavChat({groups}) {
     const {isMobile} = useSidebar()
+    const {selectedGroupID, setSelectedGroupID} = useChatStore();
+
 
     return (
         <SidebarGroup className="group-data-[collapsible=icon]:hidden">
             <SidebarGroupLabel>Chats</SidebarGroupLabel>
             <SidebarMenu>
-                {chats.map((item) => (
-                    <SidebarMenuItem key={item.name}>
+                {groups.map((group) => (
+                    <SidebarMenuItem key={group.group_id}>
                         <SidebarMenuButton asChild>
-                            <Link href={item.url}>
-                                <item.icon />
-                                <span>{item.name}</span>
+                            <Link href={'/chat'} onClick={() => setSelectedGroupID(group.group_id)}
+                            >
+                                {/*<item.icon />*/}
+                                <span>{group.group_name}</span>
                             </Link>
                         </SidebarMenuButton>
                         <DropdownMenu>
@@ -60,12 +65,6 @@ export function NavChat({chats}) {
                         </DropdownMenu>
                     </SidebarMenuItem>
                 ))}
-                <SidebarMenuItem>
-                    <SidebarMenuButton>
-                        <MoreHorizontal />
-                        <span>More</span>
-                    </SidebarMenuButton>
-                </SidebarMenuItem>
             </SidebarMenu>
         </SidebarGroup>
     )
