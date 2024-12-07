@@ -6,7 +6,7 @@ export async function GET(request, { params }) {
   try {
     const par = await params;
     const studentInfo = await pool.query(
-      `SELECT User_ID AS student_id, Fname, Lname, img_url
+      `SELECT User_ID AS student_id, concat(fname,' ',lname) as full_name, img_url
        FROM  Users
        WHERE user_id= $1;`,
       [par.studentid]
@@ -21,7 +21,7 @@ export async function GET(request, { params }) {
     );
 
     const reviews = await pool.query(
-      `SELECT r.content, r.rating, r.project_id, r.reviewer_id, u.Fname AS reviewer_fname, u.Lname AS reviewer_lname, u.img_url as reviewer_img 
+      `SELECT r.content, r.rating, r.project_id, r.reviewer_id, concat(u.fname,' ',u.lname) as reviewr_full_name, u.img_url as reviewer_img 
        FROM review r
        JOIN Users u ON r.reviewer_ID = u.User_ID
        WHERE r.reviewee_id = $1;`,
