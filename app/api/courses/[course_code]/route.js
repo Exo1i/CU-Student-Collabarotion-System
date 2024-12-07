@@ -22,6 +22,7 @@ export async function GET(request, { params }) {
        `,
       [par.course_code]
     );
+    const project = courseproject.rowCount === 0 ? null : courseproject.rows[0];
 
     const courseassignments = await pool.query(
       ` select assignment_id, title, description, max_grade, due_date
@@ -33,7 +34,7 @@ export async function GET(request, { params }) {
 
     const resp = {
       ...couseinfo.rows[0],
-      project: courseproject.rows[0],
+      project: project,
       assignments: courseassignments.rows,
     };
     return NextResponse.json(resp, { status: 200 });
