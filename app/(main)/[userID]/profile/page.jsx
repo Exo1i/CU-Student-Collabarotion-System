@@ -2,58 +2,8 @@ import Image from 'next/image'
 import { CrownIcon, Star, StarHalf, AwardIcon, CodeIcon, UserIcon } from 'lucide-react'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import CustomLink from '@/app/components/MyCustomLink'
-const userData = {
-    id: 1,
-    name: "John Doe",
-    email: "john.doe@example.com",
-    profilePicture: "https://example.com/profiles/john.jpg",
-    reviews: [
-        {
-            projectId: 101,
-            projectName: "AI Research",
-            reviewerId: 2,
-            reviewee: {
-                name: "John Doe",
-                photo: "https://example.com/profiles/john.jpg"
-            },
-            rate: 4.5,
-            content: "John was an excellent leader and provided great guidance."
-        },
-        {
-            projectId: 102,
-            projectName: "Data Analysis",
-            reviewerId: 3,
-            reviewee: {
-                name: "John Doe",
-                photo: "https://example.com/profiles/john.jpg"
-            },
-            rate: 5,
-            content: "Very proactive and contributed significantly to the project."
-        }
-    ],
-    projects: [
-        {
-            projectId: 101,
-            name: "AI Research",
-            role: "Leader"
-        },
-        {
-            projectId: 103,
-            name: "Mobile App Development",
-            role: "Member"
-        }
-    ],
-    badges: [
-        {
-            picture: "https://example.com/badges/innovator.png",
-            title: "Innovator"
-        },
-        {
-            picture: "https://example.com/badges/team_player.png",
-            title: "Team Player"
-        }
-    ]
-}
+import { notFound } from 'next/navigation'
+import {useUser} from "@clerk/nextjs";
 
 const StarRating = ({ rating }) => {
     const fullStars = Math.floor(rating)
@@ -72,7 +22,28 @@ const StarRating = ({ rating }) => {
         </div>
     )
 }
-export default function Profile() {
+export default async function Profile() {
+    // const {isSignedIn, user, isLoaded} = useUser();
+    let userData = null
+    let error = null;
+
+    try {
+        const response = await fetch(`http://localhost:3000/api/students/user002/profile`);
+        if (!response.ok) {
+            throw new Error(`Failed to fetch projects: ${response.statusText}`);
+        }
+        userData = await response.json();
+    } catch (err) {
+        error = err.message;
+        console.log(error);
+    }
+
+    if (error) {
+        return <div className="text-center text-red-500">Error: {error}</div>;
+    }
+    if(!userData) {
+        return notFound();
+    }
     return (
         <div className="max-w-4xl mx-auto space-y-8 relative">
             <div className="absolute inset-0 -z-10 bg-gradient-to-br from-blue-100 to-purple-100 opacity-50 blur-3xl"></div>
@@ -87,8 +58,8 @@ export default function Profile() {
                     <div className="absolute -top-16 left-1/2 transform -translate-x-1/2">
                         <div className="rounded-full border-4 border-white shadow-lg overflow-hidden">
                             <Image
-                                src="/courseImg/student.jpg"
-                                alt={userData.name}
+                                src={userData.img_url}
+                                alt={userData.full_name}
                                 width={128}
                                 height={128}
                                 className="rounded-full transition-transform duration-300 hover:scale-110"
@@ -97,11 +68,11 @@ export default function Profile() {
                     </div>
                     <div className='text-center'>
                         <h2 className='mt-3 text-gray-900 font-bold text-3xl'>
-                            {userData.name}
+                            {userData.full_name}
                         </h2>
                         <p className='flex items-center justify-center text-gray-500'>
                             <UserIcon className='w-4 h-4 mr-2' />
-                            {userData.email}
+                            {/* {userData.email} */}
                         </p>
                     </div>
                     <div className="text-center mt-4">
@@ -137,20 +108,20 @@ export default function Profile() {
             <div className="bg-white rounded-lg shadow-lg p-6 transform hover:scale-105 transition-transform duration-300">
                 <div className='flex items-center '>
                     <CodeIcon className='mr-2' />
-                    <h1 className='font-bold text-2xl'>Current Projects</h1>
+                    <h1 className='font-bold text-2xl'>Current Teams</h1>
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    {userData.projects.map((project) => (
-                        <div key={project.projectId} className={`p-4 rounded-lg transition-all duration-300 ease-in-out transform hover:scale-105 hover:shadow-xl ${project.role === 'Leader' ? 'bg-gradient-to-br from-yellow-100 to-yellow-200' : 'bg-gradient-to-br from-gray-100 to-gray-200'
+                    {userData.teams.map((Team) => (
+                        <div key={Team.team_num} className={`p-4 rounded-lg transition-all duration-300 ease-in-out transform hover:scale-105 hover:shadow-xl ${Team.leader ? 'bg-gradient-to-br from-yellow-100 to-yellow-200' : 'bg-gradient-to-br from-gray-100 to-gray-200'
                             }`}>
                             <div className='flex justify-between'>
                                 <h2>
-                                    {project.name}
+                                    {Team.team_name}
                                 </h2>
-                                {project.role === 'Leader' ? <CrownIcon className='w-6 h-6 text-yellow-500 animate-pulse' /> : null}
+                                {Team.leader ? <CrownIcon className='w-6 h-6 text-yellow-500 animate-pulse' /> : null}
                             </div>
-                            <span className={`px-2 py-1 rounded-full text-sm font-medium ${project.role === 'Leader' ? 'bg-yellow-300 text-yellow-800' : 'bg-gray-300 text-gray-800'}`}>
-                                {project.role}
+                            <span className={`px-2 py-1 rounded-full text-sm font-medium ${Team.leader  ? 'bg-yellow-300 text-yellow-800' : 'bg-gray-300 text-gray-800'}`}>
+                                {Team.leader ? "leader" : "member"}
                             </span>
                         </div>
                     ))}
@@ -163,25 +134,25 @@ export default function Profile() {
                 </h2>
                 <div className='space-y-4'>
                     {userData.reviews.map((review) => (
-                        <div key={review.projectId} className="bg-gradient-to-r from-gray-50 to-gray-100 rounded-lg p-4 hover:shadow-md transition-shadow duration-300">
+                        <div key={review.project_id} className="bg-gradient-to-r from-gray-50 to-gray-100 rounded-lg p-4 hover:shadow-md transition-shadow duration-300">
                             <div className='flex justify-between items-center'>
                                 <h3 className="text-lg font-semibold">
-                                    {review.projectName}
+                                    {review.project_name}
                                 </h3>
-                                <StarRating rating={review.rate} />
+                                <StarRating rating={review.rating} />
                             </div>
                             <p className="mt-2 text-gray-600 italic">&quot;{review.content}&quot;</p>
                             <div className="mt-4 flex items-center">
                                 <Image
                                     src="/courseImg/student.jpg"
-                                    alt={review.reviewee.name}
+                                    alt={review.reviewr_full_name}
                                     width={32}
                                     height={32}
                                     className="rounded-full mr-2 border-2 border-purple-300"
                                 >
                                 </Image>
                                 <p className="text-sm text-gray-500">
-                                    Review from: {review.reviewee.name}
+                                    Review from: {review.reviewr_full_name}
                                 </p>
                             </div>
                         </div>
