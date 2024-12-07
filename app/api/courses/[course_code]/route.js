@@ -6,7 +6,7 @@ export async function GET(request, { params }) {
   try {
     const par = await params;
     const couseinfo = await pool.query(
-      ` select course_code, course_name, course_img, course_description, max_grade, instructor_id, fname, lname
+      ` select course_code, course_name, course_img, course_description, max_grade, instructor_id, fname, lname, img_url
         from course, users
         where instructor_id = user_id and course_code = $1
       `,

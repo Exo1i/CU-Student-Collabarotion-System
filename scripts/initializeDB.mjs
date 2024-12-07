@@ -30,7 +30,8 @@ async function initializeDB() {
         User_ID VARCHAR(32) PRIMARY KEY,
         Fname TEXT NOT NULL, 
         Lname TEXT NOT NULL,
-        Role user_role NOT NULL
+        Role user_role NOT NULL,
+        img_url TEXT,        
       );
     `);
 
@@ -266,7 +267,7 @@ async function initializeDB() {
       CREATE TABLE IF NOT EXISTS earnedBadges (
         student_ID VARCHAR(32),
         Badge_ID INT,
-        earned_at DATE,
+        earned_at DATE default current_date;
         PRIMARY KEY (student_ID, Badge_ID),
         FOREIGN KEY (Badge_ID) REFERENCES Badge(Badge_ID) ON DELETE CASCADE,
         FOREIGN KEY (student_ID) REFERENCES Users(User_ID) ON DELETE CASCADE
