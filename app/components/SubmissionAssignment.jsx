@@ -46,7 +46,7 @@ export default function SubmissionAssignment({ assignment }) {
             <div className="bg-gray-50 px-6 py-4">
                 <div className="flex items-center justify-between">
                     <label
-                        htmlFor={`attachment-${assignment.ID}`}
+                        htmlFor={`attachment-${assignment.assignment_id}`}
                         className="flex items-center text-sm font-medium text-indigo-600 cursor-pointer transition-colors duration-300 hover:text-indigo-800"
                     >
                         <PaperClipIcon className="h-5 w-5 mr-2" />
@@ -60,7 +60,7 @@ export default function SubmissionAssignment({ assignment }) {
                     </button>
                 </div>
                 <Input
-                    id={`attachment-${assignment.ID}`}
+                    id={`attachment-${assignment.assignment_id}`}
                     type="file"
                     onChange={(e) => setassignmentPath(e.target ? e.target.files[0] : "")}
                     required

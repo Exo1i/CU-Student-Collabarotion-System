@@ -21,11 +21,11 @@ export default function ProjectTeamCard({ Team }) {
         <Card className="w-full max-w-2xl mx-auto overflow-hidden transition-all duration-300 hover:shadow-xl relative">
             <div
                 className="absolute top-4 right-4 bg-gradient-to-r from-yellow-400 to-orange-500 text-white rounded-full w-12 h-12 flex items-center justify-center font-bold text-lg shadow-lg">
-                #{Team.teamNumber}
+                #{Team.team_num}
             </div>
             <CardHeader className="bg-gradient-to-r from-purple-500 to-pink-500 text-white">
                 <CardTitle className="text-2xl text-center font-bold">
-                    {Team.name}
+                    {Team.team_name}
                 </CardTitle>
                 <div className="text-center">
                     <CustomLink className="text-center" href={`${currentRoute}/phases`}>
@@ -35,7 +35,7 @@ export default function ProjectTeamCard({ Team }) {
             </CardHeader>
             <CardContent className="p-6 lg-w-full">
                 <div className="flex flex-col sm:flex-row justify-between items-center gap-6">
-                    {Team.available ? (!joinReq ? (<Button
+                    {Team.availableSlots == 1 ? (!joinReq ? (<Button
                         onClick={() => setjoinReq(true)}
                         className="bg-green-500 hover:bg-green-600 text-white font-medium py-2 px-4 rounded-md transition-colors duration-300 flex items-center space-x-2"
                     >
@@ -74,7 +74,7 @@ export default function ProjectTeamCard({ Team }) {
                     {Team.technologies.map((tech) => (<Badge key={tech} variant="secondary">{tech}</Badge>))}
                 </div>
                 <div className="flex flex-wrap justify-center gap-4 mb-4">
-                    {Team.members.map((member) => (<TooltipProvider key={member.name}>
+                    {Team.teamMembers.map((member) => (<TooltipProvider key={member.full_name}>
                         <Tooltip>
                             <TooltipTrigger>
                                 <motion.div
@@ -84,15 +84,15 @@ export default function ProjectTeamCard({ Team }) {
                                 >
                                     <Avatar className="w-12 h-12">
                                         <AvatarImage src={member.avatar} alt={member.name} />
-                                        <AvatarFallback>{member.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
+                                        <AvatarFallback>{member.full_name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
                                     </Avatar>
-                                    {member.role === 'leader' && (
+                                    {member.leader  && (
                                         <Crown className="absolute -top-2 -right-2 w-5 h-5 text-yellow-500" />)}
                                 </motion.div>
                             </TooltipTrigger>
                             <TooltipContent>
-                                <p>{member.name}</p>
-                                <p className="text-sm text-gray-500">{member.role}</p>
+                                <p>{member.full_name}</p>
+                                <p className="text-sm text-gray-500">{member.leader ? "leader" : "member"}</p>
                             </TooltipContent>
                         </Tooltip>
                     </TooltipProvider>))}
@@ -119,20 +119,20 @@ export default function ProjectTeamCard({ Team }) {
                     transition={{ duration: 0.3 }}
                 >
                     <CardFooter className="flex flex-col gap-4 p-6 bg-gray-50">
-                        {Team.members.map((member) => (
-                            <div key={member.name} className="flex items-center justify-between w-full">
+                        {Team.teamMembers.map((member) => (
+                            <div key={member.full_name} className="flex items-center justify-between w-full">
                                 <div className="flex items-center gap-4">
                                     <Avatar>
-                                        <AvatarImage src={member.photo} alt={member.name} />
-                                        <AvatarFallback>{member.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
+                                        <AvatarImage src={member.img} alt={member.full_name} />
+                                        <AvatarFallback>{member.full_name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
                                     </Avatar>
                                     <div>
-                                        <p className="font-semibold">{member.name}</p>
+                                        <p className="font-semibold">{member.full_name}</p>
                                         <p className="text-sm text-gray-500">
-                                            {member.role === 'leader' ? (<span className="flex items-center">
+                                            {member.leader  ? (<span className="flex items-center">
                                                 <Crown className="w-4 h-4 text-yellow-500 mr-1" />
                                                 Team Leader
-                                            </span>) : member.role}
+                                            </span>) : "member"}
                                         </p>
                                     </div>
                                 </div>

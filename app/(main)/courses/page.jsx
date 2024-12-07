@@ -6,34 +6,8 @@ import { Button } from "@/components/ui/button"
 import Image from "next/image"
 import Link from "next/link"
 import { motion } from 'framer-motion'
-import { addAssignmentSubmission } from '@/actions/add-assignmentsubmission'
 
-const courses = [
-    {
-        id: 1,
-        courseName: "Web Development Bootcamp",
-        courseImage: "/courseImg/coursetest1.jpg",
-        instructorName: "John Doe",
-        instructorImage: "/courseImg/instructortest1.jpg",
-        category: "Web Development",
-    },
-    {
-        id: 2,
-        courseName: "Data Science Mastery",
-        courseImage: "/courseImg/coursetest2.jpg",
-        instructorName: "Jane Smith",
-        instructorImage: "/courseImg/instructortest1.jpg",
-        category: "Data Science",
-    },
-    {
-        id: 3,
-        courseName: "Machine Learning Advanced",
-        courseImage: "/courseImg/coursetest1.jpg",
-        instructorName: "Alice Brown",
-        instructorImage: "/courseImg/instructortest1.jpg",
-        category: "Machine Learning",
-    },
-]
+
 
 const categories = ["All", "Web Development", "Data Science", "Machine Learning"]
 
@@ -41,7 +15,7 @@ export default function CoursesPage() {
 
 
     const [filter, setFilter] = useState("All")
-    const [Testcourses, setcourses] = useState(null);
+    const [courses, setcourses] = useState(null);
     const [error, seterror] = useState(null);
     const [loading, setloading] = useState(true);
     const filterdCourses = filter === "All" ? courses : courses.filter(course => course.category === filter);
@@ -49,11 +23,12 @@ export default function CoursesPage() {
         async function fetchCourseData() {
             try {
                 let res = await fetch("/api/courses");
+                console.log(res);
                 if (!res.ok) {
                     throw new Error(`Failed to fetch: ${res.status} ${res.statusText}`)
                 }
-                let Testcourses = await res.json();
-                setcourses(Testcourses);
+                let courses = await res.json();
+                setcourses(courses);
                 seterror(null);
             } catch (error) {
                 seterror(error);
@@ -64,7 +39,6 @@ export default function CoursesPage() {
             }
         }
         fetchCourseData();
-        console.log(Testcourses)
     }, [])
     if (loading) {
         return <div>Loading...</div>
@@ -108,9 +82,9 @@ export default function CoursesPage() {
                 animate={{ opacity: 1 }}
                 transition={{ duration: 0.5, delay: 0.4 }}
             >
-                {filterdCourses.map((course) => (
+                {courses.map((course) => (
                     <motion.div
-                        key={course.id}
+                        key={course.course_code}
                         layout
                         initial={{ opacity: 0, scale: 0.9 }}
                         animate={{ opacity: 1, scale: 1 }}
@@ -121,8 +95,8 @@ export default function CoursesPage() {
                             className="group overflow-hidden bg-white dark:bg-gray-800 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 ease-in-out transform hover:-translate-y-2">
                             <CardHeader className="p-0 relative">
                                 <Image
-                                    src={course.courseImage}
-                                    alt={course.courseName}
+                                    src={course.course_img}
+                                    alt={course.course_name}
                                     width={400}
                                     height={225}
                                     className="w-full h-56 object-cover transition-transform duration-300 group-hover:scale-110"
@@ -133,20 +107,20 @@ export default function CoursesPage() {
 
                             <CardContent className="p-6">
                                 <h2 className="text-2xl font-semibold text-gray-800 dark:text-white mb-2 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors duration-300">
-                                    {course.courseName}
+                                    {course.course_name}
                                 </h2>
                                 <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">Instructor:</p>
                                 <div className="flex items-center gap-4">
                                     <Image
-                                        src={course.instructorImage}
-                                        alt={course.instructorName}
+                                        src={course.img_url}
+                                        alt={course.full_name}
                                         width={40}
                                         height={40}
                                         className="w-10 h-10 rounded-full object-cover ring-2 ring-blue-500 transition-transform group-hover:scale-110"
                                     />
                                     <span
                                         className="text-sm font-semibold text-gray-700 dark:text-gray-300 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors duration-300">
-                                        {course.instructorName}
+                                        {`${course.full_name}`}
                                     </span>
                                 </div>
                             </CardContent>
@@ -154,7 +128,7 @@ export default function CoursesPage() {
                             <CardFooter className="p-6 pt-0">
                                 <Button asChild
                                     className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white transition-all duration-300 ease-in-out transform hover:scale-105">
-                                    <Link href={`/courses/${course.id}`}>
+                                    <Link href={`/courses/${course.course_code}`}>
                                         View Course
                                     </Link>
                                 </Button>
