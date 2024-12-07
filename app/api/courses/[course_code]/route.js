@@ -33,7 +33,7 @@ export async function GET(request, { params }) {
 
     const resp = {
       ...couseinfo.rows[0],
-      project: courseproject.rows,
+      project: courseproject.rows[0],
       assignments: courseassignments.rows,
     };
     return NextResponse.json(resp, { status: 200 });
