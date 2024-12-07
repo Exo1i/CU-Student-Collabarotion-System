@@ -20,7 +20,7 @@ export async function GET(request, { params }) {
         [team.course_code]
       );
       const teamMembers = await pool.query(
-        ` SELECT u.User_ID AS member_id, u.fname AS member_fname, u.lname AS member_lname, u.img_url
+        ` SELECT u.User_ID AS member_id, concat(u.fname,' ',u.lname) as full_name, u.img_url
           FROM participation ppart
           JOIN Users u ON ppart.student_ID = u.User_ID
           WHERE ppart.Project_ID = $1 AND ppart.Team_Num = $2;
@@ -28,7 +28,7 @@ export async function GET(request, { params }) {
         [team.project_id, team.team_num]
       );
       const teamLeader = await pool.query(
-        `SELECT u.User_ID as leader_id, u.fname, u.lname, u.img_url
+        `SELECT u.User_ID as leader_id, concat(u.fname,' ',u.lname) as full_name, u.img_url
          FROM participation p
          JOIN Users u ON p.student_ID = u.User_ID
          JOIN Team t on  p.Team_Num = t.Team_Num AND p.Project_ID = t.Project_ID
