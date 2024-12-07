@@ -55,7 +55,7 @@ export async function GET(request, { params }) {
     console.log("Team Progress:", teamProgress.rows);
 
     const teamMembersQuery = await pool.query(
-      ` SELECT Team.Team_Num, fname, lname , leader
+      ` SELECT Team.Team_Num, fname, lname, img_url, leader
         FROM Team JOIN participation ON Team.Project_ID = participation.Project_ID AND Team.Team_Num = participation.Team_Num
         JOIN Users ON participation.student_ID = Users.User_ID
         WHERE Team.Project_ID = $1 `,
@@ -71,6 +71,7 @@ export async function GET(request, { params }) {
       acc[row.team_num].push({
         fname: row.fname,
         lname: row.lname,
+        img: row.img_url,
         leader: row.leader,
       });
       return acc;
