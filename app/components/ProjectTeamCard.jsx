@@ -16,7 +16,6 @@ export default function ProjectTeamCard({ Team }) {
     const currentRoute = usePathname();
     const [joinReq, setjoinReq] = useState(false);
     const [isExpanded, setIsExpanded] = useState(false);
-
     return (
         <Card className="w-full max-w-2xl mx-auto overflow-hidden transition-all duration-300 hover:shadow-xl relative">
             <div

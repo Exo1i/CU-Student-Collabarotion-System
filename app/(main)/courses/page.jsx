@@ -22,7 +22,7 @@ export default function CoursesPage() {
     useEffect(() => {
         async function fetchCourseData() {
             try {
-                let res = await fetch("/api/courses");
+                let res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/courses`);
                 console.log(res);
                 if (!res.ok) {
                     throw new Error(`Failed to fetch: ${res.status} ${res.statusText}`)

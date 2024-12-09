@@ -25,10 +25,10 @@ export default async function projectPage({ params }) {
     return (
 
         <div className="container mx-auto px-4 py-8">
-            {Teams.length < parseInt(project.maxSize) ? <div className="flex justify-between items-center mb-8">
-                <h1 className="text-3xl font-bold">Project Teams</h1>
-                <CreateTeamButton projectID={projectID} TeamNum={Teams.length + 1} />
-            </div> : null}
+            <div className="flex justify-between items-center mb-8">
+                <h1 className="text-3xl font-bold">Project Teams</h1>{Teams.length < parseInt(project.max_teams) ?
+                    <CreateTeamButton projectID={projectID} TeamNum={Teams.length + 1} />
+                    : null}</div>
             <div className="grid grid-cols-1 gap-8">
                 {Teams.map((team) => (
                     <ProjectTeamCard key={team.team_num} Team={team} />

@@ -1,5 +1,5 @@
 "use client"
-
+import { createTeam } from "@/actions/createTeam"
 import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import {
@@ -35,26 +35,26 @@ export default function CreateTeamButton({ projectID , TeamNum }) {
         e.preventDefault()
 
         try {
-            // Here you would typically make an API call to create the team
-            // For this example, we'll simulate a successful creation
-            await new Promise(resolve => setTimeout(resolve, 1000))
-
-            setNotification({
-                type: "success",
-                title: "Team created successfully",
-                message: `Team "${teamName}" has been added to the project.`
-            })
-            setIsOpen(false)
-            setTeamName("")
+            const res = await createTeam(projectID , TeamNum  , teamName  );
+            if(res.status === 200) {
+                setNotification({
+                    type: "success",
+                    title: "Team created successfully",
+                    message: `Team "${teamName}" has been added to the project.`
+                })
+                setIsOpen(false);
+                setTeamName("");
+            } else {
+                setNotification({
+                    type: "error",
+                    title: "Error creating team",
+                    message: `${res.message}`
+                })                
+            }
         } catch (error) {
-            setNotification({
-                type: "error",
-                title: "Error creating team",
-                message: "There was a problem creating the team. Please try again."
-            })
+            console.log(error);
         }
     }
-
     return (
         <>
             <Dialog open={isOpen} onOpenChange={setIsOpen}>
@@ -84,7 +84,9 @@ export default function CreateTeamButton({ projectID , TeamNum }) {
                             </div>
                         </div>
                         <DialogFooter>
-                            <Button type="submit">Create Team</Button>
+                            <Button type="submit"
+                            onClick={handleCreateTeam}
+                            >Create Team</Button>
                         </DialogFooter>
                     </form>
                 </DialogContent>
