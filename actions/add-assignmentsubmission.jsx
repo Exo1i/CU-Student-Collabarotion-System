@@ -8,7 +8,6 @@ export async function addAssignmentSubmission(assignmentID) {
     if (!userId) redirect('/signin');
 
     if (!assignmentID) {
-        // TODO : create a error handller that display pop-up error message
         return {
             status: 422, message: 'Invalid user data'
         };

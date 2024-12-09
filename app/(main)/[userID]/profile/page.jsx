@@ -3,7 +3,8 @@ import { CrownIcon, Star, StarHalf, AwardIcon, CodeIcon, UserIcon } from 'lucide
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import CustomLink from '@/app/components/MyCustomLink'
 import { notFound } from 'next/navigation'
-import {useUser} from "@clerk/nextjs";
+import UserInfo from '@/app/components/UseEmail'
+
 
 const StarRating = ({ rating }) => {
     const fullStars = Math.floor(rating)
@@ -22,13 +23,15 @@ const StarRating = ({ rating }) => {
         </div>
     )
 }
+
+
+
 export default async function Profile() {
-    // const {isSignedIn, user, isLoaded} = useUser();
     let userData = null
     let error = null;
 
     try {
-        const response = await fetch(`http://localhost:3000/api/students/user002/profile`);
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/students/user002/profile`);
         if (!response.ok) {
             throw new Error(`Failed to fetch projects: ${response.statusText}`);
         }
@@ -39,9 +42,9 @@ export default async function Profile() {
     }
 
     if (error) {
-        return <div className="text-center text-red-500">Error: {error}</div>;
+        return <div className="text-center text-red-500">Error: {error.message}</div>;
     }
-    if(!userData) {
+    if (!userData) {
         return notFound();
     }
     return (
@@ -67,21 +70,21 @@ export default async function Profile() {
                         </div>
                     </div>
                     <div className='text-center'>
-                        <h2 className='mt-3 text-gray-900 font-bold text-3xl'>
-                            {userData.full_name}
-                        </h2>
-                        <p className='flex items-center justify-center text-gray-500'>
-                            <UserIcon className='w-4 h-4 mr-2' />
-                            {/* {userData.email} */}
-                        </p>
+                        <div className='flex items-center justify-center text-gray-500 mt-3'>
+
+                                <UserIcon className='w-6 h-6 mr-2' />
+                            <h2 className='text-gray-900 font-bold text-3xl'>
+                                {userData.full_name}
+                            </h2>
+                        </div>
                     </div>
                     <div className="text-center mt-4">
                         <h2 className="text-3xl font-bold text-gradient bg-gradient-to-r from-blue-500 to-purple-600 text-transparent bg-clip-text tracking-wide">
                             {userData.badges.length === 0 ? null : <>Student Badges</>}
                         </h2>
                         <div className="flex flex-wrap justify-center gap-4 mt-4">
-                            {userData.badges.map((badge, index) => (
-                                <TooltipProvider key={index}>
+                            {userData.badges.map((badge) => (
+                                <TooltipProvider key={badge.badge_id}>
                                     <Tooltip>
                                         <TooltipTrigger>
                                             <div className="p-3 bg-gradient-to-br from-blue-50 to-purple-50 shadow-md hover:shadow-lg rounded-full transition-transform transform hover:scale-110">
@@ -120,7 +123,7 @@ export default async function Profile() {
                                 </h2>
                                 {Team.leader ? <CrownIcon className='w-6 h-6 text-yellow-500 animate-pulse' /> : null}
                             </div>
-                            <span className={`px-2 py-1 rounded-full text-sm font-medium ${Team.leader  ? 'bg-yellow-300 text-yellow-800' : 'bg-gray-300 text-gray-800'}`}>
+                            <span className={`px-2 py-1 rounded-full text-sm font-medium ${Team.leader ? 'bg-yellow-300 text-yellow-800' : 'bg-gray-300 text-gray-800'}`}>
                                 {Team.leader ? "leader" : "member"}
                             </span>
                         </div>
@@ -133,8 +136,8 @@ export default async function Profile() {
                     Reviews
                 </h2>
                 <div className='space-y-4'>
-                    {userData.reviews.map((review) => (
-                        <div key={review.project_id} className="bg-gradient-to-r from-gray-50 to-gray-100 rounded-lg p-4 hover:shadow-md transition-shadow duration-300">
+                    {userData.reviews.map((review, index) => (
+                        <div key={index} className="bg-gradient-to-r from-gray-50 to-gray-100 rounded-lg p-4 hover:shadow-md transition-shadow duration-300">
                             <div className='flex justify-between items-center'>
                                 <h3 className="text-lg font-semibold">
                                     {review.project_name}
