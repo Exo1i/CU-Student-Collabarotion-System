@@ -14,7 +14,7 @@ import MessageInput from '@/app/(main)/chat/MessageInput';
 
 // Create socket connection function
 const createSocketConnection = (userId) => {
-    return io('http://localhost:3001', {
+    return io(process.env.NEXT_PUBLIC_RAILWAY_WS_HOST, {
         closeOnBeforeunload: true,
         reconnection: true,
         reconnectionDelay: 500,
