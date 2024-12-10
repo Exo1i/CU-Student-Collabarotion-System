@@ -14,34 +14,63 @@ const MessageList = ({messages, onMessageUpdate}) => {
     const [editingMessageId, setEditingMessageId] = useState(null)
     const [editContent, setEditContent] = useState('')
     const [userRole, setUserRole] = useState('user')
+    const [error, setError] = useState(null)
 
+    // Fetch user role on component mount
     useEffect(() => {
         const fetchUserRole = async () => {
-            const role = await getRole()
-            setUserRole(role)
+            try {
+                const role = await getRole()
+                setUserRole(role)
+            } catch (err) {
+                console.error('Failed to fetch user role:', err)
+                setError('Could not retrieve user permissions')
+            }
         }
         fetchUserRole()
     }, [])
 
+    // Handle message editing with improved error handling
     const handleEdit = async (messageId, newContent) => {
-        const result = await editMessage(messageId, newContent)
-        if (result.status === 201) {
-            onMessageUpdate(messageId, newContent)
-            setEditingMessageId(null)
-        } else {
-            console.error(result.error || result.message)
+        if (!newContent.trim()) {
+            setError('Message cannot be empty')
+            return
+        }
+
+        try {
+            const result = await editMessage(messageId, newContent)
+            if (result.status === 201) {
+                onMessageUpdate(messageId, newContent)
+                setEditingMessageId(null)
+                setError(null)
+            } else {
+                setError(result.error || 'Failed to edit message')
+                console.error('Edit message error:', result)
+            }
+        } catch (err) {
+            setError('An unexpected error occurred while editing')
+            console.error('Edit message exception:', err)
         }
     }
 
+    // Handle message deletion with improved error handling
     const handleDelete = async (messageId) => {
-        const result = await deleteMessage(messageId)
-        if (result.status === 200) {
-            onMessageUpdate(messageId, null) // null indicates message deletion
-        } else {
-            console.error(result.error || result.message)
+        try {
+            const result = await deleteMessage(messageId)
+            if (result.status === 200) {
+                onMessageUpdate(messageId, null)
+                setError(null)
+            } else {
+                setError(result.error || 'Failed to delete message')
+                console.error('Delete message error:', result)
+            }
+        } catch (err) {
+            setError('An unexpected error occurred while deleting')
+            console.error('Delete message exception:', err)
         }
     }
 
+    // Render a single message list item
     const createLi = (message) => {
         const isSentByCurrentUser = message.sender_id === user?.id
         const isEditing = editingMessageId === message.message_id
@@ -54,6 +83,7 @@ const MessageList = ({messages, onMessageUpdate}) => {
                     isSentByCurrentUser ? 'flex-row-reverse' : 'flex-row'
                 } w-full items-start my-2`}
             >
+                {/* Sender avatar */}
                 {!isSentByCurrentUser && (
                     <div className="flex-shrink-0 mr-3">
                         <Avatar className="mr-2">
@@ -61,10 +91,16 @@ const MessageList = ({messages, onMessageUpdate}) => {
                         </Avatar>
                     </div>
                 )}
+
                 <div className="flex flex-col w-full max-w-[80%]">
+                    {/* Username for non-current user */}
                     {!isSentByCurrentUser && (
-                        <div className="font-semibold text-sm mb-1">{message.username || 'anon'}</div>
+                        <div className="font-semibold text-sm mb-1">
+                            {message.username || 'Anonymous'}
+                        </div>
                     )}
+
+                    {/* Editing mode */}
                     {isEditing ? (
                         <div
                             className={`flex items-center w-full ${isSentByCurrentUser ? 'justify-end' : 'justify-start'}`}>
@@ -95,6 +131,7 @@ const MessageList = ({messages, onMessageUpdate}) => {
                         </div>
                     ) : (
                         <>
+                            {/* Message content */}
                             <div
                                 className={`whitespace-normal break-words p-4 max-w-[80%] ${
                                     isSentByCurrentUser
@@ -104,6 +141,8 @@ const MessageList = ({messages, onMessageUpdate}) => {
                             >
                                 {message.content}
                             </div>
+
+                            {/* Edit and delete buttons */}
                             {canModify && (
                                 <div
                                     className={`flex ${
@@ -135,6 +174,15 @@ const MessageList = ({messages, onMessageUpdate}) => {
                     )}
                 </div>
             </li>
+        )
+    }
+
+    // Render error message if exists
+    if (error) {
+        return (
+            <div className="w-full text-center text-red-500 p-4">
+                {error}
+            </div>
         )
     }
 

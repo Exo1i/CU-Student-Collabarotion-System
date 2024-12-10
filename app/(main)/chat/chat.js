@@ -1,6 +1,6 @@
 'use client';
 
-import {useEffect, useRef, useState} from 'react';
+import {useCallback, useEffect, useRef, useState} from 'react';
 import {useUser} from '@clerk/nextjs';
 import useChatStore from '@/hooks/useChatStore';
 import MessageList from './message-list';
@@ -11,20 +11,22 @@ import {useAlert} from "@/components/alert-context";
 import {insertMessage} from "@/actions/message-actions";
 import MessageInput from "@/app/(main)/chat/message-input";
 
-const socket = io('http://localhost:3001', {
-    closeOnBeforeunload: true,
-    reconnection: true,
-    reconnectionDelay: 500,
-    auth: {
-        userId: null,
-    },
-});
+// Create socket connection function
+const createSocketConnection = (userId) => {
+    return io('http://localhost:3001', {
+        closeOnBeforeunload: true,
+        reconnection: true,
+        reconnectionDelay: 500,
+        autoConnect: false,
+        auth: {userId},
+    });
+};
 
 const Chat = ({channelName}) => {
     const {showAlert} = useAlert();
     const {user} = useUser();
 
-    // Chat state
+    // Chat store state
     const {
         selectedGroupID,
         selectedChannel,
@@ -35,27 +37,59 @@ const Chat = ({channelName}) => {
         updateMessage,
         deleteMessage,
     } = useChatStore();
+
+    // State management
+    const [roomId, setRoomId] = useState(null);
     const [isLoadingMessages, setIsLoadingMessages] = useState(true);
     const [selectedFile, setSelectedFile] = useState(null);
+    const [socket, setSocket] = useState(null);
 
-    // Scroll to bottom
+    // Refs for scroll management
     const messagesEndRef = useRef(null);
-    const scrollToBottom = () => {
-        messagesEndRef.current?.scrollIntoView({behavior: 'smooth'});
-    };
+    const messagesContainerRef = useRef(null);
 
+    // Scroll to bottom function with options
+    const scrollToBottom = useCallback((behavior = 'smooth') => {
+        messagesEndRef.current?.scrollIntoView({behavior});
+    }, []);
+
+    // Socket connection effect
     useEffect(() => {
-        if (user?.id) {
-            socket.auth.userId = user.id;
-            socket.disconnect().connect();
+        if (user?.id && roomId) {
+            const newSocket = createSocketConnection(user.id);
+            newSocket.connect();
+            newSocket.emit('join_room', roomId);
+            setSocket(newSocket);
+
+            // Socket event listeners
+            const handleReceiveMsg = (newMessage) => {
+                addToMessagesList([newMessage]);
+                // Scroll to bottom after receiving a new message
+                setTimeout(() => scrollToBottom(), 100);
+            };
+
+            const handleUpdateMsg = (messageId, content) => {
+                if (content) {
+                    updateMessage(messageId, content);
+                } else {
+                    deleteMessage(messageId);
+                }
+            };
+
+            newSocket.on('receive_msg', handleReceiveMsg);
+            newSocket.on('update_msg', handleUpdateMsg);
+
+            // Cleanup function
+            return () => {
+                newSocket.off('receive_msg', handleReceiveMsg);
+                newSocket.off('update_msg', handleUpdateMsg);
+                newSocket.emit('leave_room', roomId);
+                newSocket.disconnect();
+            };
         }
-    }, [user]);
+    }, [user, roomId, addToMessagesList, updateMessage, deleteMessage, scrollToBottom]);
 
-    useEffect(() => {
-        socket.on('receive_msg', (newMessage) => addToMessagesList([newMessage]));
-        return () => socket.off('receive_msg');
-    }, [addToMessagesList]);
-
+    // Fetch messages effect
     useEffect(() => {
         const fetchMessages = async () => {
             setIsLoadingMessages(true);
@@ -63,9 +97,11 @@ const Chat = ({channelName}) => {
                 const response = await fetch(`/api/chat/${selectedGroupID}/${selectedChannel.channel_num}`);
                 const data = await response.json();
 
-                socket.emit('join_room', selectedGroupID + selectedChannel.channel_num);
                 clearMessages();
                 addToMessagesList(data.messages);
+
+                // Scroll to bottom after messages are loaded
+                setTimeout(() => scrollToBottom('auto'), 100);
             } catch (error) {
                 showAlert({message: 'Error loading messages', severity: 'error'});
             } finally {
@@ -73,12 +109,14 @@ const Chat = ({channelName}) => {
             }
         };
 
-        if (selectedGroupID && selectedChannel) fetchMessages();
-        return () => socket.emit('leave_room', selectedGroupID, selectedChannel?.channel_num);
-    }, [selectedGroupID, selectedChannel, clearMessages, addToMessagesList, showAlert]);
+        if (selectedGroupID && selectedChannel) {
+            const newRoomId = `group-${selectedGroupID}-room-${selectedChannel.channel_num}`;
+            setRoomId(newRoomId);
+            fetchMessages();
+        }
+    }, [selectedGroupID, selectedChannel, clearMessages, addToMessagesList, showAlert, scrollToBottom]);
 
-    useEffect(scrollToBottom, [messagesList]);
-
+    // Message sending handler
     const handleSendMessage = async (message) => {
         if (!message.trim()) {
             showAlert({message: 'Message cannot be empty.', severity: 'warning'});
@@ -86,55 +124,81 @@ const Chat = ({channelName}) => {
         }
 
         try {
-            const newMessage = await insertMessage(selectedGroupID, selectedChannel.channel_num, message, 'message');
-            addToMessagesList([{username: user.username, ...newMessage.data}]);
-            socket.emit('send_msg', {
+            const newMessage = await insertMessage(
+                selectedGroupID,
+                selectedChannel.channel_num,
+                message,
+                'message'
+            );
+
+            addToMessagesList([{
+                username: user.username,
+                ...newMessage.data
+            }]);
+
+            // Emit message to socket
+            socket?.emit('send_msg', {
                 ...newMessage.data,
+                sender_id: null,
                 username: user.username,
                 img_url: user.imageUrl,
-                roomId: selectedGroupID + selectedChannel.channel_num,
+                roomId,
             });
+
+            // Scroll to bottom after sending
+            setTimeout(() => scrollToBottom(), 100);
         } catch (error) {
             showAlert({message: 'Error sending message', severity: 'error'});
         }
     };
 
-    const handleEmojiSelect = (emoji) => {
-        setInputMessage(prev => prev + emoji.native);
-    };
-
+    // File change handler
     const handleFileChange = (e) => {
         setSelectedFile(e.target.files[0]);
     };
 
-    const handleMessageUpdate = (message_id, content) => {
+    // Message update handler
+    const handleMessageUpdate = (messageId, content) => {
         if (content !== null) {
-            updateMessage(message_id, content);
-            socket.emit('update_msg', selectedGroupID.toString() + selectedChannel.channel_num.toString(), message_id, content);
+            updateMessage(messageId, content);
+            socket?.emit('update_msg', roomId, messageId, content);
         } else {
-            deleteMessage(message_id);
-            socket.emit('update_msg', selectedGroupID.toString() + selectedChannel.channel_num.toString(), message_id);
+            deleteMessage(messageId);
+            socket?.emit('update_msg', roomId, messageId);
         }
     };
 
+    // Render loading or chat interface
     if (!selectedChannel) {
-        return <div className="flex items-center justify-center h-full text-gray-500">Select a channel to start
-                                                                                      messaging</div>;
+        return (
+            <div className="flex items-center justify-center h-full text-gray-500">
+                Select a channel to start messaging
+            </div>
+        );
     }
 
     return (
         <div className="flex flex-col h-screen w-full overflow-hidden">
+            {/* Channel header */}
             <div className="border-b p-4 flex justify-between items-center">
                 <h2 className="text-xl font-semibold truncate">{channelName}</h2>
                 <div className="flex items-center space-x-2">
-                    <Button variant="ghost" size="icon" onClick={() => document.getElementById('file-input').click()}>
+                    <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => document.getElementById('file-input').click()}
+                    >
                         <Paperclip size={20} />
                     </Button>
                 </div>
             </div>
 
+            {/* Messages container */}
             {!isLoadingMessages ? (
-                <div className="flex-grow overflow-y-auto p-4 space-y-4">
+                <div
+                    ref={messagesContainerRef}
+                    className="flex-grow overflow-y-auto p-4 space-y-4"
+                >
                     <MessageList
                         messages={messagesList}
                         onMessageUpdate={handleMessageUpdate}
@@ -147,18 +211,26 @@ const Chat = ({channelName}) => {
                 </div>
             )}
 
+            {/* Message input */}
             <div className="border-t p-4">
                 <MessageInput
                     onSubmit={handleSendMessage}
-                    onEmojiSelect={handleEmojiSelect}
                     placeholder={`Message #${channelName}`}
                 />
-                <input type="file" id="file-input" hidden onChange={handleFileChange} />
-                {selectedFile && <p className="mt-2 text-sm text-gray-500">Selected file: {selectedFile.name}</p>}
+                <input
+                    type="file"
+                    id="file-input"
+                    hidden
+                    onChange={handleFileChange}
+                />
+                {selectedFile && (
+                    <p className="mt-2 text-sm text-gray-500">
+                        Selected file: {selectedFile.name}
+                    </p>
+                )}
             </div>
         </div>
     );
 };
 
 export default Chat;
-

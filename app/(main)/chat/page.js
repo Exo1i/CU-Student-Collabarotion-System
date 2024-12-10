@@ -1,56 +1,83 @@
 'use client'
-import useSWR from "swr";
 import {useEffect, useMemo, useState} from "react";
 import {Loader2, Plus, Search, Settings} from "lucide-react";
 import {Button} from "@/components/ui/button";
 import {Input} from "@/components/ui/input";
 import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from "@/components/ui/tooltip";
+import useSWR from "swr";
 import useChatStore from "@/hooks/useChatStore";
 import Chat from "@/app/(main)/chat/chat";
 import ChannelsList from "@/app/(main)/chat/ChannelsList";
 import {useAlert} from "@/components/alert-context";
 
-const fetcher = (...args) => fetch(...args).then(res => res.json())
+// Centralized fetcher function
+const fetcher = async (url) => {
+    const response = await fetch(url);
+    if (!response.ok) {
+        throw new Error('Failed to fetch data');
+    }
+    return response.json();
+};
 
-export default function Page() {
+export default function ChatPage() {
     const {
-        selectedGroupID, setSelectedGroupID,
+        selectedGroupID,
+        setSelectedGroupID,
         selectedChannel,
         setSelectedChannel
     } = useChatStore();
-    const {showAlert} = useAlert()
-    const {data, isLoading, error} = useSWR(
+
+    const {showAlert} = useAlert();
+    const [channels, setChannels] = useState([]);
+    const [searchTerm, setSearchTerm] = useState('');
+
+    // Fetch channels using SWR with error handling
+    const {
+        data,
+        isLoading,
+        error
+    } = useSWR(
         selectedGroupID && selectedGroupID !== 'undefined'
             ? `/api/chat/${selectedGroupID}`
             : null,
         fetcher
-    )
-    const [channels, setChannels] = useState([])
-    const [searchTerm, setSearchTerm] = useState('')
+    );
 
+    // Handle data loading and error states
     useEffect(() => {
         if (!isLoading && data) {
-            setChannels(data.channels);
+            setChannels(data.channels || []);
         }
 
         if (error) {
             showAlert({
-                message: 'Error loading channels. Please try again.', severity: 'error', position: 'bottom-right',
+                message: 'Error loading channels. Please try again.',
+                severity: 'error',
+                position: 'bottom-right',
             });
             console.error('Error fetching data:', error);
         }
-    }, [data, error, showAlert])
+    }, [data, error, showAlert]);
 
-    // Memoized filtered channels based on search term
+    // Memoized filtered channels
     const filteredChannels = useMemo(() => {
         if (!searchTerm) return channels;
 
+        const searchTermLower = searchTerm.toLowerCase();
         return channels.filter(channel =>
-            channel.channel_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            channel.channel_name.toLowerCase().includes(searchTermLower) ||
             (channel.channel_description &&
-                channel.channel_description.toLowerCase().includes(searchTerm.toLowerCase()))
+                channel.channel_description.toLowerCase().includes(searchTermLower))
         );
     }, [channels, searchTerm]);
+
+    // Handle channel creation (placeholder)
+    const handleCreateChannel = () => {
+        showAlert({
+            message: 'Channel creation is not implemented yet',
+            severity: 'info'
+        });
+    };
 
     return (
         <div className="flex h-screen overflow-hidden">
@@ -60,7 +87,10 @@ export default function Page() {
                 <div className="p-4 border-b">
                     <div className="flex items-center mb-4 space-x-2">
                         <div className="relative flex-grow">
-                            <Search className="absolute left-2 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
+                            <Search
+                                className="absolute left-2 top-1/2 -translate-y-1/2 text-gray-400"
+                                size={20}
+                            />
                             <Input
                                 placeholder="Search Channels"
                                 className="pl-8"
@@ -71,7 +101,11 @@ export default function Page() {
                         <TooltipProvider>
                             <Tooltip>
                                 <TooltipTrigger asChild>
-                                    <Button variant="outline" size="icon">
+                                    <Button
+                                        variant="outline"
+                                        size="icon"
+                                        onClick={handleCreateChannel}
+                                    >
                                         <Plus size={20} />
                                     </Button>
                                 </TooltipTrigger>
@@ -124,5 +158,5 @@ export default function Page() {
                 )}
             </div>
         </div>
-    )
+    );
 }

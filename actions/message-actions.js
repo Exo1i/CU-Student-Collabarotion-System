@@ -50,12 +50,12 @@ export async function editMessage(messageID, newContent) {
 }
 
 export async function deleteMessage(messageId) {
-    const {userId} = await auth();
+    const {userId, sessionClaims} = await auth();
     if (!userId) return {
         message: "Unauthorized!",
         status: 400
     }
-
+    ///@TODO: Verify if the user is an admin or the message sender
     try {
         await pool.query("DELETE FROM Message WHERE Message_ID = $1", [messageId]);
         return {
