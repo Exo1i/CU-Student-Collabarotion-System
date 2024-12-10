@@ -1,10 +1,5 @@
 'use server'
-// import 'server-only'
-
 import pool from "@/lib/db";
-import {clerkClient} from "@clerk/nextjs/server";
-
-const clerkclient = await clerkClient();
 
 export async function addUser(userId, username, fname, lname, role) {
     let userObj = await clerkclient.users.getUser(userId)
@@ -26,27 +21,34 @@ export async function addUser(userId, username, fname, lname, role) {
             VALUES ($1,$2, $3, $4, $5,$6)
         `, [userId, username, fname, lname, role, img_url]);
 
-        console.log('Database insertion result:', result);
+    console.log("Database insertion result:", result);
 
-        return {
-            status: 200, message: "User added successfully",
-        };
-    } catch (err) {
-        console.error('Detailed error:', {
-            message: err.message, code: err.code, detail: err.detail, stack: err.stack
-        });
+    return {
+      status: 200,
+      message: "User added successfully",
+    };
+  } catch (err) {
+    console.error("Detailed error:", {
+      message: err.message,
+      code: err.code,
+      detail: err.detail,
+      stack: err.stack,
+    });
 
-        if (err.code === '23505') {  // Unique constraint violation
-            return {
-                status: 409,  // Conflict
-                message: 'User already exists'
-            };
-        }
-
-        return {
-            status: 500, message: 'Database insertion failed', error: err.message
-        };
+    if (err.code === "23505") {
+      // Unique constraint violation
+      return {
+        status: 409, // Conflict
+        message: "User already exists",
+      };
     }
+
+    return {
+      status: 500,
+      message: "Database insertion failed",
+      error: err.message,
+    };
+  }
 }
 
 export async function fetchUserData(user_id) {

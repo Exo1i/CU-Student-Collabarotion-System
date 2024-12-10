@@ -1,5 +1,5 @@
 "use server";
-import pool from "../../../lib/db";
+import pool from "@/lib/db";
 import { NextResponse } from "next/server";
 
 //get all users
