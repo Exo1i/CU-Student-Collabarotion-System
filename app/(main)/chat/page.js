@@ -103,8 +103,7 @@ export default function ChatPage() {
                     </div>
                 ) : (
                     <Chat
-                        channelName={selectedChannel?.channel_name || 'Select a channel'}
-                        channelId={selectedChannel?.channel_num}
+
                         userRole={userRole}
                     />
                 )}

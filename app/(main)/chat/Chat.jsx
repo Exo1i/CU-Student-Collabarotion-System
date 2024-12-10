@@ -22,7 +22,7 @@ const createSocketConnection = (userId) => {
     });
 };
 
-const Chat = ({channelName, userRole}) => {
+const Chat = ({userRole}) => {
     const {showAlert} = useAlert();
     const {user} = useUser();
 
@@ -181,7 +181,7 @@ const Chat = ({channelName, userRole}) => {
         <div className="flex flex-col h-screen w-full overflow-hidden">
             {/* Channel header */}
             <div className="border-b p-4 flex justify-between items-center">
-                <h2 className="text-xl font-semibold truncate">{channelName}</h2>
+                <h2 className="text-xl font-semibold truncate">{selectedChannel.channel_name ||'Select a channel'}</h2>
                 <div className="flex items-center space-x-2">
                     <Button
                         variant="ghost"
@@ -213,10 +213,10 @@ const Chat = ({channelName, userRole}) => {
             )}
 
             {/* Message input */}
-            <div className="border-t p-4">
+            {selectedChannel.channel_type === 'open' && (<div className="border-t p-4">
                 <MessageInput
                     onSubmit={handleSendMessage}
-                    placeholder={`Message #${channelName}`}
+                    placeholder={`Message #${selectedChannel.channel_name}`}
                 />
                 <input
                     type="file"
@@ -229,7 +229,7 @@ const Chat = ({channelName, userRole}) => {
                         Selected file: {selectedFile.name}
                     </p>
                 )}
-            </div>
+            </div>)}
         </div>
     );
 };
