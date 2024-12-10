@@ -117,14 +117,13 @@ export function SidebarLeft({...props}) {
             <SignedOut>
                 <SignInButton />
             </SignedOut>
-            {isLoaded ? (
-                <SignedIn>
-                    <NavUser
-                        email={user?.emailAddresses[0]?.emailAddress}
-                        avatar={user?.imageUrl}
-                        name={user?.fullName}
-                    />
-                </SignedIn>) : (<div className={"flex items-center space-x-4 h-[48px] w-full"}>
+            {isLoaded ? (<SignedIn>
+                <NavUser
+                    email={user?.emailAddresses[0]?.emailAddress}
+                    avatar={user?.imageUrl}
+                    name={user?.fullName}
+                />
+            </SignedIn>) : (<div className={"flex items-center space-x-4 h-[48px] w-full"}>
                 <Skeleton className="h-10 w-10 rounded-full" />
                 <div className={"flex flex-col space-y-2 w-[10rem] items-center"}>
                     <Skeleton className="h-2 w-full rounded-full" />

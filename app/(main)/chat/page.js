@@ -19,28 +19,17 @@ const fetcher = async (url) => {
 
 export default function ChatPage() {
     const {
-        selectedGroupID,
-        setSelectedGroupID,
-        selectedChannel,
-        setSelectedChannel
+        selectedGroupID, setSelectedGroupID, selectedChannel, setSelectedChannel
     } = useChatStore();
 
     const {showAlert} = useAlert();
     const [channels, setChannels] = useState([]);
-    const [userRole, setUserRole] = useState('user')
+    const [userRole, setUserRole] = useState('student')
     const [disableInput, setDisableInput] = useState(true)
 
     const {
-        data,
-        isLoading,
-        error,
-        mutate
-    } = useSWR(
-        selectedGroupID && selectedGroupID !== 'undefined'
-            ? `/api/chat/${selectedGroupID}`
-            : null,
-        fetcher
-    );
+        data, isLoading, error, mutate
+    } = useSWR(selectedGroupID && selectedGroupID !== 'undefined' ? `/api/chat/${selectedGroupID}` : null, fetcher);
 
     useEffect(() => {
         const fetchUserRole = async () => {
@@ -61,62 +50,44 @@ export default function ChatPage() {
         }
 
         if (error) {
-            showAlert({
-                message: 'Error loading channels. Please try again.',
-                severity: 'error',
-                position: 'bottom-right',
-            });
-            console.error('Error fetching data:', error);
+            setTimeout(() => {
+                showAlert({
+                    message: 'Error loading channels. Please try again.', severity: 'error', position: 'bottom-right',
+                });
+                console.error('Error fetching data:', error);
+            }, 500)
         }
     }, [data, error, showAlert]);
 
-    useEffect(() => {
-        if (channels.length > 0 && !selectedChannel) {
-            setSelectedChannel(channels[0]);
-        }
-    }, [channels, selectedChannel, setSelectedChannel]);
-
 
     useEffect(() => {
-        if (selectedChannel)
-            setDisableInput(channels.filter(channel => channel.channel_num === selectedChannel.channel_num)[0]?.channel_type !== 'open' && userRole === 'user')
-    }, [selectedChannel,channels])
-
-    return (
-        <div className="flex h-screen overflow-hidden">
-            {/* Sidebar Channels Section */}
-            <div className="w-[15%] flex-shrink-0 flex flex-col border-r border-gray-200">
-                {/* Channels List */}
-                <div className="flex-grow overflow-y-auto p-2">
-                    {isLoading ? (
-                        <div className="flex justify-center items-center h-full">
-                            <Loader2 className="animate-spin text-gray-400" size={32} />
-                        </div>
-                    ) : (
-                        <ChannelsList
-                            channels={channels}
-                            setChannels={setChannels}
-                            userRole={userRole}
-                            onChannelUpdate={() => mutate(`/api/chat/${selectedGroupID}`)}
-                        />
-                    )}
-                </div>
-            </div>
-
-            {/* Main Chat Section */}
-            <div className="flex-grow overflow-hidden">
-                {isLoading ? (
-                    <div className="flex justify-center items-center h-full">
-                        <Loader2 className="animate-spin text-gray-400" size={32} />
-                    </div>
-                ) : (
-                    <Chat
-                        disableInput={disableInput}
-                        userRole={userRole}
-                    />
-                )}
+        if (selectedChannel) setDisableInput(channels.filter(channel => channel.channel_num === selectedChannel.channel_num)[0]?.channel_type !== 'open' && userRole === 'student')
+    }, [selectedChannel, channels])
+    return (<div className="flex h-screen overflow-hidden">
+        {/* Sidebar Channels Section */}
+        <div className="w-[15%] flex-shrink-0 flex flex-col border-r border-gray-200">
+            {/* Channels List */}
+            <div className="flex-grow overflow-y-auto p-2">
+                {isLoading ? (<div className="flex justify-center items-center h-full">
+                    <Loader2 className="animate-spin text-gray-400" size={32} />
+                </div>) : (<ChannelsList
+                    channels={channels}
+                    setChannels={setChannels}
+                    userRole={userRole}
+                    onChannelUpdate={() => mutate(`/api/chat/${selectedGroupID}`)}
+                />)}
             </div>
         </div>
-    );
+
+        {/* Main Chat Section */}
+        <div className="flex-grow overflow-hidden">
+            {isLoading ? (<div className="flex justify-center items-center h-full">
+                <Loader2 className="animate-spin text-gray-400" size={32} />
+            </div>) : (<Chat
+                disableInput={disableInput}
+                userRole={userRole}
+            />)}
+        </div>
+    </div>);
 }
 
