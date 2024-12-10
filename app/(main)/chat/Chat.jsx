@@ -14,7 +14,7 @@ import MessageInput from '@/app/(main)/chat/MessageInput';
 
 // Create socket connection function
 const createSocketConnection = (userId) => {
-    return io('http://localhost:3001', {
+    return io(process.env.NEXT_PUBLIC_RAILWAY_WS_HOST, {
         closeOnBeforeunload: true,
         reconnection: true,
         reconnectionDelay: 500,
@@ -66,7 +66,7 @@ const Chat = ({disableInput, userRole}) => {
 
     // Effect for populating messages list with SWR data
     useEffect(() => {
-        if (fetchedMessages) {
+        if (fetchedMessages && fetchedMessages.messages) {
             clearMessages();
             addToMessagesList(fetchedMessages.messages);
             setTimeout(() => scrollToBottom('auto'), 100);

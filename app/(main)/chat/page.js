@@ -70,18 +70,11 @@ export default function ChatPage() {
         }
     }, [data, error, showAlert]);
 
-    useEffect(() => {
-        if (channels.length > 0 && !selectedChannel) {
-            setSelectedChannel(channels[0]);
-        }
-    }, [channels, selectedChannel, setSelectedChannel]);
-
 
     useEffect(() => {
         if (selectedChannel)
             setDisableInput(channels.filter(channel => channel.channel_num === selectedChannel.channel_num)[0]?.channel_type !== 'open' && userRole === 'user')
-    }, [selectedChannel,channels])
-
+    }, [selectedChannel, channels])
     return (
         <div className="flex h-screen overflow-hidden">
             {/* Sidebar Channels Section */}
