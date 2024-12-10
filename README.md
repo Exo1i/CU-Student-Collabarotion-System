@@ -65,7 +65,7 @@ GET /api/projects/:id/phases
 ```
 
 [View full API documentation](./docs/api.md)
-
+ 
 ## 🗂️ Project Structure
 
 ```
