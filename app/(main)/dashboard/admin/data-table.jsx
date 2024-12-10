@@ -6,7 +6,6 @@ import {
   useReactTable,
   getFilteredRowModel,
   getPaginationRowModel,
-  VisibilityState,
 } from "@tanstack/react-table";
 import {
   Table,
@@ -32,18 +31,15 @@ DataTable.propTypes = {
 
 export function DataTable({ columns, data }) {
   const [columnFilters, setColumnFilters] = React.useState([]);
-  const [columnVisibility, setColumnVisibility] = React.useState({});
   const table = useReactTable({
     data,
     columns,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     onColumnFiltersChange: setColumnFilters,
-    onColumnVisibilityChange: setColumnVisibility,
     getFilteredRowModel: getFilteredRowModel(),
     state: {
       columnFilters,
-      columnVisibility,
     },
   });
 
