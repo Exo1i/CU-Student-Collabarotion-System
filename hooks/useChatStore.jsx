@@ -29,8 +29,7 @@ const useChatStore = create(persist(combine({
     updateMessage: (message_id, content) => {
         set((state) => ({
             messagesList: state.messagesList.map((message) => message.message_id === message_id ? {
-                ...message,
-                content: content
+                ...message, content: content
             } : message),
         }));
     },
