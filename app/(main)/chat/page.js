@@ -1,14 +1,12 @@
 'use client'
-import {useEffect, useMemo, useState} from "react";
-import {Loader2, Plus, Search, Settings} from "lucide-react";
-import {Button} from "@/components/ui/button";
-import {Input} from "@/components/ui/input";
-import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from "@/components/ui/tooltip";
+import {useEffect, useState} from "react";
+import {Loader2} from 'lucide-react';
 import useSWR from "swr";
 import useChatStore from "@/hooks/useChatStore";
-import Chat from "@/app/(main)/chat/chat";
-import ChannelsList from "@/app/(main)/chat/ChannelsList";
+import Chat from "@/app/(main)/chat/Chat";
+import {ChannelsList} from "@/app/(main)/chat/ChannelsList";
 import {useAlert} from "@/components/alert-context";
+import {getRole} from "@/lib/role";
 
 // Centralized fetcher function
 const fetcher = async (url) => {
@@ -29,19 +27,31 @@ export default function ChatPage() {
 
     const {showAlert} = useAlert();
     const [channels, setChannels] = useState([]);
-    const [searchTerm, setSearchTerm] = useState('');
+    const [userRole, setUserRole] = useState('user')
 
-    // Fetch channels using SWR with error handling
     const {
         data,
         isLoading,
-        error
+        error,
+        mutate
     } = useSWR(
         selectedGroupID && selectedGroupID !== 'undefined'
             ? `/api/chat/${selectedGroupID}`
             : null,
         fetcher
     );
+
+    useEffect(() => {
+        const fetchUserRole = async () => {
+            try {
+                const role = await getRole()
+                setUserRole(role)
+            } catch (err) {
+                console.error('Failed to fetch user role:', err)
+            }
+        }
+        fetchUserRole();
+    }, []);
 
     // Handle data loading and error states
     useEffect(() => {
@@ -59,64 +69,16 @@ export default function ChatPage() {
         }
     }, [data, error, showAlert]);
 
-    // Memoized filtered channels
-    const filteredChannels = useMemo(() => {
-        if (!searchTerm) return channels;
-
-        const searchTermLower = searchTerm.toLowerCase();
-        return channels.filter(channel =>
-            channel.channel_name.toLowerCase().includes(searchTermLower) ||
-            (channel.channel_description &&
-                channel.channel_description.toLowerCase().includes(searchTermLower))
-        );
-    }, [channels, searchTerm]);
-
-    // Handle channel creation (placeholder)
-    const handleCreateChannel = () => {
-        showAlert({
-            message: 'Channel creation is not implemented yet',
-            severity: 'info'
-        });
-    };
+    useEffect(() => {
+        if (channels.length > 0 && !selectedChannel) {
+            setSelectedChannel(channels[0]);
+        }
+    }, [channels, selectedChannel, setSelectedChannel]);
 
     return (
         <div className="flex h-screen overflow-hidden">
             {/* Sidebar Channels Section */}
             <div className="w-[15%] flex-shrink-0 flex flex-col border-r border-gray-200">
-                {/* Search and Actions */}
-                <div className="p-4 border-b">
-                    <div className="flex items-center mb-4 space-x-2">
-                        <div className="relative flex-grow">
-                            <Search
-                                className="absolute left-2 top-1/2 -translate-y-1/2 text-gray-400"
-                                size={20}
-                            />
-                            <Input
-                                placeholder="Search Channels"
-                                className="pl-8"
-                                value={searchTerm}
-                                onChange={(e) => setSearchTerm(e.target.value)}
-                            />
-                        </div>
-                        <TooltipProvider>
-                            <Tooltip>
-                                <TooltipTrigger asChild>
-                                    <Button
-                                        variant="outline"
-                                        size="icon"
-                                        onClick={handleCreateChannel}
-                                    >
-                                        <Plus size={20} />
-                                    </Button>
-                                </TooltipTrigger>
-                                <TooltipContent>
-                                    <p>Create New Channel</p>
-                                </TooltipContent>
-                            </Tooltip>
-                        </TooltipProvider>
-                    </div>
-                </div>
-
                 {/* Channels List */}
                 <div className="flex-grow overflow-y-auto p-2">
                     {isLoading ? (
@@ -124,24 +86,12 @@ export default function ChatPage() {
                             <Loader2 className="animate-spin text-gray-400" size={32} />
                         </div>
                     ) : (
-                        <ChannelsList channels={filteredChannels} />
+                        <ChannelsList
+                            channels={channels}
+                            userRole={userRole}
+                            onChannelUpdate={() => mutate(`/api/chat/${selectedGroupID}`)}
+                        />
                     )}
-                </div>
-
-                {/* Bottom Actions */}
-                <div className="border-t p-4 flex justify-between items-center">
-                    <TooltipProvider>
-                        <Tooltip>
-                            <TooltipTrigger asChild>
-                                <Button variant="ghost" size="icon">
-                                    <Settings size={20} />
-                                </Button>
-                            </TooltipTrigger>
-                            <TooltipContent>
-                                <p>Group Settings</p>
-                            </TooltipContent>
-                        </Tooltip>
-                    </TooltipProvider>
                 </div>
             </div>
 
@@ -154,9 +104,12 @@ export default function ChatPage() {
                 ) : (
                     <Chat
                         channelName={selectedChannel?.channel_name || 'Select a channel'}
+                        channelId={selectedChannel?.channel_num}
+                        userRole={userRole}
                     />
                 )}
             </div>
         </div>
     );
 }
+

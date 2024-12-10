@@ -3,13 +3,13 @@
 import {useCallback, useEffect, useRef, useState} from 'react';
 import {useUser} from '@clerk/nextjs';
 import useChatStore from '@/hooks/useChatStore';
-import MessageList from './message-list';
+import MessagesList from './MessagesList';
 import {Button} from '@/components/ui/button';
 import {Loader2, Paperclip} from 'lucide-react';
 import {io} from 'socket.io-client';
 import {useAlert} from "@/components/alert-context";
 import {insertMessage} from "@/actions/message-actions";
-import MessageInput from "@/app/(main)/chat/message-input";
+import MessageInput from "@/app/(main)/chat/MessageInput";
 
 // Create socket connection function
 const createSocketConnection = (userId) => {
@@ -22,7 +22,7 @@ const createSocketConnection = (userId) => {
     });
 };
 
-const Chat = ({channelName}) => {
+const Chat = ({channelName, userRole}) => {
     const {showAlert} = useAlert();
     const {user} = useUser();
 
@@ -199,9 +199,10 @@ const Chat = ({channelName}) => {
                     ref={messagesContainerRef}
                     className="flex-grow overflow-y-auto p-4 space-y-4"
                 >
-                    <MessageList
+                    <MessagesList
                         messages={messagesList}
                         onMessageUpdate={handleMessageUpdate}
+                        userRole={userRole}
                     />
                     <div ref={messagesEndRef} />
                 </div>

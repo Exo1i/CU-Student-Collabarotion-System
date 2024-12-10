@@ -1,34 +1,18 @@
 'use client'
 
-import {useEffect, useState} from 'react'
+import {useState} from 'react'
 import {Avatar, AvatarImage} from '@/components/ui/avatar'
 import {useUser} from '@clerk/nextjs'
 import {Button} from '@/components/ui/button'
 import {Input} from '@/components/ui/input'
 import {deleteMessage, editMessage} from '@/actions/message-actions'
 import {Check, Pencil, Trash2, X} from 'lucide-react'
-import {getRole} from '@/lib/role'
 
-const MessageList = ({messages, onMessageUpdate}) => {
+const MessagesList = ({messages, onMessageUpdate, userRole}) => {
     const {user} = useUser()
     const [editingMessageId, setEditingMessageId] = useState(null)
     const [editContent, setEditContent] = useState('')
-    const [userRole, setUserRole] = useState('user')
     const [error, setError] = useState(null)
-
-    // Fetch user role on component mount
-    useEffect(() => {
-        const fetchUserRole = async () => {
-            try {
-                const role = await getRole()
-                setUserRole(role)
-            } catch (err) {
-                console.error('Failed to fetch user role:', err)
-                setError('Could not retrieve user permissions')
-            }
-        }
-        fetchUserRole()
-    }, [])
 
     // Handle message editing with improved error handling
     const handleEdit = async (messageId, newContent) => {
@@ -187,10 +171,13 @@ const MessageList = ({messages, onMessageUpdate}) => {
     }
 
     return (
-        <ul className="flex flex-col w-full space-y-2 overflow-y-auto">
-            {messages.map(createLi)}
-        </ul>
+        <>
+
+            <ul className="flex flex-col w-full space-y-2 overflow-y-auto">
+                {messages.map(createLi)}
+            </ul>
+        </>
     )
 }
 
-export default MessageList
+export default MessagesList
