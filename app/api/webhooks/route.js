@@ -65,16 +65,17 @@ async function syncUserToDatabase(clerkUser) {
 
         // Upsert user in the database
         const upsertQuery = `
-      INSERT INTO Users (User_ID, Fname, Lname, Role,img_url)
-      VALUES ($1, $2, $3, $4,$5)
+      INSERT INTO Users (User_ID, Fname, Lname, Role,img_url,username)
+      VALUES ($1, $2, $3, $4,$5,$6)
       ON CONFLICT (User_ID) DO UPDATE
       SET Fname = $2, 
           Lname = $3, 
           Role = $4,
-          img_url = $5
+          img_url = $5,
+          username = $6
     `;
 
-        await client.query(upsertQuery, [clerkUser.id, clerkUser.firstName || '', clerkUser.lastName || '', role, clerkUser.image_url]);
+        await client.query(upsertQuery, [clerkUser.id, clerkUser.first_name || '', clerkUser.last_name || '', role, clerkUser.image_url, clerkUser.username]);
 
         // Commit transaction
         await client.query('COMMIT');
