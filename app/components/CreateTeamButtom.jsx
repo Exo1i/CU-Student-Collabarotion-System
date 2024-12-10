@@ -15,12 +15,14 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { CheckCircledIcon, CrossCircledIcon } from "@radix-ui/react-icons"
+import { useRouter } from "next/navigation"
 
-export default function CreateTeamButton({ projectID , TeamNum }) {
+export default function CreateTeamButton({ userid , projectID , TeamNum }) {
     const [teamName, setTeamName] = useState("")
     const [isOpen, setIsOpen] = useState(false)
-    const [notification, setNotification] = useState(null)
-
+    const [notification, setNotification] = useState(null);
+    const router = useRouter();
+    console.log("project id -> " + projectID)
     useEffect(() => {
         if (notification) {
             const timer = setTimeout(() => {
@@ -35,7 +37,7 @@ export default function CreateTeamButton({ projectID , TeamNum }) {
         e.preventDefault()
 
         try {
-            const res = await createTeam(projectID , TeamNum  , teamName  );
+            const res = await createTeam( userid , projectID , TeamNum  , teamName  );
             if(res.status === 200) {
                 setNotification({
                     type: "success",
@@ -44,6 +46,7 @@ export default function CreateTeamButton({ projectID , TeamNum }) {
                 })
                 setIsOpen(false);
                 setTeamName("");
+                router.refresh();
             } else {
                 setNotification({
                     type: "error",

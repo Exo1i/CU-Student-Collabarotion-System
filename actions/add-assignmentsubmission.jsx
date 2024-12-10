@@ -6,7 +6,6 @@ import { redirect } from 'next/navigation';
 export async function addAssignmentSubmission(assignmentID) {
     const { userId } = await auth();
     if (!userId) redirect('/signin');
-
     if (!assignmentID) {
         return {
             status: 422, message: 'Invalid user data'

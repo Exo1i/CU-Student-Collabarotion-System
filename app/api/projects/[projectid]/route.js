@@ -12,7 +12,7 @@ export async function GET(request, { params }) {
       [par.projectid]
     );
 
-    console.log("Project Details:", projectDetails.rows[0]);
+    // console.log("Project Details:", projectDetails.rows[0]);
 
     const maxNumTeams = await pool.query(
       `SELECT CEIL(CAST(COUNT(u.User_ID) AS FLOAT) / (p.Max_team_size)) AS max_teams
@@ -22,7 +22,7 @@ export async function GET(request, { params }) {
       [par.projectid]
     );
 
-    console.log("maxNumTeams:", maxNumTeams.rows[0]);
+    // console.log("maxNumTeams:", maxNumTeams.rows[0]);
 
     const teamDetails = await pool.query(
       `SELECT Team_Num, Team_Name 
@@ -31,7 +31,7 @@ export async function GET(request, { params }) {
       [par.projectid]
     );
 
-    console.log("Team Details:", teamDetails.rows);
+    // console.log("Team Details:", teamDetails.rows);
 
     const teamAvailability = await pool.query(
       `SELECT Team.Team_Num, Max_team_size - COUNT(student_ID) AS Available_Slots
@@ -43,7 +43,7 @@ export async function GET(request, { params }) {
       [par.projectid]
     );
 
-    console.log("Team Availability:", teamAvailability.rows);
+    // console.log("Team Availability:", teamAvailability.rows);
 
     const teamProgress = await pool.query(
       `SELECT Team_Num, COALESCE(SUM(Phase_load), 0) AS Progress
@@ -56,7 +56,7 @@ export async function GET(request, { params }) {
       [par.projectid]
     );
 
-    console.log("Team Progress:", teamProgress.rows);
+    // console.log("Team Progress:", teamProgress.rows);
 
     const technologies = await pool.query(
       `SELECT te.team_num, array_agg(t.technology) AS technologies
@@ -67,7 +67,7 @@ export async function GET(request, { params }) {
       [par.projectid]
     );
 
-    console.log("Technologies:", technologies.rows);
+    // console.log("Technologies:", technologies.rows);
 
     const teamMembersQuery = await pool.query(
       `SELECT Team.Team_Num, concat(fname,' ',lname) as full_name, img_url, leader
@@ -78,7 +78,7 @@ export async function GET(request, { params }) {
       [par.projectid]
     );
 
-    console.log("Team Members Query:", teamMembersQuery.rows);
+    // console.log("Team Members Query:", teamMembersQuery.rows);
 
     const teamMembers = teamMembersQuery.rows.reduce((acc, row) => {
       if (!acc[row.team_num]) {
@@ -92,7 +92,7 @@ export async function GET(request, { params }) {
       return acc;
     }, {});
 
-    console.log("Team Members Aggregated:", teamMembers);
+    // console.log("Team Members Aggregated:", teamMembers);
 
     const resp = {
       ...projectDetails.rows[0],
@@ -122,7 +122,7 @@ export async function GET(request, { params }) {
       }),
     };
 
-    console.log("Final Response:", resp);
+    // console.log("Final Response:", resp);
 
     return NextResponse.json(resp, { status: 200 });
   } catch (error) {
