@@ -1,8 +1,8 @@
 "use server";
 import pool from "@/lib/db";
 
-export async function createTeam(projectID, TeamNum, TeamName) {
-    console.log("Received parameters:", { projectID, TeamNum, TeamName });
+export async function createTeam( student_ID , projectID, TeamNum, TeamName) {
+    console.log("Received parameters:", { student_ID , projectID, TeamNum, TeamName });
 
     // Validate input more rigorously
     if (!projectID || !TeamNum || !TeamName) {
@@ -23,7 +23,13 @@ export async function createTeam(projectID, TeamNum, TeamName) {
         );
 
         console.log("Database insertion result:", result);
-
+        await pool.query(
+            `
+        INSERT INTO participation (student_ID, Project_ID, Team_Num, Leader)  
+            VALUES ($1, $2, $3 , $4)
+        `,
+            [student_ID, projectID, TeamNum, true]
+        );
         return {
             status: 200,
             message: "Team created successfully",
