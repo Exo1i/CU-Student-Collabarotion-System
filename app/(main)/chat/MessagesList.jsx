@@ -172,7 +172,6 @@ const MessagesList = ({messages, onMessageUpdate, userRole}) => {
 
     return (
         <>
-
             <ul className="flex flex-col w-full space-y-2 overflow-y-auto">
                 {messages.map(createLi)}
             </ul>

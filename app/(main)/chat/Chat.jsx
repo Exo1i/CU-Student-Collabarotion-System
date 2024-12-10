@@ -1,15 +1,16 @@
 'use client';
 
 import {useCallback, useEffect, useRef, useState} from 'react';
+import useSWR from 'swr';
 import {useUser} from '@clerk/nextjs';
 import useChatStore from '@/hooks/useChatStore';
 import MessagesList from './MessagesList';
 import {Button} from '@/components/ui/button';
 import {Loader2, Paperclip} from 'lucide-react';
 import {io} from 'socket.io-client';
-import {useAlert} from "@/components/alert-context";
-import {insertMessage} from "@/actions/message-actions";
-import MessageInput from "@/app/(main)/chat/MessageInput";
+import {useAlert} from '@/components/alert-context';
+import {insertMessage} from '@/actions/message-actions';
+import MessageInput from '@/app/(main)/chat/MessageInput';
 
 // Create socket connection function
 const createSocketConnection = (userId) => {
@@ -22,7 +23,10 @@ const createSocketConnection = (userId) => {
     });
 };
 
-const Chat = ({userRole}) => {
+// Fetcher function for SWR
+const fetcher = (url) => fetch(url).then((res) => res.json());
+
+const Chat = ({disableInput, userRole}) => {
     const {showAlert} = useAlert();
     const {user} = useUser();
 
@@ -40,7 +44,6 @@ const Chat = ({userRole}) => {
 
     // State management
     const [roomId, setRoomId] = useState(null);
-    const [isLoadingMessages, setIsLoadingMessages] = useState(true);
     const [selectedFile, setSelectedFile] = useState(null);
     const [socket, setSocket] = useState(null);
 
@@ -48,10 +51,30 @@ const Chat = ({userRole}) => {
     const messagesEndRef = useRef(null);
     const messagesContainerRef = useRef(null);
 
+    // SWR for fetching messages
+    const {data: fetchedMessages, error, isLoading} = useSWR(
+        selectedGroupID && selectedChannel
+            ? `/api/chat/${selectedGroupID}/${selectedChannel.channel_num}`
+            : null,
+        fetcher
+    );
+
     // Scroll to bottom function with options
     const scrollToBottom = useCallback((behavior = 'smooth') => {
         messagesEndRef.current?.scrollIntoView({behavior});
     }, []);
+
+    // Effect for populating messages list with SWR data
+    useEffect(() => {
+        if (fetchedMessages) {
+            clearMessages();
+            addToMessagesList(fetchedMessages.messages);
+            setTimeout(() => scrollToBottom('auto'), 100);
+        }
+        if (error) {
+            showAlert({message: 'Error loading messages', severity: 'error'});
+        }
+    }, [fetchedMessages, error, clearMessages, addToMessagesList, scrollToBottom]);
 
     // Socket connection effect
     useEffect(() => {
@@ -64,7 +87,6 @@ const Chat = ({userRole}) => {
             // Socket event listeners
             const handleReceiveMsg = (newMessage) => {
                 addToMessagesList([newMessage]);
-                // Scroll to bottom after receiving a new message
                 setTimeout(() => scrollToBottom(), 100);
             };
 
@@ -89,32 +111,12 @@ const Chat = ({userRole}) => {
         }
     }, [user, roomId, addToMessagesList, updateMessage, deleteMessage, scrollToBottom]);
 
-    // Fetch messages effect
+    // Room ID effect
     useEffect(() => {
-        const fetchMessages = async () => {
-            setIsLoadingMessages(true);
-            try {
-                const response = await fetch(`/api/chat/${selectedGroupID}/${selectedChannel.channel_num}`);
-                const data = await response.json();
-
-                clearMessages();
-                addToMessagesList(data.messages);
-
-                // Scroll to bottom after messages are loaded
-                setTimeout(() => scrollToBottom('auto'), 100);
-            } catch (error) {
-                showAlert({message: 'Error loading messages', severity: 'error'});
-            } finally {
-                setIsLoadingMessages(false);
-            }
-        };
-
         if (selectedGroupID && selectedChannel) {
-            const newRoomId = `group-${selectedGroupID}-room-${selectedChannel.channel_num}`;
-            setRoomId(newRoomId);
-            fetchMessages();
+            setRoomId(`group-${selectedGroupID}-room-${selectedChannel.channel_num}`);
         }
-    }, [selectedGroupID, selectedChannel, clearMessages, addToMessagesList, showAlert, scrollToBottom]);
+    }, [selectedGroupID, selectedChannel]);
 
     // Message sending handler
     const handleSendMessage = async (message) => {
@@ -131,10 +133,12 @@ const Chat = ({userRole}) => {
                 'message'
             );
 
-            addToMessagesList([{
-                username: user.username,
-                ...newMessage.data
-            }]);
+            addToMessagesList([
+                {
+                    username: user.username,
+                    ...newMessage.data,
+                },
+            ]);
 
             // Emit message to socket
             socket?.emit('send_msg', {
@@ -145,7 +149,6 @@ const Chat = ({userRole}) => {
                 roomId,
             });
 
-            // Scroll to bottom after sending
             setTimeout(() => scrollToBottom(), 100);
         } catch (error) {
             showAlert({message: 'Error sending message', severity: 'error'});
@@ -181,7 +184,9 @@ const Chat = ({userRole}) => {
         <div className="flex flex-col h-screen w-full overflow-hidden">
             {/* Channel header */}
             <div className="border-b p-4 flex justify-between items-center">
-                <h2 className="text-xl font-semibold truncate">{selectedChannel.channel_name ||'Select a channel'}</h2>
+                <h2 className="text-xl font-semibold truncate">
+                    {selectedChannel.channel_name || 'Select a channel'}
+                </h2>
                 <div className="flex items-center space-x-2">
                     <Button
                         variant="ghost"
@@ -194,7 +199,7 @@ const Chat = ({userRole}) => {
             </div>
 
             {/* Messages container */}
-            {!isLoadingMessages ? (
+            {!isLoading ? (
                 <div
                     ref={messagesContainerRef}
                     className="flex-grow overflow-y-auto p-4 space-y-4"
@@ -213,8 +218,9 @@ const Chat = ({userRole}) => {
             )}
 
             {/* Message input */}
-            {selectedChannel.channel_type === 'open' && (<div className="border-t p-4">
+            <div className="border-t p-4">
                 <MessageInput
+                    disabled={disableInput}
                     onSubmit={handleSendMessage}
                     placeholder={`Message #${selectedChannel.channel_name}`}
                 />
@@ -229,7 +235,7 @@ const Chat = ({userRole}) => {
                         Selected file: {selectedFile.name}
                     </p>
                 )}
-            </div>)}
+            </div>
         </div>
     );
 };

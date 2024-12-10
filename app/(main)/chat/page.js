@@ -28,6 +28,7 @@ export default function ChatPage() {
     const {showAlert} = useAlert();
     const [channels, setChannels] = useState([]);
     const [userRole, setUserRole] = useState('user')
+    const [disableInput, setDisableInput] = useState(true)
 
     const {
         data,
@@ -75,6 +76,12 @@ export default function ChatPage() {
         }
     }, [channels, selectedChannel, setSelectedChannel]);
 
+
+    useEffect(() => {
+        if (selectedChannel)
+            setDisableInput(channels.filter(channel => channel.channel_num === selectedChannel.channel_num)[0]?.channel_type !== 'open' && userRole === 'user')
+    }, [selectedChannel,channels])
+
     return (
         <div className="flex h-screen overflow-hidden">
             {/* Sidebar Channels Section */}
@@ -88,6 +95,7 @@ export default function ChatPage() {
                     ) : (
                         <ChannelsList
                             channels={channels}
+                            setChannels={setChannels}
                             userRole={userRole}
                             onChannelUpdate={() => mutate(`/api/chat/${selectedGroupID}`)}
                         />
@@ -103,7 +111,7 @@ export default function ChatPage() {
                     </div>
                 ) : (
                     <Chat
-
+                        disableInput={disableInput}
                         userRole={userRole}
                     />
                 )}

@@ -27,9 +27,11 @@ import {
     AlertDialogTitle
 } from "@/components/ui/alert-dialog";
 import {createChannel, deleteChannel, updateChannel} from "@/actions/channel-actions";
+import {mutate} from "swr";
 
 export const ChannelsList = ({
                                  channels,
+                                 setChannels,
                                  userRole,
                                  onChannelUpdate
                              }) => {
@@ -70,6 +72,22 @@ export const ChannelsList = ({
                     selectedGroupID,
                     editingChannel.channel_num
                 );
+                if (selectedChannel.channel_num === editingChannel.channel_num) {
+                    setSelectedChannel({
+                        channel_name: editChannelName,
+                        channel_type: editChannelType,
+                        group_id: selectedGroupID,
+                        channel_num: editingChannel.channel_num
+                    })
+                }
+                setChannels(channels.map((channel) => channel.channel_num === editingChannel.channel_num && channel.group_id === selectedGroupID ? {
+                        channel_name: editChannelName,
+                        channel_type: editChannelType,
+                        group_id: selectedGroupID,
+                        channel_num: editingChannel.channel_num
+                    } : channel)
+                )
+
 
                 if (result.status === 200) {
                     showAlert({
@@ -77,6 +95,7 @@ export const ChannelsList = ({
                         severity: "success"
                     });
                     setIsEditModalOpen(false);
+                    mutate(`/api/chat/${selectedGroupID}/${selectedChannel.channel_num}`)
                     onChannelUpdate();
                 } else {
                     showAlert({
@@ -335,3 +354,4 @@ export const ChannelsList = ({
 }
 
 export default ChannelsList
+
