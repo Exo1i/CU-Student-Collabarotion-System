@@ -31,7 +31,7 @@ export function NavChat({groups}) {
         <SidebarGroup className="group-data-[collapsible=icon]:hidden">
             <SidebarGroupLabel>Chats</SidebarGroupLabel>
             <SidebarMenu>
-                {groups.map((group) => (
+                {groups?.map((group) => (
                     <SidebarMenuItem key={group.group_id}>
                         <SidebarMenuButton asChild>
                             <Link href={'/chat'} onClick={() => setSelectedGroupID(group.group_id)}

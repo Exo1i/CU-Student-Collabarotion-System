@@ -3,7 +3,7 @@ import {NextResponse} from "next/server";
 
 const authRoutes = ["/reset-password", "/signin(.*)", "/signup(.*)"];
 const isAuthRoute = createRouteMatcher(authRoutes);
-const isPublicRoute = createRouteMatcher(['/', ...authRoutes])
+const isPublicRoute = createRouteMatcher(['/', '/api/webhooks(.*)', ...authRoutes])
 
 const isDevelopment = process.env.NODE_ENV === "development";
 

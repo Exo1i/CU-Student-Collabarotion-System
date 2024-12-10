@@ -26,6 +26,8 @@ export default function VerifyingEmailView({signUp, isInstructor, setActive}) {
 
                 const userRole = isInstructor ? instructor : student;
 
+
+                ///@TODO: TO BE COMMENTED OUT LATER
                 console.log('Adding user with details:', {
                     userId: signUp.createdUserId,
                     firstName: signUp.firstName,
