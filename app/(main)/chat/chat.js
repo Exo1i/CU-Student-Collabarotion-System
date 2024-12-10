@@ -11,7 +11,7 @@ import {useAlert} from "@/components/alert-context";
 import {insertMessage} from "@/actions/message-actions";
 import MessageInput from "@/app/(main)/chat/message-input";
 
-const socket = io('http://localhost:3001', {
+const socket = io(process.env.NEXT_PUBLIC_RAILWAY_WS_HOST, {
     closeOnBeforeunload: true,
     reconnection: true,
     reconnectionDelay: 500,
