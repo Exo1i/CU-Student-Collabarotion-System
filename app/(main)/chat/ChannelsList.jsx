@@ -186,62 +186,48 @@ export const ChannelsList = ({
     // Only show management options for admins
     const canManageChannels = userRole === 'admin';
 
-    return (
-        <div className={'flex flex-col space-y-4'}>
-            <div className="p-4 border-b">
-                <div className="relative flex-grow">
-                    <Input
-                        placeholder="Search Channels"
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                    />
-                    {canManageChannels && (
-                        <Button
-                            variant="outline"
-                            size="icon"
-                            className="absolute right-0 top-1/2 -translate-y-1/2"
-                            onClick={() => {
-                                setEditingChannel(null);
-                                setEditChannelName('');
-                                setEditChannelType('');
-                                setIsEditModalOpen(true);
-                            }}
-                        >
-                            <Plus size={20} />
-                        </Button>
-                    )}
-                </div>
-            </div>
 
-            <nav aria-label="Channels navigation">
-                <ul className="space-y-2 ">
-                    {filteredChannels?.map((channel) => (
-                        <li
-                            key={channel.channel_num}
-                            className={cn(
-                                "group relative rounded transition-all  ",
-                                selectedChannel?.channel_num === channel.channel_num
-                                    ? "bg-indigo-700 text-white"
-                                    : ""
-                            )}
-                        >
-                            <Link
-                                href={``}
-                                onClick={() => handleChannelSelect(channel)}
-                                className={cn(
-                                    "flex items-center px-2", canManageChannels ? "py-1" : "py-2",
-                                    " rounded-md transition-all",
-                                    selectedChannel?.channel_num === channel.channel_num
-                                        ? "text-white font-medium"
-                                        : "text-muted-foreground hover:bg-gray-100"
-                                )}
-                            >
-                                <ChevronRight
-                                    strokeWidth={5}
-                                    className="mr-2 h-4 w-4"
-                                    color={selectedChannel?.channel_num === channel.channel_num ? 'white' : 'grey'}
-                                />
-                                <div className="flex-grow">{channel.channel_name}</div>
+    return (<div className={'flex flex-col space-y-4'}>
+        <div className="p-4 border-b">
+            <div className="relative flex-grow">
+                <Input
+                    placeholder="Search Channels"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                />
+                {canManageChannels && (<Button
+                    variant="outline"
+                    size="icon"
+                    className="absolute right-0 top-1/2 -translate-y-1/2"
+                    onClick={() => {
+                        setEditingChannel(null);
+                        setEditChannelName('');
+                        setEditChannelType('');
+                        setIsEditModalOpen(true);
+                    }}
+                >
+                    <Plus size={20} />
+                </Button>)}
+            </div>
+        </div>
+
+        <nav aria-label="Channels navigation">
+            <ul className="space-y-2 ">
+                {selectedGroupID && filteredChannels?.map((channel) => (<li
+                    key={channel.channel_num}
+                    className={cn("group relative rounded transition-all  ", selectedChannel?.channel_num === channel.channel_num ? "bg-indigo-700 text-white" : "")}
+                >
+                    <Link
+                        href={``}
+                        onClick={() => handleChannelSelect(channel)}
+                        className={cn("flex items-center px-2", canManageChannels ? "py-1" : "py-2", " rounded-md transition-all", selectedChannel?.channel_num === channel.channel_num ? "text-white font-medium" : "text-muted-foreground hover:bg-gray-100")}
+                    >
+                        <ChevronRight
+                            strokeWidth={5}
+                            className="mr-2 h-4 w-4"
+                            color={selectedChannel?.channel_num === channel.channel_num ? 'white' : 'grey'}
+                        />
+                        <div className="flex-grow">{channel.channel_name}</div>
 
                                 {canManageChannels && (
                                     <div

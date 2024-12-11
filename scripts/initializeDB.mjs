@@ -27,9 +27,11 @@ async function initializeDB() {
         await pool.query(`
       CREATE TABLE IF NOT EXISTS Users (
         User_ID VARCHAR(32) PRIMARY KEY,
+        USERNAME TEXT,
         Fname TEXT NOT NULL, 
         Lname TEXT NOT NULL,
-        Role user_role NOT NULL
+        Role user_role NOT NULL,
+        IMG_URL TEXT
       );
     `);
 

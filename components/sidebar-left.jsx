@@ -110,7 +110,9 @@ export function SidebarLeft({...props}) {
         </SidebarHeader>
         <SidebarContent>
             <NavMain items={data.navMain} />
-            {isLoading ? <Loader className={"animate-spin"} /> : <NavChat groups={chatsData} />}
+            {isLoading
+                ? <Loader className={"animate-spin"} /> :
+                <NavChat groups={chatsData}  />}
             <NavSecondary items={data.navSecondary} className="mt-auto" />
         </SidebarContent>
         <SidebarFooter>

@@ -16,7 +16,7 @@ export async function GET(request, { params }) {
       );
     }
     const groupchannels = await pool.query(
-      "SELECT * FROM channel WHERE Group_ID = $1",
+      "SELECT * FROM channel WHERE Group_ID = $1 ORDER BY channel.channel_name ASC",
       [par.groupid]
     );
     const resp = { ...groupinfo.rows[0], channels: groupchannels.rows };

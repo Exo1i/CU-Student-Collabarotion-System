@@ -14,7 +14,7 @@ export default async function Profile({ params }) {
     let error = null;
     const role = await getRole();
     try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/students/${userID}/profile`);
+        const response = await fetch(`${process.env.NEXT_PUBLIC_DEPLOYMENT_URL}/api/students/user002/profile`);
         if (!response.ok) {
             throw new Error(`Failed to fetch projects: ${response.statusText}`);
         }
