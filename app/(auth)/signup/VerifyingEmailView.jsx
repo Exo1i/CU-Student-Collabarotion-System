@@ -6,7 +6,7 @@ import {REGEXP_ONLY_DIGITS} from "input-otp";
 import {Button} from "@/components/ui/button";
 import {Alert, AlertDescription, AlertTitle} from "@/components/ui/alert";
 import {AlertCircle} from "lucide-react";
-import {addUser} from "@/actions/add-user";
+import {addUser} from "@/actions/user-actions";
 import {instructor, student} from "@/constants";
 
 export default function VerifyingEmailView({signUp, isInstructor, setActive}) {
@@ -26,6 +26,8 @@ export default function VerifyingEmailView({signUp, isInstructor, setActive}) {
 
                 const userRole = isInstructor ? instructor : student;
 
+
+                ///@TODO: TO BE COMMENTED OUT LATER
                 console.log('Adding user with details:', {
                     userId: signUp.createdUserId,
                     firstName: signUp.firstName,
@@ -35,9 +37,11 @@ export default function VerifyingEmailView({signUp, isInstructor, setActive}) {
 
                 const response = await addUser(
                     signUp.createdUserId,
+                    signUp.username,
                     signUp.firstName,
                     signUp.lastName,
-                    userRole
+                    userRole,
+                    signUp.image_url
                 );
 
                 console.log('Add user response:', response);

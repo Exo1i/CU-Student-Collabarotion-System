@@ -3,7 +3,7 @@ import {NextResponse} from "next/server";
 
 const authRoutes = ["/reset-password", "/signin(.*)", "/signup(.*)"];
 const isAuthRoute = createRouteMatcher(authRoutes);
-const isPublicRoute = createRouteMatcher(['/', ...authRoutes])
+const isPublicRoute = createRouteMatcher(['/', '/api/webhooks(.*)', ...authRoutes])
 
 const isDevelopment = process.env.NODE_ENV === "development";
 
@@ -15,6 +15,16 @@ export default clerkMiddleware(async (auth, request) => {
     if (!isPublicRoute(request) && !userId && !isDevelopment) {
         await auth.protect();
     }
+    // Store current request url in a custom header, which you can read later
+    const requestHeaders = new Headers(request.headers);
+    requestHeaders.set('x-url', request.url);
+
+    return NextResponse.next({
+        request: {
+            // Apply new request headers
+            headers: requestHeaders,
+        }
+    });
 });
 
 export const config = {

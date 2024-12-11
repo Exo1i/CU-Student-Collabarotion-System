@@ -1,12 +1,7 @@
 'use client'
 import {Button} from "@/components/ui/button"
 import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger,
+    Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger,
 } from "@/components/ui/dialog"
 import {Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle,} from "@/components/ui/card"
 import {Input} from "@/components/ui/input"
@@ -49,8 +44,7 @@ export function EditProfile() {
             lastName: nameRef.current.value.split(' ')[1]
         })
     }
-    return (
-        <Dialog>
+    return (<Dialog>
             <DialogTrigger asChild>
                 <Button variant="outline">Edit Profile</Button>
             </DialogTrigger>
@@ -132,6 +126,5 @@ export function EditProfile() {
                     </TabsContent>
                 </Tabs>
             </DialogContent>
-        </Dialog>
-    )
+        </Dialog>)
 }

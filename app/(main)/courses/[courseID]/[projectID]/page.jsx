@@ -27,7 +27,7 @@ export default async function projectPage({ params }) {
 
     try {
         const [projectRes, participationRes] = await Promise.all([
-            fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/projects/${projectID}`),
+            fetch(`${process.env.NEXT_PUBLIC_DEPLOYMENT_URL}/api/projects/${projectID}`),
             getUserParticipation(userId , projectID)
         ]);
 

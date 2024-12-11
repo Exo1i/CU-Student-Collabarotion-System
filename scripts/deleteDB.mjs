@@ -2,8 +2,8 @@ import dotenv from "dotenv";
 import pkg from "pg";
 
 dotenv.config({path: "./.env.local"});
-const {Pool} = pkg;
-const pool = new Pool({
+const {Client} = pkg;
+const pool = new Client({
     connectionString: process.env.DATABASE_URL, ssl: false, // Adjust based on your database settings
 });
 
