@@ -146,6 +146,7 @@ export const ChannelsList = ({
     // Only show management options for admins
     const canManageChannels = userRole === 'admin';
 
+
     return (<div className={'flex flex-col space-y-4'}>
         <div className="p-4 border-b">
             <div className="relative flex-grow">
@@ -172,7 +173,7 @@ export const ChannelsList = ({
 
         <nav aria-label="Channels navigation">
             <ul className="space-y-2 ">
-                {filteredChannels?.map((channel) => (<li
+                {selectedGroupID && filteredChannels?.map((channel) => (<li
                     key={channel.channel_num}
                     className={cn("group relative rounded transition-all  ", selectedChannel?.channel_num === channel.channel_num ? "bg-indigo-700 text-white" : "")}
                 >
