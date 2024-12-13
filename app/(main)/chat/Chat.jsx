@@ -66,7 +66,7 @@ const Chat = ({disableInput, userRole}) => {
 
     // Effect for populating messages list with SWR data
     useEffect(() => {
-        if (fetchedMessages) {
+        if (fetchedMessages && fetchedMessages.messages) {
             clearMessages();
             addToMessagesList(fetchedMessages.messages);
             setTimeout(() => scrollToBottom('auto'), 100);

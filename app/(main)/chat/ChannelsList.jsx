@@ -18,7 +18,7 @@ import {Label} from "@/components/ui/label";
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select";
 import {createChannel, deleteChannel, updateChannel} from "@/actions/channel-actions";
 import {mutate} from "swr"
-import { DeleteConfirmationDialog } from "@/components/ui/delete-alert"
+import {DeleteConfirmationDialog} from "@/components/delete-alert";
 
 export const ChannelsList = ({
                                  channels, setChannels, userRole, onChannelUpdate

@@ -1,12 +1,13 @@
 'use client'
 
 import {useState} from 'react'
-import {Avatar, AvatarImage} from '@/components/ui/avatar'
+import {Avatar} from '@/components/ui/avatar'
 import {useUser} from '@clerk/nextjs'
 import {Button} from '@/components/ui/button'
 import {Input} from '@/components/ui/input'
 import {deleteMessage, editMessage} from '@/actions/message-actions'
 import {Check, Pencil, Trash2, X} from 'lucide-react'
+import Image from "next/image";
 
 const MessagesList = ({messages, onMessageUpdate, userRole}) => {
     const {user} = useUser()
@@ -71,7 +72,13 @@ const MessagesList = ({messages, onMessageUpdate, userRole}) => {
                 {!isSentByCurrentUser && (
                     <div className="flex-shrink-0 mr-3">
                         <Avatar className="mr-2">
-                            <AvatarImage src={message.img_url} />
+                            <Image
+                                src={message.img_url.trim()}
+                                width={40}
+                                height={40}
+                                loading={"lazy"}
+                                alt={'User profile image'}
+                            />
                         </Avatar>
                     </div>
                 )}
