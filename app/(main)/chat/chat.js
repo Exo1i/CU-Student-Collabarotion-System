@@ -3,13 +3,13 @@
 import {useEffect, useRef, useState} from 'react';
 import {useUser} from '@clerk/nextjs';
 import useChatStore from '@/hooks/useChatStore';
-import MessageList from './message-list';
+import MessagesList from './MessagesList';
 import {Button} from '@/components/ui/button';
 import {Loader2, Paperclip} from 'lucide-react';
 import {io} from 'socket.io-client';
 import {useAlert} from "@/components/alert-context";
 import {insertMessage} from "@/actions/message-actions";
-import MessageInput from "@/app/(main)/chat/message-input";
+import MessageInput from './MessageInput';
 
 const socket = io('http://localhost:3001', {
     closeOnBeforeunload: true,
@@ -135,7 +135,7 @@ const Chat = ({channelName}) => {
 
             {!isLoadingMessages ? (
                 <div className="flex-grow overflow-y-auto p-4 space-y-4">
-                    <MessageList
+                    <MessagesList
                         messages={messagesList}
                         onMessageUpdate={handleMessageUpdate}
                     />

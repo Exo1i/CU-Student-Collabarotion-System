@@ -1,4 +1,4 @@
-import { addProject } from "@/actions/add-project";
+import addProject from "@/actions/add-project";
 
 async function test() {
   try {

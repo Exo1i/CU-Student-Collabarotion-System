@@ -25,7 +25,7 @@ import useChatStore from "@/hooks/useChatStore"
 import {useEffect, useState} from "react"
 import {useAlert} from "@/components/alert-context"
 import {createGroup, deleteGroup, renameGroup} from "@/actions/group-actions"
-import {DeleteConfirmationDialog} from "@/components/delete-alert"
+import { DeleteConfirmationDialog } from './ui/delete-alert'
 import {cn} from "@/lib/utils"
 import {usePathname} from "next/navigation";
 import {mutate} from "swr";
