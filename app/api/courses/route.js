@@ -2,17 +2,46 @@
 import pool from "@/lib/db";
 import { NextResponse } from "next/server";
 
-//get all courses
+// Get all courses
 export async function GET(request) {
-  const resp = await pool.query(
-    `select course_code, course_name, course_img, instructor_id, concat(fname,' ',lname) as full_name, img_url
-     from course join users on instructor_id = user_id;
-    `
-  );
-  if (resp.rowCount === 0)
-    return NextResponse.json("no courses found", { status: 404 });
+  try {
+    const coursesResult = await pool.query(
+      `SELECT course_code, course_name, course_img, instructor_id, CONCAT(fname,' ',lname) AS full_name, img_url
+       FROM course
+       JOIN users ON instructor_id = user_id;`
+    );
 
-  return NextResponse.json(resp.rows, { status: 200 });
+    if (coursesResult.rowCount === 0) {
+      return NextResponse.json("No courses found", { status: 404 });
+    }
+
+    const coursesWithCategory = await Promise.all(
+      coursesResult.rows.map(async (course) => {
+        const projectResult = await pool.query(
+          `SELECT project_id
+           FROM project
+           WHERE course_code = $1;`,
+          [course.course_code]
+        );
+
+        const category =
+          projectResult.rowCount === 0 ? "theory_only" : "project_based";
+
+        return {
+          ...course,
+          category: category,
+        };
+      })
+    );
+
+    return NextResponse.json(coursesWithCategory, { status: 200 });
+  } catch (error) {
+    console.error("Error fetching courses:", error);
+    return NextResponse.json(
+      { error: "Failed to fetch courses" },
+      { status: 500 }
+    );
+  }
 }
 
 //to be made into a server component to
