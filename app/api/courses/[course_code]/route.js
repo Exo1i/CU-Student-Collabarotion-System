@@ -1,42 +1,43 @@
 import pool from "@/lib/db";
 import { NextResponse } from "next/server";
 
-//get a course and its projects given course code
+// Get a course and its projects given course code
 export async function GET(request, { params }) {
   try {
     const par = await params;
-    const couseinfo = await pool.query(
-      ` select course_code, course_name, course_img, course_description, max_grade, instructor_id, concat(fname,' ',lname) as full_name, img_url
-        from course, users
-        where instructor_id = user_id and course_code = $1
-      `,
+    const courseinfo = await pool.query(
+      `SELECT course_code, course_name, course_img, COALESCE(course_description, '') AS course_description, max_grade, instructor_id, CONCAT(fname,' ',lname) AS full_name, img_url
+       FROM course, users
+       WHERE instructor_id = user_id AND course_code = $1`,
       [par.course_code]
     );
-    if (couseinfo.rowCount === 0)
+
+    if (courseinfo.rowCount === 0) {
       return NextResponse.json("Course not found", { status: 404 });
+    }
 
     const courseproject = await pool.query(
-      ` select project_id, project_name, start_date, end_date, description, max_team_size, max_grade
-        from project
-        where course_code = $1;
-       `,
+      `SELECT project_id, project_name, start_date, end_date, description, max_team_size, max_grade
+       FROM project
+       WHERE course_code = $1`,
       [par.course_code]
     );
-    const project = courseproject.rowCount === 0 ? null : courseproject.rows[0];
+
+    const project = courseproject.rowCount === 0 ? {} : courseproject.rows[0];
 
     const courseassignments = await pool.query(
-      ` select assignment_id, title, description, max_grade, due_date
-        from assignment
-        where course_code = $1;
-       `,
+      `SELECT assignment_id, title, description, max_grade, due_date
+       FROM assignment
+       WHERE course_code = $1`,
       [par.course_code]
     );
 
     const resp = {
-      ...couseinfo.rows[0],
+      ...courseinfo.rows[0],
       project: project,
       assignments: courseassignments.rows,
     };
+
     return NextResponse.json(resp, { status: 200 });
   } catch (error) {
     console.error("Error fetching course:", error);
