@@ -4,9 +4,23 @@ import { useEffect, useState } from "react";
 import { Input } from "@/components/ui/input"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { CheckCircledIcon, CrossCircledIcon } from "@radix-ui/react-icons"
+import { addAssignmentSubmission } from "@/actions/add-assignmentsubmission";
+import { getRole } from "@/actions/GetRole";
 export default function SubmissionAssignment({ assignment }) {
     const [notification, setNotification] = useState(null)
     const [assignmentPath, setassignmentPath] = useState("")
+    const [role, setrole] = useState(null);
+    useEffect(() => {
+        async function getcurrentuserrole() {
+            try {
+                const currentUserRole = await getRole();
+                setrole(currentUserRole);
+            } catch (err) {
+                console.log(err);
+            }
+        }
+        getcurrentuserrole()
+    }, [role])
     useEffect(() => {
         if (notification) {
             const timer = setTimeout(() => {
@@ -20,51 +34,56 @@ export default function SubmissionAssignment({ assignment }) {
         e.preventDefault();
         const file = assignmentPath !== "" ? assignmentPath : null;
         if (file) {
-            console.log(file);
+            console.log(file.name);
         } else {
             console.log("No file selected.");
         }
         try {
-            // todo Here i will add call for server component
-            await new Promise(resolve => setTimeout(resolve, 1000))
-
-            setNotification({
-                type: "success",
-                title: "Submission added successfully",
-            })
+            const res = await addAssignmentSubmission(assignment.assignment_id, file);
+            console.log("response : " + res)
+            if (res.status === 201) {
+                setNotification({
+                    type: "success",
+                    title: "Submission added successfully",
+                })
+                router.refresh();
+            } else {
+                setNotification({
+                    type: "error",
+                    title: "Error adding submission",
+                    message: `${res.message}`
+                })
+            }
         } catch (error) {
             console.log(error)
-            setNotification({
-                type: "error",
-                title: "Error adding submission",
-                message: "There was a problem adding the submission. Please try again."
-            })
         }
     }
     return (
         <>
             <div className="bg-gray-50 px-6 py-4">
-                <div className="flex items-center justify-between">
-                    <label
-                        htmlFor={`attachment-${assignment.assignment_id}`}
-                        className="flex items-center text-sm font-medium text-indigo-600 cursor-pointer transition-colors duration-300 hover:text-indigo-800"
-                    >
-                        <PaperClipIcon className="h-5 w-5 mr-2" />
-                        Add Attachment
-                    </label>
-                    <button
-                        className="px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-md transition-colors duration-300 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                        onClick={handleAddAssignmentSubmission}
-                    >
-                        Submit
-                    </button>
-                </div>
+                {
+                    role === 'student' && <div className="flex items-center justify-between">
+                        <label
+                            htmlFor={`attachment-${assignment.assignment_id}`}
+                            className="flex items-center text-sm font-medium text-indigo-600 cursor-pointer transition-colors duration-300 hover:text-indigo-800"
+                        >
+                            <PaperClipIcon className="h-5 w-5 mr-2" />
+                            Add Attachment
+                        </label>
+                        <button
+                            className="px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-md transition-colors duration-300 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                            onClick={handleAddAssignmentSubmission}
+                        >
+                            Submit
+                        </button>
+                    </div>
+                }
                 <Input
                     id={`attachment-${assignment.assignment_id}`}
                     type="file"
                     onChange={(e) => setassignmentPath(e.target ? e.target.files[0] : "")}
                     required
-                    className= 'hidden'
+                    className='hidden'
                 />
             </div>
             {

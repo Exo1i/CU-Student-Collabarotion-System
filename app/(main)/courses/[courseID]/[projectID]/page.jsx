@@ -3,13 +3,15 @@ import ProjectTeamCard from "@/app/components/ProjectTeamCard";
 import CreateTeamButton from "@/app/components/CreateTeamButtom";
 import { auth } from '@clerk/nextjs/server'
 import { getUserTeamNum } from '@/actions/GetTeamNum'
-async function getUserParticipation(userId , project_id) {
+import { getRole } from "@/actions/GetRole";
+import CustomLink from "@/app/components/MyCustomLink";
+async function getUserParticipation(userId, project_id) {
     try {
-        const res = await getUserTeamNum(userId , project_id);
+        const res = await getUserTeamNum(userId, project_id);
         if (res.status == 200) {
-            return res.message;
+            return res.student;
         }
-        console.log("test function: " );
+        console.log("test function: ");
         console.log(res)
     } catch (error) {
         console.error("Error fetching user participation:", error);
@@ -18,17 +20,19 @@ async function getUserParticipation(userId , project_id) {
 }
 
 export default async function projectPage({ params }) {
+    const role = await getRole();
     const { projectID } = params;
-    const {userId} = await auth(); 
+    const {courseID} = params;
+    const { userId } = await auth();
     console.log(userId);
     let project = null;
     let Teams = null;
-    let teamNumber = null;
+    let currentuserdata = null;
 
     try {
         const [projectRes, participationRes] = await Promise.all([
             fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/projects/${projectID}`),
-            getUserParticipation(userId , projectID)
+            getUserParticipation(userId, projectID)
         ]);
 
         if (!projectRes.ok) {
@@ -36,7 +40,7 @@ export default async function projectPage({ params }) {
         }
 
         project = await projectRes.json();
-        teamNumber = participationRes;
+        currentuserdata = participationRes;
     } catch (err) {
         console.log(err);
         return <div>Error loading project data. Please try again later.</div>;
@@ -47,23 +51,25 @@ export default async function projectPage({ params }) {
     if (!Teams) {
         return notFound();
     }
-console.log("current team number " + teamNumber)
+    console.log("currentuserdata " + currentuserdata)
     return (
         <div className="container mx-auto px-4 py-8">
             <div className="flex justify-center gap-6 items-center mb-8">
                 <h1 className="text-3xl font-bold">Project Teams</h1>
-                {Teams.length < parseInt(project.max_teams) && !teamNumber ?
+                {Teams.length < parseInt(project.max_teams) && !currentuserdata && role === 'student' ?
                     <CreateTeamButton projectID={projectID} userid={userId} TeamNum={Teams.length + 1} />
-                    : null}
+                    : <CustomLink className="text-center" href={`/courses/${courseID}/${projectID}/phases`}>
+                        View phases
+                    </CustomLink>}
             </div>
             <div className="grid grid-cols-1 gap-8">
                 {Teams.map((team) => (
-                    <ProjectTeamCard 
+                    <ProjectTeamCard
                         key={team.team_num}
-                        userid={userId} 
-                        Team={team} 
+                        userid={userId}
+                        Team={team}
                         projectID={projectID}
-                        userTeamNumber={teamNumber}
+                        currentuserdata={currentuserdata}
                         currentRoute={`/projects/${projectID}`}
                     />
                 ))}

@@ -70,7 +70,7 @@ export async function GET(request, { params }) {
     // console.log("Technologies:", technologies.rows);
 
     const teamMembersQuery = await pool.query(
-      `SELECT Team.Team_Num, concat(fname,' ',lname) as full_name, img_url, leader
+      `SELECT Team.Team_Num, concat(fname,' ',lname) as full_name, img_url, leader , User_ID
        FROM Team 
        JOIN participation ON Team.Project_ID = participation.Project_ID AND Team.Team_Num = participation.Team_Num
        JOIN Users ON participation.student_ID = Users.User_ID
@@ -88,6 +88,7 @@ export async function GET(request, { params }) {
         full_name: row.full_name,
         img: row.img_url,
         leader: row.leader,
+        user_id: row.user_id
       });
       return acc;
     }, {});

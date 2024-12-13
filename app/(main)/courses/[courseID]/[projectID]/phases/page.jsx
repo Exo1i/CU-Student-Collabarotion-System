@@ -5,12 +5,8 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
-import { CalendarIcon, UsersIcon, ClockIcon, CheckCircleIcon, CodeIcon, RocketIcon } from 'lucide-react'
-import { Button } from "@/components/ui/button"
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
-import { CheckCircledIcon, CrossCircledIcon } from "@radix-ui/react-icons"
-
-
+import { CalendarIcon, UsersIcon, ClockIcon, CheckCircleIcon, CodeIcon } from 'lucide-react'
+import Phasesubmissionbutton from '@/app/components/phasesubmissionbuttom'
 export default function ProjectPhasesPage({ params }) {
     const [projectID, setProjectID] = useState(null);
     useEffect(() => {
@@ -18,6 +14,18 @@ export default function ProjectPhasesPage({ params }) {
             setProjectID(resolvedparams.projectID);
         }))
     }, [params, projectID])
+    const [role, setrole] = useState(null);
+    useEffect(() => {
+        async function getcurrentuserrole() {
+            try {
+                const currentUserRole = await getRole();
+                setrole(currentUserRole);
+            } catch (err) {
+                console.log(err);
+            }
+        }
+        getcurrentuserrole()
+    }, [role])
     const [project, setproject] = useState({ phases: [] });
     const [Loading, setLoading] = useState(false);
     const [error, seterror] = useState(null);
@@ -26,7 +34,7 @@ export default function ProjectPhasesPage({ params }) {
             if (!projectID) return;
             console.log(projectID);
             try {
-                const res = await fetch(`http://localhost:3000/api/projects/${projectID}/phases`);
+                const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/projects/${projectID}/phases`);
                 if (!res.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
@@ -49,38 +57,7 @@ export default function ProjectPhasesPage({ params }) {
     }, [projectID])
     const [progress, setProgress] = useState(0);
     const [submittedphases, setsubmittedphases] = useState([]);
-    const [notification, setNotification] = useState(null)
-    const handellersubmitted = async (e, phasenum) => {
-        e.preventDefault();
-        if (phasenum) {
-            console.log(projectID + ": " + phasenum);
-        }
-        try {
-            // todo Here i will add call for server component
-            await new Promise(resolve => setTimeout(resolve, 1000))
-            setsubmittedphases(prev => [...prev, phasenum]);
-            setNotification({
-                type: "success",
-                title: "phase submitted successfully",
-            })
-        } catch (error) {
-            console.log(error)
-            setNotification({
-                type: "error",
-                title: "Error submitting phase",
-                message: "There was a problem submitting the phase. Please try again."
-            })
-        }
-    }
-    useEffect(() => {
-        if (notification) {
-            const timer = setTimeout(() => {
-                setNotification(null)
-            }, 5000)
 
-            return () => clearTimeout(timer)
-        }
-    }, [notification])
     useEffect(() => {
         const completedload = project.phases.filter(phase => submittedphases.includes(phase.phase_num))
             .reduce((sum, phase) => sum + phase.phase_load, 0)
@@ -143,7 +120,7 @@ export default function ProjectPhasesPage({ params }) {
                                     <div className="text-3xl font-bold text-blue-600">{progress}%</div>
                                     <div className="text-sm text-gray-500">Overall Progress</div>
                                 </div>
-                            </div>  
+                            </div>
                             <motion.div
                                 initial={{ width: 0 }}
                                 animate={{ width: `${progress}%` }}
@@ -185,47 +162,15 @@ export default function ProjectPhasesPage({ params }) {
                                                         Phase Load: {phase.phase_load}%
                                                     </span>
                                                     <AnimatePresence>
-                                                        {submittedphases.includes(phase.phase_num) ?
-                                                            <motion.div
-                                                                initial={{ opacity: 0 }}
-                                                                animate={{ opacity: 1 }}
-                                                                className="flex items-center text-green-500"
-                                                            >
-                                                                <CheckCircleIcon className="w-5 h-5 mr-2" />
-                                                                Submitted
-                                                            </motion.div>
-                                                            :
-                                                            <motion.div
-                                                                initial={{ opacity: 0 }}
-                                                                animate={{ opacity: 1 }}
-                                                                exit={{ opacity: 0 }}
-                                                            >
-                                                                <Button
-                                                                    onClick={(e) => handellersubmitted(e, phase.phase_num)}
-                                                                    className="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white"
-                                                                >
-                                                                    <RocketIcon className="w-4 h-4 mr-2" />
-                                                                    Submit Phase
-                                                                </Button>
-                                                                {
-                                                                    notification && (
-                                                                        <Alert
-                                                                            variant={notification.type === "success" ? "default" : "destructive"}
-                                                                            className={`z-[9999] fixed bottom-4 right-4 w-96 animate-in fade-in slide-in-from-bottom-5 ${notification.type === "success" ? "bg-green-100 border-green-500 text-green-800" : "bg-red-100 border-red-500 text-red-800"
-                                                                                }`}
-                                                                        >
-                                                                            {notification.type === "success" ? (
-                                                                                <CheckCircledIcon className="h-4 w-4" />
-                                                                            ) : (
-                                                                                <CrossCircledIcon className="h-4 w-4" />
-                                                                            )}
-                                                                            <AlertTitle>{notification.title}</AlertTitle>
-                                                                            <AlertDescription>{notification.message}</AlertDescription>
-                                                                        </Alert>
-                                                                    )
-                                                                }
-                                                            </motion.div>
-                                                        }
+                                                        <motion.div
+                                                            initial={{ opacity: 0 }}
+                                                            animate={{ opacity: 1 }}
+                                                            exit={{ opacity: 0 }}
+                                                        >
+                                                            {
+                                                                role === 'student' && <Phasesubmissionbutton phase={phase} projectID={projectID} setsubmittedphases={setsubmittedphases} />
+                                                            }
+                                                        </motion.div>
                                                     </AnimatePresence>
                                                 </div>
                                             </CardContent>

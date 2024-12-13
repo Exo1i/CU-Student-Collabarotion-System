@@ -6,7 +6,7 @@ export default async function ProjectDashboard() {
     let error = null;
 
     try {
-        const response = await fetch('http://localhost:3000/api/projects');
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/projects`);
         if (!response.ok) {
             throw new Error(`Failed to fetch projects: ${response.statusText}`);
         }
@@ -42,8 +42,8 @@ export default async function ProjectDashboard() {
                                         {new Date(project.start_date).toLocaleDateString()} - {new Date(project.end_date).toLocaleDateString()}
                                     </span>
                                 </div>
-                                <CustomLink href={`/courses/${project.course_code}/${project.project_id}/phases`}>
-                                    View Phases
+                                <CustomLink href={`/courses/${project.course_code}/${project.project_id}`}>
+                                    View Teams
                                 </CustomLink>
                             </div>
                         </div>
