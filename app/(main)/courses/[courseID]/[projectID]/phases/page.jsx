@@ -34,7 +34,7 @@ export default function ProjectPhasesPage({ params }) {
             if (!projectID) return;
             console.log(projectID);
             try {
-                const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/projects/${projectID}/phases`);
+                const res = await fetch(`/api/projects/${projectID}/phases`);
                 if (!res.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }

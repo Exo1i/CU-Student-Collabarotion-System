@@ -2,7 +2,7 @@
 import { auth } from '@clerk/nextjs/server';
 import pool from "@/lib/db";
 import { redirect } from 'next/navigation';
-import { v4 as uuidv4 } from 'uuid';
+
 
 export async function addAssignmentSubmission(assignmentID, file) {
     const { userId } = await auth();

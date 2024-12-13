@@ -6,7 +6,7 @@ export default async function ProjectDashboard() {
     let error = null;
 
     try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/projects`);
+        const response = await fetch(`${process.env.NEXT_PUBLIC_DEPLOYMENT_URL}/api/projects`);
         if (!response.ok) {
             throw new Error(`Failed to fetch projects: ${response.statusText}`);
         }

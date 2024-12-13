@@ -20,7 +20,7 @@ export default function CoursePage() {
         async function fetchCourseData() {
             try {
                 console.log(`Fetching course data for courseCode: ${courseCode}`);
-                let res = await fetch(`${process.env.NEXT_PUBLIC_DEPLOYMENT_URL}/api/courses/${courseCode}`);
+                let res = await fetch(`/api/courses/${courseCode}`);
                 console.log(res);
                 if (!res.ok) {
                     throw new Error(`Failed to fetch: ${res.status} ${res.statusText}`)
