@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -13,8 +13,11 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { addAssignmentGrade } from "@/actions/update-assignmentgrade";
+import { useAlert } from "./alert-context";
 
 export default function StudentSubmissions() {
+  const { showAlert } = useAlert();
   const [selectedAssignment, setSelectedAssignment] = useState("");
   const [submissions, setSubmissions] = useState([
     {
@@ -38,11 +41,25 @@ export default function StudentSubmissions() {
   ]);
 
   const handleGradeChange = (id, grade) => {
-    setSubmissions(
-      submissions.map((sub) =>
-        sub.id === id ? { ...sub, grade: parseInt(grade) } : sub
-      )
-    );
+    const gradeChange = async function () {
+      try {
+        const res = await addAssignmentGrade(id, grade);
+        if (res.status == 200)
+          showAlert({
+            message: "assignment graded successfully",
+            severity: "success",
+          });
+      } catch (e) {
+        console.log(e);
+      }
+    };
+    gradeChange().then(() => {
+      setSubmissions(
+        submissions.map((sub) =>
+          sub.id === id ? { ...sub, grade: parseInt(grade) } : sub
+        )
+      );
+    });
   };
 
   return (
@@ -68,28 +85,42 @@ export default function StudentSubmissions() {
         </TableHeader>
         <TableBody>
           {submissions.map((submission) => (
-            <TableRow key={submission.id}>
-              <TableCell>{submission.studentName}</TableCell>
-              <TableCell>{submission.submissionDate}</TableCell>
-              <TableCell>
-                <Input
-                  type="number"
-                  value={submission.grade || ""}
-                  onChange={(e) =>
-                    handleGradeChange(submission.id, e.target.value)
-                  }
-                  className="w-20"
-                />
-              </TableCell>
-              <TableCell>
-                <Button variant="outline" size="sm">
-                  Save Grade
-                </Button>
-              </TableCell>
-            </TableRow>
+            <SubmissionRow
+              key={submission.id}
+              submission={submission}
+              handleGradeChange={handleGradeChange}
+            />
           ))}
         </TableBody>
       </Table>
     </div>
+  );
+}
+function SubmissionRow({ submission, handleGradeChange }) {
+  const [grade, setGrade] = useState(submission.grade || "0");
+  return (
+    <TableRow key={submission.id}>
+      <TableCell>{submission.studentName}</TableCell>
+      <TableCell>{submission.submissionDate}</TableCell>
+      <TableCell>
+        <Input
+          type="number"
+          value={grade}
+          onChange={(e) => setGrade(e.target.value)}
+          className="w-20"
+        />
+      </TableCell>
+      <TableCell>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => {
+            handleGradeChange(submission.id, grade);
+          }}
+        >
+          Save Grade
+        </Button>
+      </TableCell>
+    </TableRow>
   );
 }

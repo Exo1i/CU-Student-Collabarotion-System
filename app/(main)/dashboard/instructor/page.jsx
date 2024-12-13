@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { notFound } from "next/navigation";
 import Course from "@/components/Course";
 import CreateProject from "@/components/CreateProjectCard";
 import EnrolledStudents from "@/components/Enrolledstudents";
@@ -10,8 +11,14 @@ import StudentSubmissions from "@/components/Submission";
 import CurrentProject from "@/components/CurrentProject";
 import CreateAssignment from "@/components/CreateAssignment";
 import AssignmentList from "@/components/AssignmentList";
+import { addAssignmentGrade } from "@/actions/update-assignmentgrade";
+import { useAlert } from "@/components/alert-context";
+export default function Page({ params }) {
+  // const {??} = params; TODO
+  // const { instructorId } = await auth();
+  // console.log(instructorId);
+  const { showAlert } = useAlert();
 
-export default function Page() {
   const [course, setcourse] = useState({
     id: 1,
     name: "Introduction to Computer Science",
@@ -118,3 +125,4 @@ export default function Page() {
     </div>
   );
 }
+if (window) window.addAssignmentGrade = addAssignmentGrade;

@@ -29,15 +29,17 @@ export default async function projectPage({ params }) {
     let Teams = null;
     let currentuserdata = null;
 
-    try {
-        const [projectRes, participationRes] = await Promise.all([
-            fetch(`${process.env.NEXT_PUBLIC_DEPLOYMENT_URL}/api/projects/${projectID}`),
-            getUserParticipation(userId , projectID)
-        ]);
+  try {
+    const [projectRes, participationRes] = await Promise.all([
+      fetch(
+        `${process.env.NEXT_PUBLIC_DEPLOYMENT_URL}/api/projects/${projectID}`
+      ),
+      getUserParticipation(userId, projectID),
+    ]);
 
-        if (!projectRes.ok) {
-            throw new Error(`HTTP error! status: ${projectRes.status}`);
-        }
+    if (!projectRes.ok) {
+      throw new Error(`HTTP error! status: ${projectRes.status}`);
+    }
 
         project = await projectRes.json();
         currentuserdata = participationRes;
@@ -77,4 +79,3 @@ export default async function projectPage({ params }) {
         </div>
     )
 }
-
