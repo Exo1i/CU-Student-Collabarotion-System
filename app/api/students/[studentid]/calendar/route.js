@@ -7,9 +7,11 @@ export async function GET(request, { params }) {
     const { searchParams } = new URL(request.url);
     const date = searchParams.get("date");
 
-    // Get assignments deadlines along with course names
+    // Get assignments deadlines along with course names and descriptions
     const assignmentsQuery = `
-      SELECT assignment.assignment_id, assignment.title, COALESCE(assignment.max_grade,0) AS max_grade, COALESCE(assignment.due_date::TEXT, ''), 'assignment' AS type, course.course_name
+      SELECT assignment.assignment_id, assignment.title, COALESCE(assignment.max_grade, 0) AS max_grade, 
+             COALESCE(assignment.due_date::TEXT, '') AS due_date, 'assignment' AS type, 
+             course.course_name, COALESCE(assignment.description, '') AS description
       FROM Assignment
       JOIN Course ON Assignment.course_code = Course.course_code
       ${date ? "WHERE assignment.due_date = $1" : ""}
@@ -47,6 +49,7 @@ export async function GET(request, { params }) {
           name: assignment.title,
           max_grade: assignment.max_grade,
           due_date: assignment.due_date,
+          description: assignment.description,
           type: "assignment",
           course_name: assignment.course_name,
           status: status,
@@ -54,18 +57,14 @@ export async function GET(request, { params }) {
       })
     );
 
-    // Get phases deadlines
+    // Get phases deadlines along with their descriptions
     const phasesQuery = `
-     SELECT
-     phase.project_id,
-     phase_num,
-     phase_name,
-     COALESCE(phase.deadline::TEXT, '') AS deadline,
-     'phase' AS type,
-     COALESCE(project.max_grade, 0) * COALESCE(phase.phase_load, 0) / 100 AS max_grade
-     FROM Phase
-     JOIN Project ON Project.project_id = Phase.project_id;
-     ${date ? "WHERE deadline = $1" : ""}
+      SELECT phase.project_id, phase_num, phase_name, COALESCE(phase.deadline::TEXT, '') AS deadline, 
+             'phase' AS type, COALESCE(project.max_grade, 0) * COALESCE(phase.phase_load, 0) / 100 AS max_grade,
+             COALESCE(phase.description, '') AS description
+      FROM Phase
+      JOIN Project ON Project.project_id = Phase.project_id
+      ${date ? "WHERE deadline = $1" : ""}
     `;
     const phases = await pool.query(phasesQuery, date ? [date] : []);
 
@@ -101,6 +100,7 @@ export async function GET(request, { params }) {
           phase_num: phase.phase_num,
           max_grade: phase.max_grade,
           due_date: phase.deadline,
+          description: phase.description,
           type: "phase",
           status: status,
         };
