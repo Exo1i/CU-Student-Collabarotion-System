@@ -11,6 +11,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { addAssignment } from "@/actions/add-assignment";
 
 export default function CreateAssignment(onCreateAssignment) {
   const [isOpen, setIsOpen] = useState(false);
@@ -28,7 +29,11 @@ export default function CreateAssignment(onCreateAssignment) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onCreateAssignment(assignment);
+    const createAssign = async function (params) {
+      try {
+      } catch (e) {}
+    };
+    createAssign();
     setAssignment({ name: "", deadline: "", maxGrade: "", description: "" });
     setIsOpen(false);
   };

@@ -1,8 +1,10 @@
 "use client";
 
 import { useState } from "react";
+import { useEffect } from "react";
 import { motion } from "framer-motion";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { notFound } from "next/navigation";
 import Course from "@/components/Course";
 import CreateProject from "@/components/CreateProjectCard";
 import EnrolledStudents from "@/components/Enrolledstudents";
@@ -10,14 +12,15 @@ import StudentSubmissions from "@/components/Submission";
 import CurrentProject from "@/components/CurrentProject";
 import CreateAssignment from "@/components/CreateAssignment";
 import AssignmentList from "@/components/AssignmentList";
+import { addAssignmentGrade } from "@/actions/update-assignmentgrade";
+import { addAssignment } from "@/actions/add-assignment";
+import { useAlert } from "@/components/alert-context";
 
-export default function Page() {
-  const [course, setcourse] = useState({
-    id: 1,
-    name: "Introduction to Computer Science",
-    maxGrade: 100,
-    courseImage: "/courseImg/coursetest1.jpg",
-  });
+export default function Page({ params }) {
+  // const {??} = params; TODO
+  // const { instructorId } = await auth();
+  // console.log(instructorId);
+  const { showAlert } = useAlert();
 
   const [currentProject, setCurrentProject] = useState({
     name: "Final Project",
@@ -26,23 +29,33 @@ export default function Page() {
     grade: 100,
     dueDate: "2023-12-31",
   });
-
-  const [assignments, setAssignments] = useState([
-    {
-      id: 1,
-      name: "Assignment 1",
-      deadline: "2023-07-15",
-      maxGrade: 100,
-      description: "Complete exercises 1-5",
-    },
-    {
-      id: 2,
-      name: "Assignment 2",
-      deadline: "2023-07-30",
-      maxGrade: 100,
-      description: "Build a simple calculator",
-    },
-  ]);
+  const [assignments, setAssignments] = useState([]);
+  const [instructorData, setInstructorData] = useState({});
+  const [error, seterror] = useState(null);
+  const [loading, setloading] = useState(true);
+  useEffect(() => {
+    async function fetchCourseData() {
+      try {
+        let res = await fetch("http://localhost:3000/api/instructor/user005");
+        if (!res.ok) {
+          throw new Error(`Failed to fetch: ${res.status} ${res.statusText}`);
+        }
+        let data = await res.json();
+        setInstructorData(data);
+        setAssignments(data.course.assignments);
+        setCurrentProject(data.course.project);
+        seterror(null);
+      } catch (error) {
+        seterror(error);
+        console.log(error);
+      } finally {
+        setloading(false);
+      }
+    }
+    fetchCourseData();
+  }, []);
+  if (loading) return <div>Loading...</div>;
+  if (error) return <div>Error...</div>;
 
   const handleCreateProject = (project) => {
     console.log("New project created:", project);
@@ -64,7 +77,7 @@ export default function Page() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
       >
-        Welcome, Instructor
+        Welcome, {instructorData.instructor.full_name}
       </motion.h1>
       <div className="grid gap-8">
         <div>
@@ -76,7 +89,7 @@ export default function Page() {
               transition={{ duration: 0.5, delay: 0.2 }}
               className="col-span-2"
             >
-              <Course course={course} />
+              <Course courseData={instructorData.course} />
             </motion.div>
 
             {/* Actions Section */}
@@ -112,9 +125,13 @@ export default function Page() {
         </motion.div>
         <div className="grid grid-cols-2 gap-2">
           <AssignmentList assignments={assignments} onModify={setAssignments} />
-          <StudentSubmissions />
+          <StudentSubmissions submissions={instructorData.course.assignments} />
         </div>
       </div>
     </div>
   );
 }
+// if (window) {
+//   window.addAssignmentGrade = addAssignmentGrade;
+//   window.addAssignment = addAssignment;
+// }

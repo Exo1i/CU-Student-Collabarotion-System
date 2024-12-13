@@ -37,19 +37,19 @@ export default function CurrentProject({ project, onModify }) {
       </CardHeader>
       <CardContent className="pt-4 flex flex-col gap-y-3">
         <p>
-          <strong>Name:</strong> {project.name}
+          <strong>Name:</strong> {project.project_name}
         </p>
         <p>
           <strong>Description:</strong> {project.description}
         </p>
         <p>
-          <strong>Team Size:</strong> {project.teamSize}
+          <strong>Team Size:</strong> {project.max_team_size}
         </p>
         <p>
-          <strong>Grade:</strong> {project.grade}
+          <strong>Grade:</strong> {project.max_grade}
         </p>
         <p>
-          <strong>Due Date:</strong> {project.dueDate}
+          <strong>Due Date:</strong> {project.end_date}
         </p>
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
           <DialogTrigger asChild>
@@ -67,7 +67,7 @@ export default function CurrentProject({ project, onModify }) {
                 <Input
                   id="name"
                   name="name"
-                  value={editedProject.name}
+                  value={editedProject.project_name}
                   onChange={handleChange}
                   className="col-span-3"
                 />
@@ -88,7 +88,7 @@ export default function CurrentProject({ project, onModify }) {
                   id="teamSize"
                   name="teamSize"
                   type="number"
-                  value={editedProject.teamSize}
+                  value={editedProject.max_team_size}
                   onChange={handleChange}
                   className="col-span-3"
                 />
@@ -99,7 +99,7 @@ export default function CurrentProject({ project, onModify }) {
                   id="grade"
                   name="grade"
                   type="number"
-                  value={editedProject.grade}
+                  value={editedProject.max_grade}
                   onChange={handleChange}
                   className="col-span-3"
                 />
@@ -110,7 +110,7 @@ export default function CurrentProject({ project, onModify }) {
                   id="dueDate"
                   name="dueDate"
                   type="date"
-                  value={editedProject.dueDate}
+                  value={editedProject.end_date}
                   onChange={handleChange}
                   className="col-span-3"
                 />
