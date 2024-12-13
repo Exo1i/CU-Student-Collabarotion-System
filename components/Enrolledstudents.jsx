@@ -21,7 +21,6 @@ export default function EnrolledStudents() {
         const resp = await fetch(`/api/students`)
           .then((response) => response.json())
           .then((data) => {
-            console.log(data.students_list);
             setStudents(data.students_list);
           });
       } catch (e) {
