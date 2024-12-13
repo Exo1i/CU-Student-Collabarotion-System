@@ -24,6 +24,8 @@ export async function GET(request, { params }) {
     );
 
     const project = courseproject.rowCount === 0 ? {} : courseproject.rows[0];
+    const category =
+      courseproject.rowCount === 0 ? "theory_only" : "project_based";
 
     const courseassignments = await pool.query(
       `SELECT assignment_id, title, description, max_grade, due_date
@@ -36,6 +38,7 @@ export async function GET(request, { params }) {
       ...courseinfo.rows[0],
       project: project,
       assignments: courseassignments.rows,
+      category: category,
     };
 
     return NextResponse.json(resp, { status: 200 });
