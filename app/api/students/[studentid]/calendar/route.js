@@ -7,24 +7,25 @@ export async function GET(request, { params }) {
     const { searchParams } = new URL(request.url);
     const date = searchParams.get("date");
 
-    //get assignments deadlines
-    const assignments = await pool.query(
-      `
-        SELECT assignment_id, title, due_date, 'assignment' AS type
-        FROM Assignment
-        WHERE due_date = $1;
-    `,
-      [date]
-    );
+    // Get assignments deadlines along with course names and descriptions
+    const assignmentsQuery = `
+      SELECT assignment.assignment_id, assignment.title, COALESCE(assignment.max_grade, 0) AS max_grade, 
+             COALESCE(assignment.due_date::TEXT, '') AS due_date, 'assignment' AS type, 
+             course.course_name, COALESCE(assignment.description, '') AS description
+      FROM Assignment
+      JOIN Course ON Assignment.course_code = Course.course_code
+      ${date ? "WHERE assignment.due_date = $1" : ""}
+    `;
+    const assignments = await pool.query(assignmentsQuery, date ? [date] : []);
 
     const assignmentres = await Promise.all(
       assignments.rows.map(async (assignment) => {
         const submissions = await pool.query(
           `
            SELECT submission_date
-           FROM Submission JOIN AssignmentSubmission ON Submission.Submission_id = AssignmentSubmission.Submission_id
+           FROM Submission
+           JOIN AssignmentSubmission ON Submission.Submission_id = AssignmentSubmission.Submission_id
            WHERE AssignmentSubmission.assignment_id = $1 AND student_id = $2;
-                
         `,
           [assignment.assignment_id, par.studentid]
         );
@@ -44,31 +45,36 @@ export async function GET(request, { params }) {
         }
 
         return {
-          assign_id: assignment.id,
-          name: assignment.name,
+          assign_id: assignment.assignment_id,
+          name: assignment.title,
+          max_grade: assignment.max_grade,
           due_date: assignment.due_date,
+          description: assignment.description,
           type: "assignment",
+          course_name: assignment.course_name,
           status: status,
         };
       })
     );
 
-    //get phases deadlines
-    const phases = await pool.query(
-      `
-        SELECT phase.project_id, phase_num, phase_name, deadline, 'phase' AS type
-        FROM Phase join project on project.project_id = phase.project_id
-        WHERE deadline = $1;
-   `,
-      [date]
-    );
+    // Get phases deadlines along with their descriptions
+    const phasesQuery = `
+      SELECT phase.project_id, phase_num, phase_name, COALESCE(phase.deadline::TEXT, '') AS deadline, 
+             'phase' AS type, COALESCE(project.max_grade, 0) * COALESCE(phase.phase_load, 0) / 100 AS max_grade,
+             COALESCE(phase.description, '') AS description
+      FROM Phase
+      JOIN Project ON Project.project_id = Phase.project_id
+      ${date ? "WHERE deadline = $1" : ""}
+    `;
+    const phases = await pool.query(phasesQuery, date ? [date] : []);
 
     const phasesres = await Promise.all(
       phases.rows.map(async (phase) => {
         const submissions = await pool.query(
           `
             SELECT submission_date
-            FROM submission JOIN phasesubmission ON submission.submission_id = phasesubmission.submission_id
+            FROM Submission
+            JOIN PhaseSubmission ON Submission.submission_id = PhaseSubmission.submission_id
             WHERE phase_num = $1 AND project_id = $2 AND student_id = $3;
         `,
           [phase.phase_num, phase.project_id, par.studentid]
@@ -82,7 +88,7 @@ export async function GET(request, { params }) {
         let status;
         if (!submissionDate) {
           status = "missed";
-        } else if (new Date(submissionDate) <= new Date(phase.end_date)) {
+        } else if (new Date(submissionDate) <= new Date(phase.deadline)) {
           status = "done";
         } else {
           status = "late";
@@ -90,9 +96,11 @@ export async function GET(request, { params }) {
 
         return {
           proj_id: phase.project_id,
-          proj_name: phase.proj_name,
+          proj_name: phase.phase_name,
           phase_num: phase.phase_num,
-          due_date: phase.end_date,
+          max_grade: phase.max_grade,
+          due_date: phase.deadline,
+          description: phase.description,
           type: "phase",
           status: status,
         };
