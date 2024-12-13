@@ -1,5 +1,7 @@
 "use client";
 import { Bookmark } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+
 export const columns = [
   {
     accessorKey: "title",
@@ -22,11 +24,21 @@ export const columns = [
     header: "Deadline",
   },
   {
-    accessorKey: "", //TODO check if it has a submission by this student
+    accessorKey: "status",
     header: "Status",
     cell: ({ row }) => {
-      //row.original.  //to access any data of an assignment
-      return <div />;
+      const status = row.getValue("status");
+      const isSuccess = row.original.status === "done";
+      return (
+        <Badge
+          variant={status.toLowerCase() === "done" ? "outline" : "destructive"}
+          className={`capitalize ${
+            isSuccess ? "bg-green-100 text-green-800" : ""
+          }`}
+        >
+          {status.toUpperCase()}
+        </Badge>
+      );
     },
   },
 ];

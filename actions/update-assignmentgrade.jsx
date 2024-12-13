@@ -2,6 +2,7 @@
 import pool from "@/lib/db";
 
 export async function addAssignmentGrade(subID, submittedGrade) {
+  submittedGrade = Number(submittedGrade);
   console.log("Received parameters:", { subID });
 
   // Validate input more rigorously
@@ -17,7 +18,7 @@ export async function addAssignmentGrade(subID, submittedGrade) {
     const result = await pool.query(
       `
            UPDATE submission SET grade = $1
-           WHERE submission_id = $2 and type = 'assignment';
+           WHERE submission_id = $2;
         `,
       [submittedGrade, subID]
     );
