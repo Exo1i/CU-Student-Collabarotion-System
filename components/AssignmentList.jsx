@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { motion } from "framer-motion";
+import { useAlert } from "./alert-context";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -21,8 +21,10 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { updateAssignment } from "@/actions/update-assignment";
 
 export default function AssignmentList({ assignments, onModify }) {
+  const { showAlert } = useAlert();
   const [editingAssignment, setEditingAssignment] = useState(null);
 
   const handleEditClick = (assignment) => {
@@ -31,16 +33,41 @@ export default function AssignmentList({ assignments, onModify }) {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
+
     setEditingAssignment((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onModify(
-      assignments.map((a) =>
-        a.id === editingAssignment.id ? editingAssignment : a
-      )
-    );
+
+    const assignModify = async function () {
+      try {
+        const res = await updateAssignment(
+          Number(editingAssignment.assignment_id),
+          editingAssignment.title,
+          editingAssignment.max_grade,
+          editingAssignment.description,
+          editingAssignment.due_date
+        );
+        if (res.status == 200)
+          showAlert({
+            message: "assignment modified successfully",
+            severity: "success",
+          });
+      } catch (e) {
+        console.log(e);
+      }
+    };
+    assignModify().then(() => {
+      onModify(
+        assignments.map((a) =>
+          a.assignment_id === editingAssignment.assignment_id
+            ? editingAssignment
+            : a
+        )
+      );
+    });
+
     setEditingAssignment(null);
   };
 
@@ -82,33 +109,33 @@ export default function AssignmentList({ assignments, onModify }) {
                       className="flex flex-col gap-4 py-4"
                     >
                       <div className="grid grid-cols-4 items-center gap-4">
-                        <Label htmlFor="name">Name</Label>
+                        <Label htmlFor="title">Name</Label>
                         <Input
-                          id="name"
-                          name="name"
-                          value={editingAssignment?.name || ""}
+                          id="title"
+                          name="title"
+                          value={editingAssignment?.title || ""}
                           onChange={handleChange}
                           className="col-span-3"
                         />
                       </div>
                       <div className="grid grid-cols-4 items-center gap-4">
-                        <Label htmlFor="deadline">Deadline</Label>
+                        <Label htmlFor="due_date">Deadline</Label>
                         <Input
-                          id="deadline"
-                          name="deadline"
+                          id="due_date"
+                          name="due_date"
                           type="date"
-                          value={editingAssignment?.deadline || ""}
+                          value={editingAssignment?.due_date || ""}
                           onChange={handleChange}
                           className="col-span-3"
                         />
                       </div>
                       <div className="grid grid-cols-4 items-center gap-4">
-                        <Label htmlFor="maxGrade">Max Grade</Label>
+                        <Label htmlFor="max_grade">Max Grade</Label>
                         <Input
-                          id="maxGrade"
-                          name="maxGrade"
+                          id="max_grade"
+                          name="max_grade"
                           type="number"
-                          value={editingAssignment?.maxGrade || ""}
+                          value={editingAssignment?.max_grade || ""}
                           onChange={handleChange}
                           className="col-span-3"
                         />

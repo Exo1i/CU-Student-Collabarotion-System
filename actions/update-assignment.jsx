@@ -1,11 +1,17 @@
 "use server";
 import pool from "@/lib/db";
 
-export async function addAssignmentGrade(subID, submittedGrade) {
-  submittedGrade = Number(submittedGrade);
+export async function updateAssignment(
+  id,
+  title,
+  maxGrade,
+  description,
+  due_date
+) {
+  maxGrade = Number(maxGrade);
 
   // Validate input more rigorously
-  if (!subID) {
+  if (!id || id < 0) {
     console.error("Missing required parameters");
     return {
       status: 422,
@@ -16,17 +22,17 @@ export async function addAssignmentGrade(subID, submittedGrade) {
   try {
     const result = await pool.query(
       `
-           UPDATE submission SET grade = $1
-           WHERE submission_id = $2;
+           UPDATE assignment SET title = $1, max_grade = $2, description = $3, due_date = $4
+           WHERE assignment_id = $5;
         `,
-      [submittedGrade, subID]
+      [title, maxGrade, description, due_date, id]
     );
 
     console.log("Database insertion result:", result);
 
     return {
       status: 200,
-      message: "grade updated successfully",
+      message: "assignment modified successfully",
     };
   } catch (err) {
     console.error("Detailed error:", {
@@ -38,7 +44,7 @@ export async function addAssignmentGrade(subID, submittedGrade) {
 
     return {
       status: 500,
-      message: "Database insertion failed",
+      message: "Database update failed",
       error: err.message,
     };
   }
