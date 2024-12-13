@@ -131,7 +131,7 @@ export default function Page({ params }) {
     </div>
   );
 }
-if (window) {
-  window.addAssignmentGrade = addAssignmentGrade;
-  window.addAssignment = addAssignment;
-}
+// if (window) {
+//   window.addAssignmentGrade = addAssignmentGrade;
+//   window.addAssignment = addAssignment;
+// }
