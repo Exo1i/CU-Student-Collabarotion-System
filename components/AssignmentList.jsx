@@ -58,10 +58,10 @@ export default function AssignmentList({ assignments, onModify }) {
         </TableHeader>
         <TableBody>
           {assignments.map((assignment) => (
-            <TableRow key={assignment.id}>
-              <TableCell>{assignment.name}</TableCell>
-              <TableCell>{assignment.deadline}</TableCell>
-              <TableCell>{assignment.maxGrade}</TableCell>
+            <TableRow key={assignment.assignment_id}>
+              <TableCell>{assignment.title}</TableCell>
+              <TableCell>{assignment.due_date}</TableCell>
+              <TableCell>{assignment.max_grade}</TableCell>
               <TableCell>
                 <Dialog>
                   <DialogTrigger asChild>
