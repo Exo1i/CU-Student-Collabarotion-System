@@ -1,13 +1,13 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import Image from "next/image";
-export default function Course(props) {
+export default function Course({ courseData }) {
   return (
     <div className="mb-8">
       <Card className="w-4\5 shadow-lg hover:shadow-xl transition-shadow duration-300">
         <div className="relative w-full">
           <Image
-            src={props.course.courseImage}
-            alt={`${props.course.name} thumbnail`}
+            src={courseData.course_img}
+            alt={`${courseData.course_name} thumbnail`}
             layout="responsive"
             width={80}
             height={60}
@@ -16,10 +16,10 @@ export default function Course(props) {
           />
         </div>
         <CardHeader>
-          <CardTitle>Name: {props.course.name}</CardTitle>
+          <CardTitle>Course Name: {courseData.course_name}</CardTitle>
         </CardHeader>
         <CardContent>
-          <p>Max Grade: {props.course.maxGrade}</p>
+          <p>Max Grade: {courseData.max_grade}</p>
         </CardContent>
       </Card>
     </div>
