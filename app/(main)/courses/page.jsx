@@ -9,7 +9,7 @@ import { motion } from 'framer-motion'
 
 
 
-const categories = ["All", "Web Development", "Data Science", "Machine Learning"]
+const categories = ["All", "project_based", "theory_only"]
 
 export default function CoursesPage() {
 
@@ -22,7 +22,7 @@ export default function CoursesPage() {
     useEffect(() => {
         async function fetchCourseData() {
             try {
-                let res = await fetch(`${process.env.NEXT_PUBLIC_DEPLOYMENT_URL}/api/courses`);
+                let res = await fetch(`/api/courses`);
                 console.log(res);
                 if (!res.ok) {
                     throw new Error(`Failed to fetch: ${res.status} ${res.statusText}`)
@@ -82,7 +82,7 @@ export default function CoursesPage() {
                 animate={{ opacity: 1 }}
                 transition={{ duration: 0.5, delay: 0.4 }}
             >
-                {courses.map((course) => (
+                {filterdCourses.map((course) => (
                     <motion.div
                         key={course.course_code}
                         layout

@@ -21,7 +21,7 @@ export async function GET(request, { params }) {
     );
 
     const reviews = await pool.query(
-      `SELECT r.content, r.rating, p.project_name, r.reviewer_id, concat(u.fname,' ',u.lname) as reviewr_full_name, u.img_url as reviewer_img 
+      `SELECT r.content, r.rating, p.project_name, p.project_id ,  r.reviewer_id, concat(u.fname,' ',u.lname) as reviewr_full_name, u.img_url as reviewer_img 
        FROM review r
        JOIN Users u ON r.reviewer_ID = u.User_ID
        JOIN project p ON r.project_id = p.project_id
