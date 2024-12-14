@@ -1,9 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useAlert } from "./alert-context";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -14,20 +14,50 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { updateProject } from "@/actions/update-project";
 
 export default function CurrentProject({ project, onModify }) {
   const [isOpen, setIsOpen] = useState(false);
+  const { showAlert } = useAlert();
   const [editedProject, setEditedProject] = useState(project);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setEditedProject((prev) => ({ ...prev, [name]: value }));
+    setEditedProject((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onModify(editedProject);
-    setIsOpen(false);
+
+    const projModify = async function () {
+      try {
+        const res = await updateProject(
+          Number(editedProject.project_id),
+          editedProject.project_name,
+          editedProject.max_grade,
+          editedProject.description,
+          editedProject.end_date,
+          editedProject.max_team_size
+        );
+        if (res.status == 200)
+          showAlert({
+            message: res.message,
+            severity: "success",
+          });
+      } catch (e) {
+        showAlert({
+          message: e.message,
+          severity: "error",
+        });
+      }
+    };
+    projModify().then(() => {
+      onModify(editedProject);
+      setIsOpen(false);
+    });
   };
 
   return (
@@ -63,10 +93,10 @@ export default function CurrentProject({ project, onModify }) {
             </DialogHeader>
             <form onSubmit={handleSubmit} className="flex flex-col gap-4 py-4">
               <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="name">Name</Label>
+                <Label htmlFor="project_name">Name</Label>
                 <Input
-                  id="name"
-                  name="name"
+                  id="project_name"
+                  name="project_name"
                   value={editedProject.project_name}
                   onChange={handleChange}
                   className="col-span-3"
@@ -83,10 +113,10 @@ export default function CurrentProject({ project, onModify }) {
                 />
               </div>
               <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="teamSize">Team Size</Label>
+                <Label htmlFor="max_team_size">Team Size</Label>
                 <Input
-                  id="teamSize"
-                  name="teamSize"
+                  id="max_team_size"
+                  name="max_team_size"
                   type="number"
                   value={editedProject.max_team_size}
                   onChange={handleChange}
@@ -94,10 +124,10 @@ export default function CurrentProject({ project, onModify }) {
                 />
               </div>
               <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="grade">Grade</Label>
+                <Label htmlFor="max_grade">Grade</Label>
                 <Input
-                  id="grade"
-                  name="grade"
+                  id="max_grade"
+                  name="max_grade"
                   type="number"
                   value={editedProject.max_grade}
                   onChange={handleChange}
@@ -105,10 +135,10 @@ export default function CurrentProject({ project, onModify }) {
                 />
               </div>
               <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="dueDate">Due Date</Label>
+                <Label htmlFor="end_date">Due Date</Label>
                 <Input
-                  id="dueDate"
-                  name="dueDate"
+                  id="end_date"
+                  name="end_date"
                   type="date"
                   value={editedProject.end_date}
                   onChange={handleChange}

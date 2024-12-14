@@ -11,7 +11,6 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { addAssignment } from "@/actions/add-assignment";
 
 export default function CreateAssignment(onCreateAssignment) {
   const [isOpen, setIsOpen] = useState(false);
