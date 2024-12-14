@@ -4,7 +4,6 @@ import { useState } from "react";
 import { useEffect } from "react";
 import { motion } from "framer-motion";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { notFound } from "next/navigation";
 import Course from "@/components/Course";
 import CreateProject from "@/components/CreateProjectCard";
 import EnrolledStudents from "@/components/Enrolledstudents";
@@ -12,8 +11,6 @@ import StudentSubmissions from "@/components/Submission";
 import CurrentProject from "@/components/CurrentProject";
 import CreateAssignment from "@/components/CreateAssignment";
 import AssignmentList from "@/components/AssignmentList";
-import { addAssignmentGrade } from "@/actions/update-assignmentgrade";
-import { addAssignment } from "@/actions/add-assignment";
 import { useAlert } from "@/components/alert-context";
 
 export default function Page({ params }) {
@@ -21,7 +18,6 @@ export default function Page({ params }) {
   // const { instructorId } = await auth();
   // console.log(instructorId);
   const { showAlert } = useAlert();
-
   const [currentProject, setCurrentProject] = useState({
     name: "Final Project",
     description: "Build a full-stack web application",
@@ -33,6 +29,7 @@ export default function Page({ params }) {
   const [instructorData, setInstructorData] = useState({});
   const [error, seterror] = useState(null);
   const [loading, setloading] = useState(true);
+  const [courseCode, setCourseCode] = useState("");
   useEffect(() => {
     async function fetchCourseData() {
       try {
@@ -42,12 +39,21 @@ export default function Page({ params }) {
         }
         let data = await res.json();
         setInstructorData(data);
-        setAssignments(data.course.assignments);
+        setCourseCode(data.course.course_code);
+        setAssignments(
+          data.course.assignments.map((assignment) => ({
+            ...assignment,
+            course_code: data.course.course_code,
+          }))
+        );
         setCurrentProject(data.course.project);
         seterror(null);
       } catch (error) {
         seterror(error);
-        console.log(error);
+        showAlert({
+          message: error.message,
+          severity: "error",
+        });
       } finally {
         setloading(false);
       }
@@ -58,11 +64,12 @@ export default function Page({ params }) {
   if (error) return <div>Error...</div>;
 
   const handleCreateProject = (project) => {
-    console.log("New project created:", project);
+    // console.log("New project created:", project);
     setCurrentProject(project);
   };
 
   const handleCreateAssignment = (assignment) => {
+    console.log(assignment);
     setAssignments([
       ...assignments,
       { id: assignments.length + 1, ...assignment },
@@ -107,6 +114,7 @@ export default function Page({ params }) {
                   <CreateProject onCreateProject={handleCreateProject} />
                   <CreateAssignment
                     onCreateAssignment={handleCreateAssignment}
+                    courseCode={courseCode}
                   />
                 </CardContent>
               </Card>
