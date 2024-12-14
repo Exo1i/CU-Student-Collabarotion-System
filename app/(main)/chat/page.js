@@ -3,7 +3,7 @@ import {useEffect, useState} from "react";
 import {Loader2} from 'lucide-react';
 import useSWR from "swr";
 import useChatStore from "@/hooks/useChatStore";
-import Chat from "./chat";
+import Chat from "./Chat";
 import {ChannelsList} from "@/app/(main)/chat/ChannelsList";
 import {useAlert} from "@/components/alert-context";
 import {getRole} from "@/lib/role";
