@@ -3,6 +3,7 @@
 A modern, feature-rich learning management system built with Next.js, focusing on collaborative learning and
 project-based education.
 
+
 ## ✨ Features
 
 - **Authentication & User Management**
