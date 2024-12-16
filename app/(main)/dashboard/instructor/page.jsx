@@ -12,28 +12,28 @@ import CurrentProject from "@/components/CurrentProject";
 import CreateAssignment from "@/components/CreateAssignment";
 import AssignmentList from "@/components/AssignmentList";
 import { useAlert } from "@/components/alert-context";
-
+import { getUserID } from "@/hooks/get-userID";
 export default function Page({ params }) {
-  // const {??} = params; TODO
-  // const { instructorId } = await auth();
-  // console.log(instructorId);
   const { showAlert } = useAlert();
   const [currentProject, setCurrentProject] = useState({
-    name: "Final Project",
-    description: "Build a full-stack web application",
-    teamSize: 3,
-    grade: 100,
-    dueDate: "2023-12-31",
+    name: "",
+    description: "",
+    teamSize: 0,
+    grade: 0,
+    dueDate: "",
   });
   const [assignments, setAssignments] = useState([]);
   const [instructorData, setInstructorData] = useState({});
   const [error, seterror] = useState(null);
   const [loading, setloading] = useState(true);
   const [courseCode, setCourseCode] = useState("");
+  // const userID = getUser(); TODO wait till i get my hands on user/pass for other instructors
+  const userID = "user005";
   useEffect(() => {
+    if (!user) return;
     async function fetchCourseData() {
       try {
-        let res = await fetch("http://localhost:3000/api/instructor/user001");
+        let res = await fetch(`http://localhost:3000/api/instructor/${userID}`);
         if (!res.ok) {
           throw new Error(`Failed to fetch: ${res.status} ${res.statusText}`);
         }
@@ -59,7 +59,7 @@ export default function Page({ params }) {
       }
     }
     fetchCourseData();
-  }, []);
+  }, [userID]);
   if (loading) return <div>Loading...</div>;
   if (error) return <div>Error...</div>;
 
