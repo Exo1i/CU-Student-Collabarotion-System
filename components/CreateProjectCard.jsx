@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "./ui/label";
+import { useAlert } from "./alert-context";
 import {
   Dialog,
   DialogContent,
@@ -13,73 +14,62 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import addProject from "@/actions/add-project";
-import { useEffect } from "react";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { CheckCircle, MessageCircleXIcon } from "lucide-react";
-export default function CreateProject(onCreateProject) {
+
+export default function CreateProject({ onCreateProject, courseCode }) {
   const [isOpen, setIsOpen] = useState(false);
-  const [notification, setNotification] = useState(null);
+  const { showAlert } = useAlert();
   const [project, setProject] = useState({
     name: "",
-    courseCode: "",
+    courseCode: courseCode,
     description: "",
     teamSize: 1,
     grade: 0,
     dueDate: "",
   });
 
-  useEffect(() => {
-    if (notification) {
-      const timer = setTimeout(() => {
-        setNotification(null);
-      }, 5000); // Notification will disappear after 5 seconds
-
-      return () => clearTimeout(timer);
-    }
-  }, [notification]);
-
   const handleChange = (e) => {
     const { name, value } = e.target;
+    console.log(project);
     setProject((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    try {
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-
-      setNotification({
-        type: "success",
-        title: "Project created successfully",
-        message: `Project "${project.name}" has been added to the course.`,
+    const createProject = async function () {
+      try {
+        const res = await addProject(
+          project.name,
+          project.courseCode,
+          project.dueDate,
+          project.description,
+          project.teamSize,
+          project.grade
+        );
+        if (res.status == 200)
+          showAlert({
+            message: res.message,
+            severity: "success",
+          });
+      } catch (e) {
+        showAlert({
+          message: e.message,
+          severity: "error",
+        });
+      }
+    };
+    createProject().then(() => {
+      onCreateProject(project);
+      setProject({
+        name: "",
+        courseCode: courseCode,
+        description: "",
+        teamSize: 1,
+        grade: 0,
+        dueDate: "",
       });
-
-      const result = await addProject(
-        project.name,
-        project.courseCode,
-        project.dueDate,
-        project.description,
-        project.teamSize,
-        project.grade
-      );
-    } catch (e) {
-      setNotification({
-        type: "error",
-        title: "Error creating team",
-        message: "There was a problem creating the team. Please try again.",
-      });
-    }
-    // Reset form after submission
-    setProject({
-      name: "",
-      courseCode: "",
-      description: "",
-      teamSize: 1,
-      grade: 0,
-      dueDate: "",
+      setIsOpen(false);
     });
-    setIsOpen(false);
   };
 
   return (
@@ -168,24 +158,6 @@ export default function CreateProject(onCreateProject) {
           </form>
         </DialogContent>
       </Dialog>
-      {notification && (
-        <Alert
-          variant={notification.type === "success" ? "default" : "destructive"}
-          className={`z-[9999] fixed bottom-4 right-4 w-96 animate-in fade-in slide-in-from-bottom-5 ${
-            notification.type === "success"
-              ? "bg-green-100 border-green-500 text-green-800"
-              : "bg-red-100 border-red-500 text-red-800"
-          }`}
-        >
-          {notification.type === "success" ? (
-            <CheckCircle className="h-4 w-4" />
-          ) : (
-            <MessageCircleXIcon className="h-4 w-4" />
-          )}
-          <AlertTitle>{notification.title}</AlertTitle>
-          <AlertDescription>{notification.message}</AlertDescription>
-        </Alert>
-      )}
     </>
   );
 }

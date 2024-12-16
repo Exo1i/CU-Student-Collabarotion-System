@@ -6,6 +6,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Trash2 } from "lucide-react";
+import { useRouter } from "next/navigation";
 import {
   Table,
   TableBody,
@@ -22,10 +24,16 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { updateAssignment } from "@/actions/update-assignment";
+import { deleteAssignment } from "@/actions/delete-assignment";
 
 export default function AssignmentList({ assignments, onModify }) {
   const { showAlert } = useAlert();
   const [editingAssignment, setEditingAssignment] = useState(null);
+
+  // const refreshPage = () => { TODO: IMPLEMENT IF FOR ASSIGNMENT CREATION
+  //   const router = useRouter();
+  //   router.refresh();
+  // };
 
   const handleEditClick = (assignment) => {
     setEditingAssignment({ ...assignment });
@@ -55,7 +63,10 @@ export default function AssignmentList({ assignments, onModify }) {
             severity: "success",
           });
       } catch (e) {
-        console.log(e);
+        showAlert({
+          message: e.message,
+          severity: "error",
+        });
       }
     };
     assignModify().then(() => {
@@ -71,6 +82,34 @@ export default function AssignmentList({ assignments, onModify }) {
     setEditingAssignment(null);
   };
 
+  const handleDelete = (assignment) => {
+    const assignDelete = async function () {
+      try {
+        const res = await deleteAssignment(
+          assignment.assignment_id,
+          assignment.course_code
+        );
+        // refreshPage();
+        if (res.status == 200) {
+          onModify(
+            assignments.filter(
+              (a) => a.assignment_id !== assignment.assignment_id
+            )
+          );
+          showAlert({
+            message: "assignment deleted successfully",
+            severity: "success",
+          });
+        }
+      } catch (e) {
+        showAlert({
+          message: e.message,
+          severity: "error",
+        });
+      }
+    };
+    assignDelete();
+  };
   return (
     <div className="p-6 rounded-lg shadow-lg">
       <h2 className="text-2xl font-semibold mb-4">Assignments</h2>
@@ -81,6 +120,7 @@ export default function AssignmentList({ assignments, onModify }) {
             <TableHead>Deadline</TableHead>
             <TableHead>Max Grade</TableHead>
             <TableHead>Action</TableHead>
+            <TableHead>Delete</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -88,7 +128,9 @@ export default function AssignmentList({ assignments, onModify }) {
             <TableRow key={assignment.assignment_id}>
               <TableCell>{assignment.title}</TableCell>
               <TableCell>{assignment.due_date}</TableCell>
-              <TableCell>{assignment.max_grade}</TableCell>
+              <TableCell className="pl-[26px]">
+                {assignment.max_grade}
+              </TableCell>
               <TableCell>
                 <Dialog>
                   <DialogTrigger asChild>
@@ -96,6 +138,7 @@ export default function AssignmentList({ assignments, onModify }) {
                       variant="outline"
                       size="sm"
                       onClick={() => handleEditClick(assignment)}
+                      className="hover:scale-110 "
                     >
                       Modify
                     </Button>
@@ -156,6 +199,9 @@ export default function AssignmentList({ assignments, onModify }) {
                     </form>
                   </DialogContent>
                 </Dialog>
+              </TableCell>
+              <TableCell onClick={() => handleDelete(assignment)}>
+                <Trash2 className="h-5 w-5 text-red-500 hover:scale-125" />
               </TableCell>
             </TableRow>
           ))}

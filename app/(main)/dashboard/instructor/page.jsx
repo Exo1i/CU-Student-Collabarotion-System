@@ -33,7 +33,7 @@ export default function Page({ params }) {
   useEffect(() => {
     async function fetchCourseData() {
       try {
-        let res = await fetch("http://localhost:3000/api/instructor/user005");
+        let res = await fetch("http://localhost:3000/api/instructor/user001");
         if (!res.ok) {
           throw new Error(`Failed to fetch: ${res.status} ${res.statusText}`);
         }
@@ -111,7 +111,10 @@ export default function Page({ params }) {
                 </CardHeader>
                 <CardContent className="flex flex-col gap-5">
                   <EnrolledStudents />
-                  <CreateProject onCreateProject={handleCreateProject} />
+                  <CreateProject
+                    onCreateProject={handleCreateProject}
+                    courseCode={courseCode}
+                  />
                   <CreateAssignment
                     onCreateAssignment={handleCreateAssignment}
                     courseCode={courseCode}
