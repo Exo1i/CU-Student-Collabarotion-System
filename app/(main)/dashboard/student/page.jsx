@@ -5,13 +5,14 @@ import { columns } from "@/app/(main)/dashboard/student/columns";
 import { DataTable } from "@/app/(main)/dashboard/student/data_table";
 import { CalendarDays, Notebook, Users } from "lucide-react";
 import { useEffect, useState } from "react";
-
+import { getUser } from "@/hooks/get-userID";
 export default function StudentPage() {
   const [assignData, setassigndata] = useState([]);
+  const user = getUser();
   useEffect(() => {
     const getData = async () => {
       try {
-        const resp = await fetch("/api/assignments")
+        const resp = await fetch("/api/assignments") //TODO UPDATE FETCH
           .then((response) => response.json())
           .then((data) => setassigndata(data));
       } catch (e) {
@@ -19,7 +20,7 @@ export default function StudentPage() {
       }
     };
     getData();
-  }, []);
+  }, [user]);
 
   return (
     <div>
