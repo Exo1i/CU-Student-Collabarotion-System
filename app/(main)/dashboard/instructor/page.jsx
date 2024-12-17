@@ -12,7 +12,7 @@ import CurrentProject from "@/components/CurrentProject";
 import CreateAssignment from "@/components/CreateAssignment";
 import AssignmentList from "@/components/AssignmentList";
 import { useAlert } from "@/components/alert-context";
-import { getUserID } from "@/hooks/get-userID";
+import Loader from "@/components/Loader";
 export default function Page({ params }) {
   const { showAlert } = useAlert();
   const [currentProject, setCurrentProject] = useState({
@@ -27,10 +27,10 @@ export default function Page({ params }) {
   const [error, seterror] = useState(null);
   const [loading, setloading] = useState(true);
   const [courseCode, setCourseCode] = useState("");
-  // const userID = getUser(); TODO wait till i get my hands on user/pass for other instructors
+  // const user = getUser(); TODO wait till i get my hands on user/pass for other instructors
   const userID = "user005";
   useEffect(() => {
-    if (!user) return;
+    // if (!user) return;
     async function fetchCourseData() {
       try {
         let res = await fetch(`http://localhost:3000/api/instructor/${userID}`);
@@ -60,11 +60,10 @@ export default function Page({ params }) {
     }
     fetchCourseData();
   }, [userID]);
-  if (loading) return <div>Loading...</div>;
+  if (loading) return <Loader />;
   if (error) return <div>Error...</div>;
 
   const handleCreateProject = (project) => {
-    // console.log("New project created:", project);
     setCurrentProject(project);
   };
 
