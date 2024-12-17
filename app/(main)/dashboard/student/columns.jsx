@@ -4,23 +4,28 @@ import { Badge } from "@/components/ui/badge";
 
 export const columns = [
   {
-    accessorKey: "title",
+    accessorKey: "name",
     header: "Title",
     cell: ({ row }) => {
       return (
         <div className="flex gap-2">
           <Bookmark />
-          {row.original.title}
+          {row.original.name}
         </div>
       );
     },
   },
+  ,
   {
-    accessorKey: "maxGrade",
+    accessorKey: "course_name",
+    header: "Course",
+  },
+  {
+    accessorKey: "max_grade",
     header: "Max Grade",
   },
   {
-    accessorKey: "dueDate",
+    accessorKey: "due_date",
     header: "Deadline",
   },
   {
@@ -41,4 +46,9 @@ export const columns = [
       );
     },
   },
+  // {
+  //   accessorKey: "grade",
+  //   header: "Grade",
+  // },
+  ,
 ];
