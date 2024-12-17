@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
 import { CalendarIcon, UsersIcon, ClockIcon, CheckCircleIcon, CodeIcon } from 'lucide-react'
 import Phasesubmissionbutton from '@/app/components/phasesubmissionbuttom'
+import { getRole } from '@/actions/GetRole'
 export default function ProjectPhasesPage({ params }) {
     const [projectID, setProjectID] = useState(null);
     useEffect(() => {
@@ -20,6 +21,7 @@ export default function ProjectPhasesPage({ params }) {
             try {
                 const currentUserRole = await getRole();
                 setrole(currentUserRole);
+                console.log("current student role: " + currentUserRole);
             } catch (err) {
                 console.log(err);
             }
@@ -36,7 +38,7 @@ export default function ProjectPhasesPage({ params }) {
             try {
                 const res = await fetch(`/api/projects/${projectID}/phases`);
                 if (!res.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
+                    throw new Error(`HTTP error! status: ${res.status}`);
                 }
                 let data = await res.json();
                 console.log(res);

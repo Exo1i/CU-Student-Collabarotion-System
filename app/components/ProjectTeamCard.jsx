@@ -2,10 +2,9 @@
 
 import { useEffect, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { CheckCircle, ChevronDown, ChevronUp, Crown, XCircle, UserCheck, Trash2, Star } from 'lucide-react'
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Progress } from "@/components/ui/progress"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
@@ -15,6 +14,7 @@ import { Participation } from '@/actions/Participation'
 import { DeleteMember } from '@/actions/DeleteMember'
 import ReviewDialog from './review-dialog'
 import { getRole } from "@/actions/GetRole";
+import EditTechnology from './EditTechnology'
 export default function ProjectTeamCard({ userid, Team, projectID, currentuserdata }) {
     const [role, setrole] = useState(null);
     useEffect(() => {
@@ -58,6 +58,8 @@ export default function ProjectTeamCard({ userid, Team, projectID, currentuserda
         setSelectedMember(member);
         setIsReviewDialogOpen(true);
     };
+
+
 
     const isUserInAnyTeam = currentuserdata !== null;
     const isUserInThisTeam = currentuserdata?.team_num === Team.team_num;
@@ -133,11 +135,7 @@ export default function ProjectTeamCard({ userid, Team, projectID, currentuserda
                         </div>
                     </div>
                 </div>
-                <div className="flex items-center justify-center flex-wrap gap-2 pt-6 mb-4">
-                    {Team.technologies.map((tech) => (
-                        <Badge key={tech} variant="secondary">{tech}</Badge>
-                    ))}
-                </div>
+            <EditTechnology technologies={Team.technologies} teamNum={Team.team_num} projectId={projectID} isUserLeader={isUserLeader} isUserInThisTeam={isUserInThisTeam} />
                 <div className="flex flex-wrap justify-center gap-4 mb-4">
                     {Team.teamMembers.map((member) => (
                         <TooltipProvider key={member.full_name}>
