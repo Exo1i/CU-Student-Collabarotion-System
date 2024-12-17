@@ -1,5 +1,5 @@
 import Image from 'next/image'
-import { CrownIcon, AwardIcon, CodeIcon, UserIcon, PlusCircleIcon, Trash2Icon } from 'lucide-react'
+import { CrownIcon, AwardIcon, CodeIcon, UserIcon, PlusCircleIcon } from 'lucide-react'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { notFound } from 'next/navigation'
 import { getRole } from '@/actions/GetRole'
@@ -7,9 +7,13 @@ import ProfileReview from '@/app/components/ProfileReview'
 import GiveBadgeDialog from '@/app/components/GiveBadgeDialog'
 import DeleteBadgeButton from '@/app/components/DeleteBadgeButtom'
 import { Button } from '@/components/ui/button'
+import { auth } from '@clerk/nextjs/server'
+import GradesSection from '@/app/components/GradesSection'
 
 export default async function Profile({ params }) {
-    const { userID } = params;
+    const { userID } = params; // user id for this profile
+    const { userId } = await auth(); // current user id logged in
+    // const userId = 'user002';
     let userData = null
     let error = null;
     const role = await getRole();
@@ -30,10 +34,11 @@ export default async function Profile({ params }) {
     if (!userData) {
         return notFound();
     }
+
     return (
         <div className="max-w-4xl mx-auto space-y-8 relative">
             <div className="absolute inset-0 -z-10 bg-gradient-to-br from-blue-100 to-purple-100 opacity-50 blur-3xl"></div>
-            <div className="bg-white rounded-lg shadow-lg overflow-hidden transform hover:scale-105 transition-transform duration-300">
+            <div className="bg-white rounded-lg shadow-lg overflow-hidden transform  transition-transform duration-300">
                 <div className="h-32 bg-gradient-to-r from-blue-500 to-purple-600 relative">
                     <div className="absolute inset-0 bg-black opacity-20"></div>
                     <div className="absolute inset-0 flex items-center justify-center">
@@ -106,14 +111,14 @@ export default async function Profile({ params }) {
                     </div>
                 </div>
             </div>
-            <div className="bg-white rounded-lg shadow-lg p-6 transform hover:scale-105 transition-transform duration-300">
+            <div className="bg-white rounded-lg shadow-lg p-6 transform  transition-transform duration-300">
                 <div className='flex items-center '>
                     <CodeIcon className='mr-2' />
                     <h1 className='font-bold text-2xl'>Current Teams</h1>
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     {userData.teams.map((Team) => (
-                        <div key={Team.team_num} className={`p-4 rounded-lg transition-all duration-300 ease-in-out transform hover:scale-105 hover:shadow-xl ${Team.leader ? 'bg-gradient-to-br from-yellow-100 to-yellow-200' : 'bg-gradient-to-br from-gray-100 to-gray-200'
+                        <div key={Team.team_num} className={`p-4 rounded-lg transition-all duration-300 ease-in-out transform  hover:shadow-xl ${Team.leader ? 'bg-gradient-to-br from-yellow-100 to-yellow-200' : 'bg-gradient-to-br from-gray-100 to-gray-200'
                             }`}>
                             <div className='flex justify-between'>
                                 <h2>
@@ -128,7 +133,7 @@ export default async function Profile({ params }) {
                     ))}
                 </div>
             </div>
-            <div className="bg-white rounded-lg shadow-lg p-6 transform hover:scale-105 transition-transform duration-300">
+            <div className="bg-white rounded-lg shadow-lg p-6 transform  transition-transform duration-300">
                 <h2 className='text-2xl font-bold mb-4 text-gray-800 flex items-center'>
                     <AwardIcon className="w-6 h-6 mr-2 text-purple-500" />
                     Reviews
@@ -139,6 +144,11 @@ export default async function Profile({ params }) {
                     ))}
                 </div>
             </div>
+            {userId === userID && (
+                <div className="bg-white rounded-lg shadow-lg p-6 transform  transition-transform duration-300">
+                    <GradesSection userId={userID} />
+                </div>
+            )}
         </div>
     )
 }
