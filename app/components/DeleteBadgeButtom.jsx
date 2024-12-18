@@ -1,12 +1,13 @@
 'use client'
 
-import { Button } from '@/components/ui/button'
-import { Trash2Icon } from 'lucide-react'
-import { useRouter } from 'next/navigation'
-import { DeleteStudentBadge } from "@/actions/deleteBadge"
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
-import { CheckCircledIcon, CrossCircledIcon } from "@radix-ui/react-icons"
-import { useEffect, useState } from "react"
+import {Button} from '@/components/ui/button'
+import {Trash2Icon} from 'lucide-react'
+import {useRouter} from 'next/navigation'
+import {DeleteStudentBadge} from "@/actions/deleteBadge"
+import {Alert, AlertDescription, AlertTitle} from "@/components/ui/alert"
+import {CheckCircledIcon, CrossCircledIcon} from "@radix-ui/react-icons"
+import {useEffect, useState} from "react"
+
 export default function DeleteBadgeButton({ userId, badgeId }) {
     const router = useRouter()
     const [notification, setNotification] = useState(null)

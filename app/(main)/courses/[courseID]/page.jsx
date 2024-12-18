@@ -1,11 +1,13 @@
 'use client'
-import { notFound, usePathname } from "next/navigation";
-import { UserGroupIcon } from "@heroicons/react/20/solid";
+import {notFound, usePathname} from "next/navigation";
+import {UserGroupIcon} from "@heroicons/react/20/solid";
 import Image from "next/image";
-import { CalendarIcon, ClockIcon } from "lucide-react";
+import {CalendarIcon, ClockIcon} from "lucide-react";
 import CustomLink from "@/app/components/MyCustomLink";
 import SubmissionAssignment from "@/app/components/SubmissionAssignment";
-import { useEffect, useState } from "react";
+import {useEffect, useState} from "react";
+import Loading from "@/app/(main)/loading";
+
 export default function CoursePage() {
     const pathname = usePathname();
     console.log("path : " + pathname);
@@ -17,6 +19,7 @@ export default function CoursePage() {
         const pathParts = pathname.split('/');
         const code = pathParts[pathParts.length - 1];
         setCourseCode(code);
+
         async function fetchCourseData() {
             try {
                 console.log(`Fetching course data for courseCode: ${courseCode}`);
@@ -36,15 +39,18 @@ export default function CoursePage() {
                 setloading(false);
             }
         }
+
         if (courseCode) {
             fetchCourseData()
         }
     }, [courseCode])
     if (loading) {
-        return <div>Loading...</div>
+        return <Loading />
     }
     if (error) {
-        { console.error(error); }
+        {
+            console.error(error);
+        }
         return <div>Error...</div>;
     }
     if (!course) {

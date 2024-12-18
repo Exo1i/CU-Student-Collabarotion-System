@@ -1,5 +1,5 @@
 import pool from "@/lib/db";
-import { NextResponse } from "next/server";
+import {NextResponse} from "next/server";
 
 //get number of studens (and a list of the students (may not be needed))
 export async function GET(request) {

@@ -1,6 +1,5 @@
 "use server";
-import pool from "../../../lib/db";
-import { NextResponse } from "next/server";
+import {NextResponse} from "next/server";
 
 export async function GET(request) {
   const data = [

@@ -1,20 +1,21 @@
 'use client'
 
-import { useEffect, useState } from 'react'
-import { AnimatePresence, motion } from 'framer-motion'
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { CheckCircle, ChevronDown, ChevronUp, Crown, XCircle, UserCheck, Trash2, Star } from 'lucide-react'
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { Progress } from "@/components/ui/progress"
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
+import {useEffect, useState} from 'react'
+import {AnimatePresence, motion} from 'framer-motion'
+import {Card, CardContent, CardFooter, CardHeader, CardTitle} from "@/components/ui/card"
+import {CheckCircle, ChevronDown, ChevronUp, Crown, Star, Trash2, UserCheck, XCircle} from 'lucide-react'
+import {Avatar, AvatarFallback, AvatarImage} from "@/components/ui/avatar"
+import {Badge} from "@/components/ui/badge"
+import {Button} from "@/components/ui/button"
+import {Progress} from "@/components/ui/progress"
+import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from "@/components/ui/tooltip"
 import CustomLink from './MyCustomLink'
-import { usePathname, useRouter } from 'next/navigation'
-import { Participation } from '@/actions/Participation'
-import { DeleteMember } from '@/actions/DeleteMember'
+import {usePathname, useRouter} from 'next/navigation'
+import {Participation} from '@/actions/Participation'
+import {DeleteMember} from '@/actions/DeleteMember'
 import ReviewDialog from './review-dialog'
-import { getRole } from "@/actions/GetRole";
+import {getRole} from "@/actions/GetRole";
+
 export default function ProjectTeamCard({ userid, Team, projectID, currentuserdata }) {
     const [role, setrole] = useState(null);
     useEffect(() => {
