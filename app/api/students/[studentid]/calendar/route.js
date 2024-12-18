@@ -22,7 +22,7 @@ export async function GET(request, { params }) {
       assignments.rows.map(async (assignment) => {
         const submissions = await pool.query(
           `
-           SELECT submission_date
+           SELECT submission_date, COALESCE(grade, 0) AS grade
            FROM Submission
            JOIN AssignmentSubmission ON Submission.Submission_id = AssignmentSubmission.Submission_id
            WHERE AssignmentSubmission.assignment_id = $1 AND student_id = $2;
@@ -31,8 +31,10 @@ export async function GET(request, { params }) {
         );
 
         let submissionDate = null;
+        let grade = 0;
         if (submissions.rowCount > 0) {
           submissionDate = submissions.rows[0].submission_date;
+          grade = submissions.rows[0].grade;
         }
 
         let status;
@@ -53,6 +55,7 @@ export async function GET(request, { params }) {
           type: "assignment",
           course_name: assignment.course_name,
           status: status,
+          grade: status === "missed" ? 0 : grade,
         };
       })
     );
@@ -72,7 +75,7 @@ export async function GET(request, { params }) {
       phases.rows.map(async (phase) => {
         const submissions = await pool.query(
           `
-            SELECT submission_date
+            SELECT submission_date, COALESCE(grade, 0) AS grade
             FROM Submission
             JOIN PhaseSubmission ON Submission.submission_id = PhaseSubmission.submission_id
             WHERE phase_num = $1 AND project_id = $2 AND student_id = $3;
@@ -81,8 +84,10 @@ export async function GET(request, { params }) {
         );
 
         let submissionDate = null;
+        let grade = 0;
         if (submissions.rowCount > 0) {
           submissionDate = submissions.rows[0].submission_date;
+          grade = submissions.rows[0].grade;
         }
 
         let status;
@@ -103,6 +108,7 @@ export async function GET(request, { params }) {
           description: phase.description,
           type: "phase",
           status: status,
+          grade: status === "missed" ? 0 : grade,
         };
       })
     );

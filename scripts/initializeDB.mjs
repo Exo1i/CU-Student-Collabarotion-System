@@ -43,7 +43,7 @@ async function initializeDB() {
         Course_Name TEXT NOT NULL,
         Instructor_ID VARCHAR(32),
         max_Grade INTEGER NOT NULL,
-        FOREIGN KEY (Instructor_ID) REFERENCES Users (User_ID) ON DELETE SET NULL
+        FOREIGN KEY (Instructor_ID) REFERENCES Users (User_ID) ON DELETE SET NULL on update cascades
       );
     `);
 
@@ -58,7 +58,7 @@ async function initializeDB() {
         Description TEXT,
         Max_team_size INTEGER,
         max_grade INTEGER,
-        FOREIGN KEY (Course_Code) REFERENCES Course(Course_Code) ON DELETE SET NULL
+        FOREIGN KEY (Course_Code) REFERENCES Course(Course_Code) ON DELETE SET NULL on update cascade
       );
     `);
 
@@ -72,7 +72,7 @@ async function initializeDB() {
         Phase_load INTEGER NOT NULL,
         deadline DATE,
         PRIMARY KEY (Project_ID, Phase_Num),
-        FOREIGN KEY (Project_ID) REFERENCES Project(Project_ID) ON DELETE CASCADE
+        FOREIGN KEY (Project_ID) REFERENCES Project(Project_ID) ON DELETE CASCADE on update cascade
       );
     `);
 
@@ -83,7 +83,7 @@ async function initializeDB() {
         Team_Num INT,
         Team_Name TEXT,
         PRIMARY KEY (Project_ID, Team_Num),
-        FOREIGN KEY (Project_ID) REFERENCES Project(Project_ID) ON DELETE CASCADE
+        FOREIGN KEY (Project_ID) REFERENCES Project(Project_ID) ON DELETE CASCADE on update cascade
       );
     `);
 
@@ -103,7 +103,7 @@ async function initializeDB() {
         Group_ID INT,
         Channel_Type channel_access NOT NULL,
         PRIMARY KEY (Channel_Num, Group_ID),
-        FOREIGN KEY (Group_ID) REFERENCES Chat_Group(Group_ID) ON DELETE CASCADE
+        FOREIGN KEY (Group_ID) REFERENCES Chat_Group(Group_ID) ON DELETE CASCADE on update cascade
       );
     `);
 
@@ -117,8 +117,8 @@ async function initializeDB() {
         Type message_type NOT NULL,
         Content TEXT NOT NULL,
         sender_ID VARCHAR(32),
-        FOREIGN KEY (sender_ID) REFERENCES Users(User_ID) ON DELETE CASCADE,
-        FOREIGN KEY (Channel_Num, Group_ID) REFERENCES channel(Channel_Num, Group_ID) ON DELETE CASCADE
+        FOREIGN KEY (sender_ID) REFERENCES Users(User_ID) ON DELETE CASCADE on update cascade,
+        FOREIGN KEY (Channel_Num, Group_ID) REFERENCES channel(Channel_Num, Group_ID) ON DELETE CASCADE on update cascade
       );
     `);
 
@@ -131,7 +131,7 @@ async function initializeDB() {
         Description TEXT,
         Due_Date DATE,
         Course_Code VARCHAR(10),
-        FOREIGN KEY (Course_Code) REFERENCES Course(Course_Code) ON DELETE CASCADE
+        FOREIGN KEY (Course_Code) REFERENCES Course(Course_Code) ON DELETE CASCADE on update cascade
       );
     `);
 
@@ -143,7 +143,7 @@ async function initializeDB() {
         Student_ID VARCHAR(32) NOT NULL,
         Grade INTEGER,
         Submission_date DATE DEFAULT NOW(),
-        FOREIGN KEY (Student_ID) REFERENCES Users(User_ID) ON DELETE CASCADE
+        FOREIGN KEY (Student_ID) REFERENCES Users(User_ID) ON DELETE CASCADE on update cascade
       );
     `);
 
@@ -174,8 +174,8 @@ async function initializeDB() {
         Team_Num INT,
         Leader BOOLEAN,
         PRIMARY KEY (student_ID, Project_ID, Team_Num),
-        FOREIGN KEY (Project_ID, Team_Num) REFERENCES Team(Project_ID, Team_Num) ON DELETE CASCADE,
-        FOREIGN KEY (student_ID) REFERENCES Users(User_ID) ON DELETE SET NULL
+        FOREIGN KEY (Project_ID, Team_Num) REFERENCES Team(Project_ID, Team_Num) ON DELETE CASCADE on update cascade,
+        FOREIGN KEY (student_ID) REFERENCES Users(User_ID) ON DELETE SET NULL on update cascade
       );
     `);
 
@@ -185,8 +185,8 @@ async function initializeDB() {
         student_ID VARCHAR(32), 
         Course_Code VARCHAR(10),
         PRIMARY KEY (student_ID, Course_Code),
-        FOREIGN KEY (Course_Code) REFERENCES Course(Course_Code) ON DELETE CASCADE,
-        FOREIGN KEY (student_ID) REFERENCES Users(User_ID) ON DELETE CASCADE
+        FOREIGN KEY (Course_Code) REFERENCES Course(Course_Code) ON DELETE CASCADE on update cascade,
+        FOREIGN KEY (student_ID) REFERENCES Users(User_ID) ON DELETE CASCADE on update cascade
       );
     `);
 
@@ -197,8 +197,8 @@ async function initializeDB() {
         user_ID VARCHAR(32),
         readAt TIMESTAMP DEFAULT NOW(),
         PRIMARY KEY (lastMessageRead_ID, user_ID),
-        FOREIGN KEY (lastMessageRead_ID) REFERENCES Message(Message_ID) ON DELETE SET NULL,
-        FOREIGN KEY (user_ID) REFERENCES Users(User_ID) ON DELETE CASCADE
+        FOREIGN KEY (lastMessageRead_ID) REFERENCES Message(Message_ID) ON DELETE SET NULL on update cascade,
+        FOREIGN KEY (user_ID) REFERENCES Users(User_ID) ON DELETE CASCADE on update cascade
       );
     `);
 
@@ -208,8 +208,8 @@ async function initializeDB() {
         Message_ID INT,
         Attachment_ID INT,
         PRIMARY KEY (Message_ID, Attachment_ID),
-        FOREIGN KEY (Message_ID) REFERENCES Message(Message_ID) ON DELETE CASCADE,
-        FOREIGN KEY (Attachment_ID) REFERENCES Attachment(Attachment_ID) ON DELETE CASCADE
+        FOREIGN KEY (Message_ID) REFERENCES Message(Message_ID) ON DELETE CASCADE on update cascade,
+        FOREIGN KEY (Attachment_ID) REFERENCES Attachment(Attachment_ID) ON DELETE CASCADE on update cascade
       );
     `);
 
@@ -219,8 +219,8 @@ async function initializeDB() {
         Attachment_ID INT,
         Submission_ID INT,
         PRIMARY KEY (Attachment_ID, Submission_ID),
-        FOREIGN KEY (Attachment_ID) REFERENCES Attachment(Attachment_ID) ON DELETE CASCADE,
-        FOREIGN KEY (Submission_ID) REFERENCES Submission(Submission_ID) ON DELETE CASCADE
+        FOREIGN KEY (Attachment_ID) REFERENCES Attachment(Attachment_ID) ON DELETE CASCADE on update cascade,
+        FOREIGN KEY (Submission_ID) REFERENCES Submission(Submission_ID) ON DELETE CASCADE on update cascade
       );
     `);
 
@@ -231,8 +231,8 @@ async function initializeDB() {
         Project_ID INT,
         Phase_Num INT,
         PRIMARY KEY (Submission_ID, Project_ID, Phase_Num),
-        FOREIGN KEY (Submission_ID) REFERENCES Submission(Submission_ID) ON DELETE CASCADE,
-        FOREIGN KEY (Project_ID, Phase_Num) REFERENCES Phase(Project_ID, Phase_Num) ON DELETE CASCADE
+        FOREIGN KEY (Submission_ID) REFERENCES Submission(Submission_ID) ON DELETE CASCADE on update cascade,
+        FOREIGN KEY (Project_ID, Phase_Num) REFERENCES Phase(Project_ID, Phase_Num) ON DELETE CASCADE on update cascade
       );
     `);
 
@@ -242,8 +242,8 @@ async function initializeDB() {
         Submission_ID INT,
         Assignment_ID INT,
         PRIMARY KEY (Submission_ID, Assignment_ID),
-        FOREIGN KEY (Assignment_ID) REFERENCES Assignment(Assignment_ID) ON DELETE CASCADE,
-        FOREIGN KEY (Submission_ID) REFERENCES Submission(Submission_ID) ON DELETE CASCADE
+        FOREIGN KEY (Assignment_ID) REFERENCES Assignment(Assignment_ID) ON DELETE CASCADE on update cascade,
+        FOREIGN KEY (Submission_ID) REFERENCES Submission(Submission_ID) ON DELETE CASCADE on update cascade
       );
     `);
 
@@ -256,9 +256,9 @@ async function initializeDB() {
         content TEXT,
         rating INTEGER,
         PRIMARY KEY (reviewer_ID, reviewee_ID, Project_ID),
-        FOREIGN KEY (Project_ID) REFERENCES Project(Project_ID) ON DELETE CASCADE,
-        FOREIGN KEY (reviewer_ID) REFERENCES Users(User_ID) ON DELETE CASCADE,
-        FOREIGN KEY (reviewee_ID) REFERENCES Users(User_ID) ON DELETE CASCADE
+        FOREIGN KEY (Project_ID) REFERENCES Project(Project_ID) ON DELETE CASCADE on update cascade,
+        FOREIGN KEY (reviewer_ID) REFERENCES Users(User_ID) ON DELETE CASCADE on update cascade,
+        FOREIGN KEY (reviewee_ID) REFERENCES Users(User_ID) ON DELETE CASCADE on update cascade
       );
     `);
 
@@ -269,8 +269,8 @@ async function initializeDB() {
         Badge_ID INT,
         earned_at DATE,
         PRIMARY KEY (student_ID, Badge_ID),
-        FOREIGN KEY (Badge_ID) REFERENCES Badge(Badge_ID) ON DELETE CASCADE,
-        FOREIGN KEY (student_ID) REFERENCES Users(User_ID) ON DELETE CASCADE
+        FOREIGN KEY (Badge_ID) REFERENCES Badge(Badge_ID) ON DELETE CASCADE on update cascade,
+        FOREIGN KEY (student_ID) REFERENCES Users(User_ID) ON DELETE CASCADE on update cascade
       );
     `);
 
