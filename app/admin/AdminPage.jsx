@@ -1,7 +1,7 @@
 import React from "react";
 import UserCard from "@/components/UserCard";
-import { columns } from "@/app/(main)/dashboard/admin/columns";
-import { DataTable } from "@/app/(main)/dashboard/admin/data-table";
+import { columns } from "@/app/admin/columns";
+import { DataTable } from "@/app/admin/data-table";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";

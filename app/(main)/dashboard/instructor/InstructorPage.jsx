@@ -13,7 +13,7 @@ import CreateAssignment from "@/components/CreateAssignment";
 import AssignmentList from "@/components/AssignmentList";
 import { useAlert } from "@/components/alert-context";
 import Loader from "@/components/Loader";
-export default function Page({ params }) {
+export default function InstructorPage({ params }) {
   const { showAlert } = useAlert();
   const [currentProject, setCurrentProject] = useState({
     name: "",
