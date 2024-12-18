@@ -4,7 +4,6 @@ import { useState } from "react";
 import { useEffect } from "react";
 import { motion } from "framer-motion";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { notFound } from "next/navigation";
 import Course from "@/components/Course";
 import CreateProject from "@/components/CreateProjectCard";
 import EnrolledStudents from "@/components/Enrolledstudents";
@@ -12,57 +11,64 @@ import StudentSubmissions from "@/components/Submission";
 import CurrentProject from "@/components/CurrentProject";
 import CreateAssignment from "@/components/CreateAssignment";
 import AssignmentList from "@/components/AssignmentList";
-import { addAssignmentGrade } from "@/actions/update-assignmentgrade";
-import { addAssignment } from "@/actions/add-assignment";
 import { useAlert } from "@/components/alert-context";
-
+import Loader from "@/components/Loader";
 export default function Page({ params }) {
-  // const {??} = params; TODO
-  // const { instructorId } = await auth();
-  // console.log(instructorId);
   const { showAlert } = useAlert();
-
   const [currentProject, setCurrentProject] = useState({
-    name: "Final Project",
-    description: "Build a full-stack web application",
-    teamSize: 3,
-    grade: 100,
-    dueDate: "2023-12-31",
+    name: "",
+    description: "",
+    teamSize: 0,
+    grade: 0,
+    dueDate: "",
   });
   const [assignments, setAssignments] = useState([]);
   const [instructorData, setInstructorData] = useState({});
   const [error, seterror] = useState(null);
   const [loading, setloading] = useState(true);
+  const [courseCode, setCourseCode] = useState("");
+  // const user = getUser(); TODO wait till i get my hands on user/pass for other instructors
+  const userID = "user005";
   useEffect(() => {
+    // if (!user) return;
     async function fetchCourseData() {
       try {
-        let res = await fetch("http://localhost:3000/api/instructor/user005");
+        let res = await fetch(`http://localhost:3000/api/instructor/${userID}`);
         if (!res.ok) {
           throw new Error(`Failed to fetch: ${res.status} ${res.statusText}`);
         }
         let data = await res.json();
         setInstructorData(data);
-        setAssignments(data.course.assignments);
+        setCourseCode(data.course.course_code);
+        setAssignments(
+          data.course.assignments.map((assignment) => ({
+            ...assignment,
+            course_code: data.course.course_code,
+          }))
+        );
         setCurrentProject(data.course.project);
         seterror(null);
       } catch (error) {
         seterror(error);
-        console.log(error);
+        showAlert({
+          message: error.message,
+          severity: "error",
+        });
       } finally {
         setloading(false);
       }
     }
     fetchCourseData();
-  }, []);
-  if (loading) return <div>Loading...</div>;
+  }, [userID]);
+  if (loading) return <Loader />;
   if (error) return <div>Error...</div>;
 
   const handleCreateProject = (project) => {
-    console.log("New project created:", project);
     setCurrentProject(project);
   };
 
   const handleCreateAssignment = (assignment) => {
+    console.log(assignment);
     setAssignments([
       ...assignments,
       { id: assignments.length + 1, ...assignment },
@@ -104,9 +110,13 @@ export default function Page({ params }) {
                 </CardHeader>
                 <CardContent className="flex flex-col gap-5">
                   <EnrolledStudents />
-                  <CreateProject onCreateProject={handleCreateProject} />
+                  <CreateProject
+                    onCreateProject={handleCreateProject}
+                    courseCode={courseCode}
+                  />
                   <CreateAssignment
                     onCreateAssignment={handleCreateAssignment}
+                    courseCode={courseCode}
                   />
                 </CardContent>
               </Card>

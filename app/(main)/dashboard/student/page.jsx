@@ -5,22 +5,37 @@ import { columns } from "@/app/(main)/dashboard/student/columns";
 import { DataTable } from "@/app/(main)/dashboard/student/data_table";
 import { CalendarDays, Notebook, Users } from "lucide-react";
 import { useEffect, useState } from "react";
-
+import { getUser } from "@/hooks/get-userID";
+import { useAlert } from "@/components/alert-context";
+import Loader from "@/components/Loader";
 export default function StudentPage() {
+  const { showAlert } = useAlert();
   const [assignData, setassigndata] = useState([]);
-  useEffect(() => {
-    const getData = async () => {
-      try {
-        const resp = await fetch("/api/assignments")
-          .then((response) => response.json())
-          .then((data) => setassigndata(data));
-      } catch (e) {
-        console.log(e);
-      }
-    };
-    getData();
-  }, []);
+  const [loading, setloading] = useState(true);
+  const user = getUser();
 
+  useEffect(() => {
+    async function fetchStudentData() {
+      try {
+        const res = await fetch(`/api/students/user002/calendar`); //TODO ${user.id}
+        if (!res.ok) {
+          throw new Error(`Failed to fetch: ${res.status} ${res.statusText}`);
+        }
+        const data = await res.json();
+        const assignments = data.assignments;
+        setassigndata(assignments);
+      } catch (error) {
+        showAlert({
+          message: error.message,
+          severity: "error",
+        });
+      } finally {
+        setloading(false);
+      }
+    }
+    fetchStudentData();
+  }, [user]);
+  if (loading) return <Loader />;
   return (
     <div>
       <div className="h-full bh-white p-4 rounded-md">

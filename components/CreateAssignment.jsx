@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { useRouter } from "next/navigation";
 import {
   Dialog,
   DialogContent,
@@ -11,15 +12,18 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { useAlert } from "./alert-context";
 import { addAssignment } from "@/actions/add-assignment";
 
-export default function CreateAssignment(onCreateAssignment) {
+export default function CreateAssignment({ onCreateAssignment, courseCode }) {
   const [isOpen, setIsOpen] = useState(false);
+  const { showAlert } = useAlert();
   const [assignment, setAssignment] = useState({
     name: "",
     deadline: "",
     maxGrade: "",
     description: "",
+    course_code: courseCode,
   });
 
   const handleChange = (e) => {
@@ -29,13 +33,39 @@ export default function CreateAssignment(onCreateAssignment) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    const createAssign = async function (params) {
+
+    const createAssign = async function () {
       try {
-      } catch (e) {}
+        const res = await addAssignment(
+          assignment.name,
+          assignment.maxGrade,
+          assignment.description,
+          assignment.deadline,
+          assignment.course_code
+        );
+        if (res.status == 200)
+          showAlert({
+            message: res.message,
+            severity: "success",
+          });
+      } catch (e) {
+        showAlert({
+          message: e.message,
+          severity: "error",
+        });
+      }
     };
-    createAssign();
-    setAssignment({ name: "", deadline: "", maxGrade: "", description: "" });
-    setIsOpen(false);
+    createAssign().then(() => {
+      onCreateAssignment(assignment);
+      setAssignment({
+        name: "",
+        deadline: "",
+        maxGrade: "",
+        description: "",
+        course_code: courseCode,
+      });
+      setIsOpen(false);
+    });
   };
 
   return (

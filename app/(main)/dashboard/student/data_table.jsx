@@ -47,9 +47,9 @@ export function DataTable({ columns, data }) {
       <div className="flex gap-2 items-center py-4">
         <Input
           placeholder="Filter assignments..."
-          value={table.getColumn("title")?.getFilterValue() ?? ""}
+          value={table.getColumn("name")?.getFilterValue() ?? ""}
           onChange={(event) =>
-            table.getColumn("title")?.setFilterValue(event.target.value)
+            table.getColumn("name")?.setFilterValue(event.target.value)
           }
           className="max-w-sm"
         />
@@ -57,7 +57,7 @@ export function DataTable({ columns, data }) {
 
       <div className="rounded-md border">
         <Table>
-          <TableHeader>
+          <TableHeader className="text-lg">
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map((header) => {
@@ -81,6 +81,7 @@ export function DataTable({ columns, data }) {
                 <TableRow
                   key={row.id}
                   data-state={row.getIsSelected() && "selected"}
+                  className="text-lg"
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>

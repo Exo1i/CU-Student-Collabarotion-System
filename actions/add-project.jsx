@@ -9,15 +9,8 @@ export default async function addProject(
   maxSize,
   maxgrade
 ) {
-  console.log("Received parameters:", {
-    name,
-    coursecode,
-    endDate,
-    description,
-    maxSize,
-    maxgrade,
-  });
-
+  maxSize = Number(maxSize);
+  maxgrade = Number(maxgrade);
   // Validate input more rigorously
   if (!name) {
     console.error("Missing required parameters");
