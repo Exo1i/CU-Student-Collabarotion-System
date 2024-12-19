@@ -63,7 +63,7 @@ export function SidebarLeft({...props}) {
         <SidebarContent>
             <NavMain items={[
                 ...data.navMain,
-                {title: "Profile", url: `${user?.id}/profile`, icon: User, items: [],}
+                {title: "Profile", url: `/profile/`, icon: User, items: [],}
             ]} />
             {isLoading ? <Loader className={"animate-spin"} /> : <NavChat groups={chatsData} />}
             <NavSecondary items={data.navSecondary} className="mt-auto" />

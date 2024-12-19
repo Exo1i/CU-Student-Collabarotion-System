@@ -236,7 +236,7 @@ export default function ProjectTeamCard({ userid, Team, projectID, currentuserda
                                             </Button>
                                         )}
                                         <Button variant="ghost" size="icon" asChild>
-                                            <CustomLink href={`/${member.user_id}/profile`}>
+                                            <CustomLink href={`/profile/${member.user_id}`}>
                                                 Show Profile
                                             </CustomLink>
                                         </Button>
