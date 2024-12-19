@@ -270,6 +270,66 @@ export const EnrollmentCreate = () => (
   </Create>
 );
 
+export const ChatGroupList = () => (
+  <List>
+    <Datagrid rowClick="edit">
+      <NumberField source="group_id" />
+      <TextField source="group_name" />
+    </Datagrid>
+  </List>
+);
+
+export const ChatGroupEdit = () => (
+  <Edit>
+    <SimpleForm>
+      <NumberInput source="group_id" disabled />
+      <TextInput source="group_name" />
+    </SimpleForm>
+  </Edit>
+);
+
+export const ChatGroupCreate = () => (
+  <Create>
+    <SimpleForm>
+      <NumberInput source="group_id" />
+      <TextInput source="group_name" />
+    </SimpleForm>
+  </Create>
+);
+
+export const ChannelList = () => (
+  <List>
+    <Datagrid rowClick="edit">
+      <NumberField source="channel_num" />
+      <NumberField source="group_id" />
+      <TextField source="channel_name" />
+      <TextField source="channel_type" />
+    </Datagrid>
+  </List>
+);
+
+export const ChannelEdit = () => (
+  <Edit>
+    <SimpleForm>
+      <NumberInput source="channel_num" disabled />
+      <NumberInput source="group_id" />
+      <TextInput source="channel_name" />
+      <TextInput source="channel_type" />
+    </SimpleForm>
+  </Edit>
+);
+
+export const ChannelCreate = () => (
+  <Create>
+    <SimpleForm>
+      <NumberInput source="channel_num" />
+      <NumberInput source="group_id" />
+      <TextInput source="channel_name" />
+      <TextInput source="channel_type" />
+    </SimpleForm>
+  </Create>
+);
+
 export default function AdminPage() {
   const dataProvider = postgrestRestProvider(config);
 
@@ -320,6 +380,8 @@ export default function AdminPage() {
       <Resource
         name="channel"
         list={ChannelList}
+        edit={ChannelEdit}
+        create={ChannelCreate}
         recordRepresentation="channel"
       />
       <Resource
