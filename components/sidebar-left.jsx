@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import {Armchair, BookOpen, Frame, Handshake, Laptop2, LifeBuoy, Loader, Map, PieChart, Send, User} from "lucide-react";
+import {Armchair, BookOpen, Handshake, Laptop2, LifeBuoy, Loader, Send, User} from "lucide-react";
 import {NavMain} from "@/components/nav-main";
 import {NavChat} from "@/components/NavChat";
 import {NavSecondary} from "@/components/nav-secondary";
@@ -21,39 +21,17 @@ import useSWR from "swr";
 import {NavUser} from "@/components/nav-user";
 
 const data = {
-    user: {
-        name: "shadcn", email: "m@example.com", avatar: "/avatars/shadcn.jpg",
-    }, navMain: [{
-        title: "Dashboard", url: "/dashboard", icon: Armchair, isActive: true, visible: ["admin", "teacher", "student"],
+    navMain: [{
+        title: "Dashboard", url: "/dashboard", icon: Armchair, isActive: true,
     }, {
-        title: "Projects", url: "/projects", icon: Handshake, items: [{
-            title: "Database Design", url: "#",
-        }, {
-            title: "Statistical Analysis", url: "#",
-        }, {
-            title: "Microprocessors", url: "#",
-        },], visible: ["admin", "teacher", "student"],
+        title: "Projects", url: "/projects", icon: Handshake, items: [],
     }, {
-        title: "Courses", url: "/courses", icon: BookOpen, items: [{
-            title: "Introduction", url: "#",
-        }, {
-            title: "Get Started", url: "#",
-        }, {
-            title: "Tutorials", url: "#",
-        }, {
-            title: "Changelog", url: "#",
-        },], visible: ["admin", "teacher", "student"],
+        title: "Courses", url: "/courses", icon: BookOpen, items: [],
     }], navSecondary: [{
         title: "Support", url: "#", icon: LifeBuoy,
     }, {
         title: "Feedback", url: "#", icon: Send,
-    },], chats: [{
-        name: "Design Engineering", url: "#", icon: Frame,
-    }, {
-        name: "Sales & Marketing", url: "#", icon: PieChart,
-    }, {
-        name: "Travel", url: "#", icon: Map,
-    },],
+    },]
 };
 const fetcher = (...args) => fetch(...args).then(res => res.json())
 
@@ -85,7 +63,7 @@ export function SidebarLeft({...props}) {
         <SidebarContent>
             <NavMain items={[
                 ...data.navMain,
-                {title: "Profile", url: `${user?.id}/profile`, icon: User, items: [],}
+                {title: "Profile", url: `/profile/`, icon: User, items: [],}
             ]} />
             {isLoading ? <Loader className={"animate-spin"} /> : <NavChat groups={chatsData} />}
             <NavSecondary items={data.navSecondary} className="mt-auto" />

@@ -20,27 +20,27 @@ async function getUserParticipation(userId, project_id) {
     return null;
 }
 
-export default async function projectPage({ params }) {
+export default async function projectPage({params}) {
     const role = await getRole();
-    const { projectID } = params;
-    const {courseID} = params;
-    const { userId } = await auth();
+    const {projectID} = await params;
+    const {courseID} = await params;
+    const {userId} = await auth();
     console.log(userId);
     let project = null;
     let Teams = null;
     let currentuserdata = null;
 
-  try {
-    const [projectRes, participationRes] = await Promise.all([
-      fetch(
-        `${process.env.NEXT_PUBLIC_DEPLOYMENT_URL}/api/projects/${projectID}`
-      ),
-      getUserParticipation(userId, projectID),
-    ]);
+    try {
+        const [projectRes, participationRes] = await Promise.all([
+            fetch(
+                `${process.env.NEXT_PUBLIC_DEPLOYMENT_URL}/api/projects/${projectID}`
+            ),
+            getUserParticipation(userId, projectID),
+        ]);
 
-    if (!projectRes.ok) {
-      throw new Error(`HTTP error! status: ${projectRes.status}`);
-    }
+        if (!projectRes.ok) {
+            throw new Error(`HTTP error! status: ${projectRes.status}`);
+        }
 
         project = await projectRes.json();
         currentuserdata = participationRes;
@@ -61,9 +61,12 @@ export default async function projectPage({ params }) {
                 <h1 className="text-3xl font-bold">Project Teams</h1>
                 {Teams.length < parseInt(project.max_teams) && !currentuserdata && role === 'student' ?
                     <CreateTeamButton projectID={projectID} userid={userId} TeamNum={Teams.length + 1} />
-                    : <CustomLink className="text-center" href={`/courses/${courseID}/${projectID}/phases`}>
+                    : null}
+                    { role !== 'student' ?
+                        <CustomLink className="text-center" href={`/courses/${courseID}/${projectID}/phases`}>
                         View phases
-                    </CustomLink>}
+                    </CustomLink> : null
+                    } 
             </div>
             <div className="grid grid-cols-1 gap-8">
                 {Teams.map((team) => (
