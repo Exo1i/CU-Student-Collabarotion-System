@@ -186,6 +186,90 @@ export const ProjectCreate = () => (
   </Create>
 );
 
+export const AssignmentsList = () => (
+  <List sort={{ field: "assignment_id", order: "ASC" }}>
+    <Datagrid rowClick="edit">
+      <TextField source="assignment_id" />
+      <TextField source="title" />
+      <ReferenceField source="course_code" reference="course">
+        <TextField source="course_name" />
+      </ReferenceField>
+      <NumberField source="max_grade" />
+      <TextField source="description" />
+      <DateField source="due_date" />
+    </Datagrid>
+  </List>
+);
+
+export const AssignmentEdit = () => (
+  <Edit>
+    <SimpleForm>
+      <TextInput source="assignment_id" disabled />
+      <TextInput source="title" />
+      <ReferenceField source="course_code" reference="course">
+        <TextInput source="course_code" />
+      </ReferenceField>
+      <NumberInput source="max_grade" />
+      <TextInput source="description" />
+      <DateInput source="due_date" />
+    </SimpleForm>
+  </Edit>
+);
+
+export const AssignmentCreate = () => (
+  <Create>
+    <SimpleForm>
+      <TextInput source="assignment_id" />
+      <TextInput source="title" />
+      <ReferenceField source="course_code" reference="course">
+        <TextInput source="course_name" />
+      </ReferenceField>
+      <NumberInput source="max_grade" />
+      <TextInput source="description" />
+      <DateInput source="due_date" />
+    </SimpleForm>
+  </Create>
+);
+
+export const EnrollmentList = () => (
+  <List>
+    <Datagrid rowClick="edit">
+      <ReferenceField source="student_id" reference="users">
+        <TextField source="username" />
+      </ReferenceField>
+      <ReferenceField source="course_code" reference="course">
+        <TextField source="course_name" />
+      </ReferenceField>
+    </Datagrid>
+  </List>
+);
+
+export const EnrollmentEdit = () => (
+  <Edit>
+    <SimpleForm>
+      <ReferenceInput source="student_id" reference="users">
+        <SelectInput optionText="user_id" />
+      </ReferenceInput>
+      <ReferenceInput source="course_code" reference="course">
+        <TextInput source="course_code" />
+      </ReferenceInput>
+    </SimpleForm>
+  </Edit>
+);
+
+export const EnrollmentCreate = () => (
+  <Create>
+    <SimpleForm>
+      <ReferenceInput source="student_id" reference="users">
+        <SelectInput optionText="user_id" />
+      </ReferenceInput>
+      <ReferenceInput source="course_code" reference="course">
+        <SelectInput optionText="course_code" />
+      </ReferenceInput>
+    </SimpleForm>
+  </Create>
+);
+
 export default function AdminPage() {
   const dataProvider = postgrestRestProvider(config);
 
