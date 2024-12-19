@@ -13,10 +13,11 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import Image from "next/image";
 import { useAuth, useSignIn, useUser } from "@clerk/nextjs";
+import { Input } from "@/components/ui/input";
 import { getUser } from "@/hooks/get-userID";
+import Loader from "@/components/Loader";
+import Image from "next/image";
 const formSchema = z.object({
   emailAddress: z.string().email({ message: "Invalid email address." }),
   password: z
@@ -25,6 +26,7 @@ const formSchema = z.object({
 });
 
 export default function SignInPage() {
+  const [loading, setLoading] = useState(false);
   const { isLoaded, signIn, setActive } = useSignIn();
   const [clerkError, setClerkError] = useState("");
   const router = useRouter();
@@ -71,7 +73,7 @@ export default function SignInPage() {
 
   async function onSubmit(values) {
     if (!isLoaded) return; // Ensure Clerk is loaded before proceeding
-
+    setLoading(true);
     try {
       // console.log(values);
       const email = values.emailAddress;
@@ -90,9 +92,11 @@ export default function SignInPage() {
       setClerkError(
         error.errors ? error.errors[0]?.message : "Something went wrong."
       );
+    } finally {
+      setLoading(false);
     }
   }
-
+  if (loading) return <Loader />;
   return (
     <div className="flex flex-col justify-center items-center h-screen w-screen">
       <div className="text-3xl mt-6 font-bold">Sign In</div>

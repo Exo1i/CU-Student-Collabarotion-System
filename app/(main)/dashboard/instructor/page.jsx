@@ -33,11 +33,13 @@ export default function Page({ params }) {
     // if (!user) return;
     async function fetchCourseData() {
       try {
-        let res = await fetch(`http://localhost:3000/api/instructor/${userID}`);
+        const res = await fetch(
+          `http://localhost:3000/api/instructor/${userID}`
+        );
         if (!res.ok) {
           throw new Error(`Failed to fetch: ${res.status} ${res.statusText}`);
         }
-        let data = await res.json();
+        const data = await res.json();
         setInstructorData(data);
         setCourseCode(data.course.course_code);
         setAssignments(
