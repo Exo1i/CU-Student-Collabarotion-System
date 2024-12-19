@@ -7,6 +7,7 @@ import {Badge} from "@/components/ui/badge"
 import {Separator} from "@/components/ui/separator"
 import {CalendarIcon, ClockIcon, CodeIcon, UsersIcon} from 'lucide-react'
 import Phasesubmissionbutton from '@/app/components/phasesubmissionbuttom'
+import Loading from "@/app/(main)/loading";
 
 export default function ProjectPhasesPage({params}) {
     const [projectID, setProjectID] = useState(null);
@@ -29,7 +30,7 @@ export default function ProjectPhasesPage({params}) {
         getcurrentuserrole()
     }, [role])
     const [project, setproject] = useState({phases: []});
-    const [Loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState(false);
     const [error, seterror] = useState(null);
     useEffect(() => {
         async function fetchprojectdata() {
@@ -67,14 +68,14 @@ export default function ProjectPhasesPage({params}) {
         setProgress(completedload);
     }, [submittedphases])
 
-    if (Loading) {
+    if (loading) {
         return <Loading />
     }
     if (error) {
         return <div>Error: {error.message}</div>;
     }
     if (!projectID || !project) {
-        return <Loading />
+        return <loading />
     } else {
         return (
             <div className="min-h-screen py-12 px-4 sm:px-6 lg:px-8">
