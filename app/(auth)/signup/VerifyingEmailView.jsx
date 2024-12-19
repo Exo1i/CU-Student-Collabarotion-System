@@ -6,8 +6,6 @@ import {REGEXP_ONLY_DIGITS} from "input-otp";
 import {Button} from "@/components/ui/button";
 import {Alert, AlertDescription, AlertTitle} from "@/components/ui/alert";
 import {AlertCircle} from "lucide-react";
-import {addUser} from "@/actions/user-actions";
-import {instructor, student} from "@/constants";
 
 export default function VerifyingEmailView({signUp, isInstructor, setActive}) {
     const [value, setValue] = useState("");
@@ -23,42 +21,6 @@ export default function VerifyingEmailView({signUp, isInstructor, setActive}) {
             setIsLoading(true);
             try {
                 await signUp.attemptEmailAddressVerification({code: newVal});
-
-                const userRole = isInstructor ? instructor : student;
-
-
-                ///@TODO: TO BE COMMENTED OUT LATER
-                console.log('Adding user with details:', {
-                    userId: signUp.createdUserId,
-                    firstName: signUp.firstName,
-                    lastName: signUp.lastName,
-                    role: userRole
-                });
-
-                const response = await addUser(
-                    signUp.createdUserId,
-                    signUp.username,
-                    signUp.firstName,
-                    signUp.lastName,
-                    userRole,
-                    signUp.image_url
-                );
-
-                console.log('Add user response:', response);
-
-                if (response && response.status === 200) {
-                    await setActive({session: signUp.createdSessionId});
-                    router.push('/dashboard');
-                } else {
-                    setError(response ? response.message : 'Failed to add user');
-                }
-            } catch (error) {
-                console.error('Full error details:', error);
-                setError(
-                    error instanceof Error
-                        ? error.message
-                        : "An unexpected error occurred during verification."
-                );
             } finally {
                 setIsLoading(false);
             }
