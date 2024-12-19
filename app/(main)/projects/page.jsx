@@ -1,22 +1,34 @@
+"use client"
 import {CalendarDays, Users} from 'lucide-react'
 import CustomLink from '@/app/components/MyCustomLink'
+import { useEffect, useState } from 'react';
+import Loading from '../loading';
+export default function ProjectDashboard() {
 
-export default async function ProjectDashboard() {
-
-    let projects = [];
-    let error = null;
-
-    try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_DEPLOYMENT_URL}/api/projects`);
-        if (!response.ok) {
-            throw new Error(`Failed to fetch projects: ${response.statusText}`);
+    const  [projects , setprojects] = useState([]);
+    const [error, setError] = useState(null)
+    const [loading, setLoading] = useState(true)
+    useEffect(() => {
+        const fetchprojectsdata = async () => {
+            try {
+                const response = await fetch('/api/projects');
+                if (!response.ok) {
+                    throw new Error(`Failed to fetch projects: ${response.statusText}`);
+                }
+                const fetchedprojects = await response.json();
+                setprojects(fetchedprojects);
+            } catch (err) {
+                setError(err);
+                console.log(error);
+            } finally {
+                setLoading(false);
+            }
         }
-        projects = await response.json();
-    } catch (err) {
-        error = err.message;
-        console.log(error);
+        fetchprojectsdata();
+    } , []);
+    if(loading) {
+        return <Loading />
     }
-
     if (error) {
         return <div className="text-center text-red-500">Error: {error}</div>;
     }
