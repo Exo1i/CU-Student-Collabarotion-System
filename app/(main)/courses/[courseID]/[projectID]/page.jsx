@@ -61,9 +61,12 @@ export default async function projectPage({params}) {
                 <h1 className="text-3xl font-bold">Project Teams</h1>
                 {Teams.length < parseInt(project.max_teams) && !currentuserdata && role === 'student' ?
                     <CreateTeamButton projectID={projectID} userid={userId} TeamNum={Teams.length + 1} />
-                    : <CustomLink className="text-center" href={`/courses/${courseID}/${projectID}/phases`}>
+                    : null}
+                    { role !== 'student' ?
+                        <CustomLink className="text-center" href={`/courses/${courseID}/${projectID}/phases`}>
                         View phases
-                    </CustomLink>}
+                    </CustomLink> : null
+                    } 
             </div>
             <div className="grid grid-cols-1 gap-8">
                 {Teams.map((team) => (
