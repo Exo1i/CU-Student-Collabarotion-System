@@ -19,8 +19,10 @@ import { getUser } from "@/hooks/get-userID";
 import Loader from "@/components/Loader";
 import Image from "next/image";
 const formSchema = z.object({
-    emailAddress: z.string().email({message: "Invalid email address."}),
-    password: z.string().min(6, {message: "Password must be at least 6 characters."}),
+  emailAddress: z.string().email({ message: "Invalid email address." }),
+  password: z
+    .string()
+    .min(6, { message: "Password must be at least 6 characters." }),
 });
 
 export default function SignInPage() {
@@ -31,25 +33,25 @@ export default function SignInPage() {
   const { isSignedIn } = useAuth();
   const user = getUser();
 
-    useEffect(() => {
-        if (isSignedIn && isLoaded) router.push("/dashboard");
-    }, [isSignedIn, isLoaded, router]);
+  useEffect(() => {
+    if (isSignedIn && isLoaded) router.push("/dashboard");
+  }, [isSignedIn, isLoaded, router]);
 
-    const signinform = useForm({
-        resolver: zodResolver(formSchema),
-        defaultValues: {
-            emailAddress: "",
-            password: "",
-        },
+  const signinform = useForm({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      emailAddress: "",
+      password: "",
+    },
+  });
+
+  const SignInWithEmail = async (emailAddress, password) => {
+    return signIn.create({
+      identifier: emailAddress,
+      password: password,
+      strategy: "password",
     });
-
-    const SignInWithEmail = async (emailAddress, password) => {
-        return signIn.create({
-            identifier: emailAddress,
-            password: password,
-            strategy: "password",
-        });
-    };
+  };
 
   async function onSubmit(values) {
     if (!isLoaded) return; // Ensure Clerk is loaded before proceeding
@@ -136,25 +138,25 @@ export default function SignInPage() {
             </form>
           </Form>
 
-                        <div className="mt-6 space-y-4">
-                            <Button
-                                variant="ghost"
-                                className="w-full text-purple-600 hover:text-purple-700 hover:bg-purple-50"
-                                onClick={() => router.push("/reset-password")}
-                            >
-                                Forgot your password?
-                            </Button>
-                            <Button
-                                variant="ghost"
-                                className="w-full text-purple-600 hover:text-purple-700 hover:bg-purple-50"
-                                onClick={() => router.push("/signup")}
-                            >
-                                Need an account? <span className="ml-1 font-semibold">Sign Up</span>
-                            </Button>
-                        </div>
-                    </div>
-                </div>
-            </div>
+          <div className="mt-6 space-y-4">
+            <Button
+              variant="ghost"
+              className="w-full text-purple-600 hover:text-purple-700 hover:bg-purple-50"
+              onClick={() => router.push("/reset-password")}
+            >
+              Forgot your password?
+            </Button>
+            <Button
+              variant="ghost"
+              className="w-full text-purple-600 hover:text-purple-700 hover:bg-purple-50"
+              onClick={() => router.push("/signup")}
+            >
+              Need an account?{" "}
+              <span className="ml-1 font-semibold">Sign Up</span>
+            </Button>
+          </div>
         </div>
-    );
+      </div>
+    </div>
+  );
 }
