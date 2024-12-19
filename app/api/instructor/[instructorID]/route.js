@@ -1,5 +1,5 @@
 import pool from "@/lib/db";
-import { NextResponse } from "next/server";
+import {NextResponse} from "next/server";
 
 // Get course details including instructor, the single project with phases and submissions, and assignments with submissions
 export async function GET(request, { params }) {

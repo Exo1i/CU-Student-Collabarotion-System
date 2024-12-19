@@ -19,10 +19,8 @@ import { getUser } from "@/hooks/get-userID";
 import Loader from "@/components/Loader";
 import Image from "next/image";
 const formSchema = z.object({
-  emailAddress: z.string().email({ message: "Invalid email address." }),
-  password: z
-    .string()
-    .min(6, { message: "Password must be at least 6 characters." }),
+    emailAddress: z.string().email({message: "Invalid email address."}),
+    password: z.string().min(6, {message: "Password must be at least 6 characters."}),
 });
 
 export default function SignInPage() {
@@ -33,43 +31,25 @@ export default function SignInPage() {
   const { isSignedIn } = useAuth();
   const user = getUser();
 
-  useEffect(() => {
-    if (isSignedIn) {
-      if (!user) return;
-      const fetchUserRole = async () => {
-        try {
-          const response = await fetch(`/api/role/${user.id}`);
-          const data = await response.json();
-          const role = data[0].role;
-          // Redirect based on fetched role
-          if (role == "admin") {
-            router.push("/dashboard/admin");
-          } else if (role == "instructor") {
-            router.push("/dashboard/instructor");
-          } else router.push("/dashboard/student");
-        } catch (error) {
-          console.error("Error fetching user data:", error);
-        }
-      };
-      fetchUserRole();
-    }
-  }, [isSignedIn, router, user]);
+    useEffect(() => {
+        if (isSignedIn && isLoaded) router.push("/dashboard");
+    }, [isSignedIn, isLoaded, router]);
 
-  const signinform = useForm({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      emailAddress: "",
-      password: "",
-    },
-  });
-
-  const SignInWithEmail = async (emailAddress, password) => {
-    return signIn.create({
-      identifier: emailAddress,
-      password: password,
-      strategy: "password",
+    const signinform = useForm({
+        resolver: zodResolver(formSchema),
+        defaultValues: {
+            emailAddress: "",
+            password: "",
+        },
     });
-  };
+
+    const SignInWithEmail = async (emailAddress, password) => {
+        return signIn.create({
+            identifier: emailAddress,
+            password: password,
+            strategy: "password",
+        });
+    };
 
   async function onSubmit(values) {
     if (!isLoaded) return; // Ensure Clerk is loaded before proceeding
@@ -156,23 +136,25 @@ export default function SignInPage() {
             </form>
           </Form>
 
-          <Button
-            variant="ghost"
-            className="w-full text-center  mt-4 "
-            onClick={() => router.push("/reset-password")}
-          >
-            Forgot your password?
-          </Button>
-          <Button
-            variant="none"
-            className={"w-full mt-3"}
-            onClick={() => router.push("/signup")}
-          >
-            Need an account?
-            <span className="uppercase underline">Sign Up</span>
-          </Button>
+                        <div className="mt-6 space-y-4">
+                            <Button
+                                variant="ghost"
+                                className="w-full text-purple-600 hover:text-purple-700 hover:bg-purple-50"
+                                onClick={() => router.push("/reset-password")}
+                            >
+                                Forgot your password?
+                            </Button>
+                            <Button
+                                variant="ghost"
+                                className="w-full text-purple-600 hover:text-purple-700 hover:bg-purple-50"
+                                onClick={() => router.push("/signup")}
+                            >
+                                Need an account? <span className="ml-1 font-semibold">Sign Up</span>
+                            </Button>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-      </div>
-    </div>
-  );
+    );
 }

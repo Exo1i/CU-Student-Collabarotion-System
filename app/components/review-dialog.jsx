@@ -1,13 +1,14 @@
 'use client'
 
-import { useEffect, useState } from 'react'
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
-import { Button } from "@/components/ui/button"
-import { Textarea } from "@/components/ui/textarea"
-import { Star } from 'lucide-react'
-import { GiveReview } from '@/actions/add-review'
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
-import { CheckCircledIcon, CrossCircledIcon } from "@radix-ui/react-icons"
+import {useEffect, useState} from 'react'
+import {Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle} from "@/components/ui/dialog"
+import {Button} from "@/components/ui/button"
+import {Textarea} from "@/components/ui/textarea"
+import {Star} from 'lucide-react'
+import {GiveReview} from '@/actions/add-review'
+import {Alert, AlertDescription, AlertTitle} from "@/components/ui/alert"
+import {CheckCircledIcon, CrossCircledIcon} from "@radix-ui/react-icons"
+
 export default function ReviewDialog({ isOpen, onClose, member, projectID }) {
     const [rating, setRating] = useState(0)
     const [review, setReview] = useState('')
