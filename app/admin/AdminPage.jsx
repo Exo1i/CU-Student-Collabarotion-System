@@ -4,16 +4,21 @@ import {
   Create,
   Datagrid,
   DateField,
+  DateInput,
   Edit,
   fetchUtils,
   List,
   NumberField,
+  NumberInput,
   ReferenceField,
+  ReferenceInput,
   Resource,
   SelectInput,
   SimpleForm,
   TextField,
   TextInput,
+  BooleanField,
+  BooleanInput,
 } from "react-admin";
 
 import postgrestRestProvider, {
@@ -31,6 +36,9 @@ const config = {
     ["assignment", ["assignment_id"]],
     ["enrollment", ["course_code", "student_id"]],
     ["chat_group", ["group_id"]],
+    ["channel", ["channel_num", "group_id"]],
+    ["message", ["message_id"]],
+    ["participation", ["project_id", "student_id", "team_num"]],
   ]),
   schema: defaultSchema,
 };
@@ -101,6 +109,32 @@ export const CourseList = () => (
   </List>
 );
 
+export const CourseEdit = () => (
+  <Edit>
+    <SimpleForm>
+      <TextInput source="course_code" disabled />
+      <TextInput source="course_name" />
+      <ReferenceField source="instructor_id" reference="users">
+        <TextInput source="instructor_id" />
+      </ReferenceField>
+      <NumberInput source="max_grade" />
+    </SimpleForm>
+  </Edit>
+);
+
+export const CourseCreate = () => (
+  <Create>
+    <SimpleForm>
+      <TextInput source="course_code" />
+      <TextInput source="course_name" />
+      <ReferenceField source="instructor_id" reference="users">
+        <TextInput source="username" />
+      </ReferenceField>
+      <NumberInput source="max_grade" />
+    </SimpleForm>
+  </Create>
+);
+
 export const ProjectList = () => (
   <List sort={{ field: "project_id", order: "ASC" }}>
     <Datagrid rowClick="edit">
@@ -117,37 +151,41 @@ export const ProjectList = () => (
     </Datagrid>
   </List>
 );
-export const AssignmentsList = () => (
-  <List sort={{ field: "assignment_id", order: "ASC" }}>
-    <Datagrid rowClick="edit">
-      <TextField source="assignment_id" />
-      <TextField source="title" />
+
+export const ProjectEdit = () => (
+  <Edit>
+    <SimpleForm>
+      <TextInput source="project_id" disabled />
+      <TextInput source="project_name" />
       <ReferenceField source="course_code" reference="course">
-        <TextField source="course_name" />
+        <TextInput source="course_code" />
       </ReferenceField>
-      <NumberField source="max_grade" />
-      <TextField source="description" />
-      <DateField source="due_date" />
-    </Datagrid>
-  </List>
+      <DateInput source="start_date" />
+      <DateInput source="end_date" />
+      <TextInput source="description" />
+      <NumberInput source="max_team_size" />
+      <NumberInput source="max_grade" />
+    </SimpleForm>
+  </Edit>
 );
-export const EnrollmentList = () => (
-  <List>
-    <Datagrid rowClick="edit">
-      <ReferenceField source="student_id" reference="users">
-        <TextField source="username" />
-      </ReferenceField>
+
+export const ProjectCreate = () => (
+  <Create>
+    <SimpleForm>
+      <TextInput source="project_id" />
+      <TextInput source="project_name" />
       <ReferenceField source="course_code" reference="course">
-        <TextField source="course_name" />
+        <TextInput source="course_name" />
       </ReferenceField>
-    </Datagrid>
-  </List>
+      <DateInput source="start_date" />
+      <DateInput source="end_date" />
+      <TextInput source="description" />
+      <NumberInput source="max_team_size" />
+      <NumberInput source="max_grade" />
+    </SimpleForm>
+  </Create>
 );
-export const ChatGroupList = () => (
-  <List>
-    <Datagrid rowClick="edit"></Datagrid>
-  </List>
-);
+
 export default function AdminPage() {
   const dataProvider = postgrestRestProvider(config);
 
@@ -163,22 +201,56 @@ export default function AdminPage() {
       <Resource
         name="course"
         list={CourseList}
+        edit={CourseEdit}
+        create={CourseCreate}
         recordRepresentation="course_name"
       />
       <Resource
         name="project"
         list={ProjectList}
+        edit={ProjectEdit}
+        create={ProjectCreate}
         recordRepresentation="project_name"
       />
       <Resource
         name="assignment"
         list={AssignmentsList}
+        edit={AssignmentEdit}
+        create={AssignmentCreate}
         recordRepresentation="assignment"
       />
       <Resource
         name="enrollment"
         list={EnrollmentList}
+        edit={EnrollmentEdit}
+        create={EnrollmentCreate}
         recordRepresentation="enrollment"
+      />
+      <Resource
+        name="chat_group"
+        list={ChatGroupList}
+        edit={ChatGroupEdit}
+        create={ChatGroupCreate}
+        recordRepresentation="chat_group"
+      />
+      <Resource
+        name="channel"
+        list={ChannelList}
+        recordRepresentation="channel"
+      />
+      <Resource
+        name="message"
+        list={MessageList}
+        edit={MessageEdit}
+        create={MessageCreate}
+        recordRepresentation="message"
+      />
+      <Resource
+        name="participation"
+        list={ParticipationList}
+        edit={participationEdit}
+        create={participationCreate}
+        recordRepresentation="participation"
       />
     </Admin>
   );
