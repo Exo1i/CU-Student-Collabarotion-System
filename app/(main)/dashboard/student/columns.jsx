@@ -1,6 +1,6 @@
 "use client";
-import { Bookmark } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
+import {Bookmark} from "lucide-react";
+import {Badge} from "@/components/ui/badge";
 
 export const columns = [
   {

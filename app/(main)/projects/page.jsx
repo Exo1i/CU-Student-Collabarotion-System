@@ -1,5 +1,6 @@
-import { CalendarDays, Users } from 'lucide-react'
+import {CalendarDays, Users} from 'lucide-react'
 import CustomLink from '@/app/components/MyCustomLink'
+
 export default async function ProjectDashboard() {
 
     let projects = [];

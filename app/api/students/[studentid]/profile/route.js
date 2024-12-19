@@ -1,5 +1,5 @@
 import pool from "@/lib/db";
-import { NextResponse } from "next/server";
+import {NextResponse} from "next/server";
 
 //get student's profile
 export async function GET(request, { params }) {
@@ -13,7 +13,7 @@ export async function GET(request, { params }) {
     );
 
     const badges = await pool.query(
-      `SELECT b.Badge_ID, b.Title, b.Description, eb.earned_at as date
+      `SELECT b.Badge_ID,b.picture, b.Title, b.Description, eb.earned_at as date
        FROM  earnedBadges eb
        JOIN  Badge b ON eb.Badge_ID = b.Badge_ID
        WHERE eb.student_id = $1;`,

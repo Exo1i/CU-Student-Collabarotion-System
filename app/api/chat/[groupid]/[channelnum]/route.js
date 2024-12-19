@@ -1,5 +1,5 @@
 import pool from "../../../../../lib/db";
-import { NextResponse } from "next/server";
+import {NextResponse} from "next/server";
 
 //get channel's info and messages given the chatgroup id and the channel number
 export async function GET(request, { params }) {

@@ -1,10 +1,11 @@
-import { notFound } from "next/navigation";
+import {notFound} from "next/navigation";
 import ProjectTeamCard from "@/app/components/ProjectTeamCard";
 import CreateTeamButton from "@/app/components/CreateTeamButtom";
-import { auth } from '@clerk/nextjs/server'
-import { getUserTeamNum } from '@/actions/GetTeamNum'
-import { getRole } from "@/actions/GetRole";
+import {auth} from '@clerk/nextjs/server'
+import {getUserTeamNum} from '@/actions/GetTeamNum'
+import {getRole} from "@/actions/GetRole";
 import CustomLink from "@/app/components/MyCustomLink";
+
 async function getUserParticipation(userId, project_id) {
     try {
         const res = await getUserTeamNum(userId, project_id);
@@ -19,27 +20,27 @@ async function getUserParticipation(userId, project_id) {
     return null;
 }
 
-export default async function projectPage({ params }) {
+export default async function projectPage({params}) {
     const role = await getRole();
-    const { projectID } = params;
-    const {courseID} = params;
-    const { userId } = await auth();
+    const {projectID} = await params;
+    const {courseID} = await params;
+    const {userId} = await auth();
     console.log(userId);
     let project = null;
     let Teams = null;
     let currentuserdata = null;
 
-  try {
-    const [projectRes, participationRes] = await Promise.all([
-      fetch(
-        `${process.env.NEXT_PUBLIC_DEPLOYMENT_URL}/api/projects/${projectID}`
-      ),
-      getUserParticipation(userId, projectID),
-    ]);
+    try {
+        const [projectRes, participationRes] = await Promise.all([
+            fetch(
+                `${process.env.NEXT_PUBLIC_DEPLOYMENT_URL}/api/projects/${projectID}`
+            ),
+            getUserParticipation(userId, projectID),
+        ]);
 
-    if (!projectRes.ok) {
-      throw new Error(`HTTP error! status: ${projectRes.status}`);
-    }
+        if (!projectRes.ok) {
+            throw new Error(`HTTP error! status: ${projectRes.status}`);
+        }
 
         project = await projectRes.json();
         currentuserdata = participationRes;
