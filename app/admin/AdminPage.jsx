@@ -330,6 +330,115 @@ export const ChannelCreate = () => (
   </Create>
 );
 
+export const MessageList = () => (
+  <List sort={{ field: "message_id", order: "ASC" }}>
+    <Datagrid rowClick="edit">
+      <NumberField source="message_id" />
+      <NumberField source="channel_num" />
+      <NumberField source="group_id" />
+      {/* <Tim */}
+      <TextField source="type" />
+      <TextField source="content" />
+      <ReferenceField source="sender_id" reference="users">
+        <TextField source="username" />
+      </ReferenceField>
+      <DateField
+        source="time_stamp"
+        showTime
+        options={{
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+          hour: "numeric",
+          minute: "numeric",
+          second: "numeric",
+        }}
+      />
+    </Datagrid>
+  </List>
+);
+
+export const MessageEdit = () => (
+  <Edit>
+    <SimpleForm>
+      <NumberInput source="message_id" disabled />
+      <NumberInput source="channel_num" />
+      <NumberInput source="group_id" />
+      <TextInput source="type" />
+      <TextInput source="content" />
+      <ReferenceInput source="sender_id" reference="users">
+        <SelectInput optionText="user_id" />
+      </ReferenceInput>
+      <DateInput source="time_stamp" />
+    </SimpleForm>
+  </Edit>
+);
+
+export const MessageCreate = () => (
+  <Create>
+    <SimpleForm>
+      <NumberInput source="message_id" />
+      <ReferenceInput source="channel_num" reference="channel">
+        <SelectInput optionText="channel_name" />
+      </ReferenceInput>
+      <ReferenceInput source="group_id" reference="chat_group">
+        <SelectInput optionText="group_name" />
+      </ReferenceInput>
+      <TextInput source="type" />
+      <TextInput source="content" />
+      <ReferenceInput source="sender_id" reference="users">
+        <SelectInput optionText="username" />
+      </ReferenceInput>
+      <DateInput source="time_stamp" />
+      <BooleanField source="leader" />
+    </SimpleForm>
+  </Create>
+);
+
+export const ParticipationList = () => (
+  <List>
+    <Datagrid rowClick="edit">
+      <ReferenceField source="project_id" reference="project">
+        <TextField source="project_name" />
+      </ReferenceField>
+      <ReferenceField source="student_id" reference="users">
+        <TextField source="username" />
+      </ReferenceField>
+      <NumberField source="team_num" />
+    </Datagrid>
+  </List>
+);
+
+export const participationEdit = () => (
+  <Edit>
+    <SimpleForm>
+      <ReferenceInput source="project_id" reference="project">
+        <SelectInput optionText="project_name" />
+      </ReferenceInput>
+      <ReferenceInput source="student_id" reference="users">
+        <SelectInput optionText="username" />
+      </ReferenceInput>
+      <NumberInput source="team_num" />
+      <BooleanInput source="leader" />
+    </SimpleForm>
+  </Edit>
+);
+
+export const participationCreate = () => (
+  <Create>
+    <SimpleForm>
+      <ReferenceInput source="project_id" reference="project">
+        <SelectInput optionText="project_name" />
+      </ReferenceInput>
+      <ReferenceInput source="student_id" reference="users">
+        <SelectInput optionText="username" />
+      </ReferenceInput>
+      <NumberInput source="team_num" />
+      <BooleanInput source="leader" />
+    </SimpleForm>
+  </Create>
+);
+
 export default function AdminPage() {
   const dataProvider = postgrestRestProvider(config);
 
