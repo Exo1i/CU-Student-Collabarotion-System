@@ -1,10 +1,11 @@
-import { notFound } from "next/navigation";
+import {notFound} from "next/navigation";
 import ProjectTeamCard from "@/app/components/ProjectTeamCard";
 import CreateTeamButton from "@/app/components/CreateTeamButtom";
-import { auth } from '@clerk/nextjs/server'
-import { getUserTeamNum } from '@/actions/GetTeamNum'
-import { getRole } from "@/actions/GetRole";
+import {auth} from '@clerk/nextjs/server'
+import {getUserTeamNum} from '@/actions/GetTeamNum'
+import {getRole} from "@/actions/GetRole";
 import CustomLink from "@/app/components/MyCustomLink";
+
 async function getUserParticipation(userId, project_id) {
     try {
         const res = await getUserTeamNum(userId, project_id);

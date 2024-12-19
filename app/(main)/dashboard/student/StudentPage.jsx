@@ -1,13 +1,13 @@
 "use client";
-import React from "react";
+import React, {useEffect, useState} from "react";
 import Schedule from "@/components/schedule";
-import { columns } from "@/app/(main)/dashboard/student/columns";
-import { DataTable } from "@/app/(main)/dashboard/student/data_table";
-import { CalendarDays, Notebook, Users } from "lucide-react";
-import { useEffect, useState } from "react";
-import { getUser } from "@/hooks/get-userID";
-import { useAlert } from "@/components/alert-context";
-import Loader from "@/components/Loader";
+import {columns} from "@/app/(main)/dashboard/student/columns";
+import {DataTable} from "@/app/(main)/dashboard/student/data_table";
+import {CalendarDays, Notebook} from "lucide-react";
+import {getUser} from "@/hooks/get-userID";
+import {useAlert} from "@/components/alert-context";
+import Loading from "@/app/(main)/loading";
+
 export default function StudentPage() {
   const { showAlert } = useAlert();
   const [assignData, setassigndata] = useState([]);
@@ -35,7 +35,7 @@ export default function StudentPage() {
     }
     fetchStudentData();
   }, [user]);
-  if (loading) return <Loader />;
+  if (loading) return <Loading />;
   return (
     <div>
       <div className="h-full bh-white p-4 rounded-md">

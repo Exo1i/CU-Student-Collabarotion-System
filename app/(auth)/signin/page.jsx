@@ -24,7 +24,6 @@ export default function SignInPage() {
     const router = useRouter();
     const {isSignedIn} = useAuth();
     const [isSignin, setIsSignin] = useState(false)
-    const user = getUser();
 
     useEffect(() => {
         if (isSignedIn && isLoaded) router.push("/dashboard");

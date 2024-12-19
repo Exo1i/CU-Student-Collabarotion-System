@@ -1,5 +1,5 @@
 import pool from "@/lib/db";
-import { NextResponse } from "next/server";
+import {NextResponse} from "next/server";
 
 //get a phase given projectid and phase number
 export async function GET(request, { params }) {

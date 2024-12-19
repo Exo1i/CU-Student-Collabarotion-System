@@ -1,23 +1,16 @@
 "use client";
 import React from "react";
 import {
-  flexRender,
-  getCoreRowModel,
-  useReactTable,
-  getFilteredRowModel,
-  getPaginationRowModel,
+    flexRender,
+    getCoreRowModel,
+    getFilteredRowModel,
+    getPaginationRowModel,
+    useReactTable,
 } from "@tanstack/react-table";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow,} from "@/components/ui/table";
 import PropTypes from "prop-types";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import {Button} from "@/components/ui/button";
+import {Input} from "@/components/ui/input";
 
 DataTable.propTypes = {
   columns: PropTypes.arrayOf(

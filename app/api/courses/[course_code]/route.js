@@ -1,5 +1,5 @@
 import pool from "@/lib/db";
-import { NextResponse } from "next/server";
+import {NextResponse} from "next/server";
 
 // Get a course and its projects given course code
 export async function GET(request, { params }) {
