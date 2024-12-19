@@ -1,9 +1,10 @@
 'use client'
-import { Star, StarHalf, Trash2 } from 'lucide-react'
-import { Button } from "@/components/ui/button"
+import {Star, StarHalf, Trash2} from 'lucide-react'
+import {Button} from "@/components/ui/button"
 import Image from 'next/image'
-import { DeleteReview } from '@/actions/DeleteReview'
-import { useRouter } from 'next/navigation'
+import {DeleteReview} from '@/actions/DeleteReview'
+import {useRouter} from 'next/navigation'
+
 const StarRating = ({ rating }) => {
     const fullStars = Math.floor(rating)
     const hasHalfStar = rating % 1 !== 0

@@ -1,7 +1,7 @@
 'use server';
-import { auth } from '@clerk/nextjs/server';
+import {auth} from '@clerk/nextjs/server';
 import pool from "@/lib/db";
-import { redirect } from 'next/navigation';
+import {redirect} from 'next/navigation';
 
 export async function addphaseSubmission(projectID, phaseNum , url) {
     const { userId } = await auth();

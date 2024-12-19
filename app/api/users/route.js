@@ -1,6 +1,6 @@
 "use server";
 import pool from "@/lib/db";
-import { NextResponse } from "next/server";
+import {NextResponse} from "next/server";
 
 //get all users
 export async function GET(request) {

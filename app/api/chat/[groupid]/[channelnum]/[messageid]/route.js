@@ -1,5 +1,5 @@
 import pool from "@/lib/db";
-import { NextResponse } from "next/server";
+import {NextResponse} from "next/server";
 
 //get a message given its id
 export async function GET(request, { params }) {

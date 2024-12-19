@@ -1,18 +1,19 @@
-"use client";
-import {zodResolver} from "@hookform/resolvers/zod";
-import {useForm} from "react-hook-form";
-import {z} from "zod";
-import {useRouter} from "next/navigation";
-import {useAuth, useSignUp} from "@clerk/nextjs";
+'use client'
+import {Checkbox} from "@/components/ui/checkbox";
+import VerifyingEmailView from "@/app/(auth)/signup/VerifyingEmailView";
 import {Button} from "@/components/ui/button";
 import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from "@/components/ui/form";
 import {Input} from "@/components/ui/input";
 import Image from "next/image";
+import {BookOpen, Sparkles} from "lucide-react";
+import {z} from "zod";
 import {useEffect, useState} from "react";
-import VerifyingEmailView from "@/app/(auth)/signup/VerifyingEmailView";
-import {Checkbox} from "@/components/ui/checkbox";
+import {useAuth, useSignUp} from "@clerk/nextjs";
+import {useRouter} from "next/navigation";
+import {useForm} from "react-hook-form";
+import {zodResolver} from "@hookform/resolvers/zod";
 
-const formSchema = z.object({
+const signUpFormSchema = z.object({
     username: z.string().min(2, {message: "Username must be at least 4 characters."}),
     firstName: z.string().min(1, {message: "First name is required."}),
     lastName: z.string().min(1, {message: "Last name is required."}),
@@ -20,40 +21,29 @@ const formSchema = z.object({
     password: z.string().min(6, {message: "Password must be at least 6 characters."}),
 });
 
-export default function SignInPage() {
-
-    const [isInstructor, setIsInstructor] = useState(false)
+export default function SignUpPage() {
+    const [isInstructor, setIsInstructor] = useState(false);
     const {isLoaded, signUp, setActive} = useSignUp();
     const [clerkError, setClerkError] = useState("");
     const router = useRouter();
     const {isSignedIn} = useAuth();
+    const [isWaitingForCode, setWaitingForCode] = useState(false);
 
     useEffect(() => {
         if (isSignedIn) {
-            router.push("/dashboard"); // Redirect to a dashboard or any protected page
+            router.push("/dashboard");
         }
     }, [isSignedIn, router]);
 
-
-    const [isWaitingForCode, setWaitingForCode] = useState(false);
     const signUpform = useForm({
-        resolver: zodResolver(formSchema),
-        defaultValues: {
-            username: "",
-            firstName: "",
-            lastName: "",
-            emailAddress: "",
-            password: "",
+        resolver: zodResolver(signUpFormSchema), defaultValues: {
+            username: "", firstName: "", lastName: "", emailAddress: "", password: "",
         },
     });
 
     const SignUpWithEmail = async (emailAddress, password, username, firstName, lastName) => {
         return signUp.create({
-            emailAddress,
-            password,
-            username,
-            firstName,
-            lastName,
+            emailAddress, password, username, firstName, lastName,
         });
     };
 
@@ -77,140 +67,155 @@ export default function SignInPage() {
         }
     }
 
-    return (isWaitingForCode ?
-            <VerifyingEmailView signUp={signUp} isInstructor={isInstructor} setActive={setActive} /> :
-            <div className="flex flex-col justify-center items-center h-screen w-screen">
-                <div className="text-3xl font-bold text-center">Sign Up</div>
-                <div className="flex flex-row items-center justify-center">
-                    <div className="hidden md:flex p-8">
-                        <Image
-                            src="/studyGuy.jpeg"
-                            width={400}
-                            height={400}
-                            alt="guy studying on a laptop"
-                            className="object-cover rounded-lg"
+    if (isWaitingForCode) {
+        return <VerifyingEmailView signUp={signUp} isInstructor={isInstructor} setActive={setActive} />;
+    }
 
-                        />
-                    </div>
-                    <div className=" p-8 flex flex-col justify-center">
-                        <Form {...signUpform}>
-                            <form
-                                onSubmit={signUpform.handleSubmit(onSubmit)}
-                                className="flex flex-col gap-6 w-full"
+    return (<div className="min-h-screen bg-background">
+        <div className="container mx-auto px-4 py-16 flex flex-col items-center">
+            <div className="relative mb-8">
+                <div className="bg-gradient-to-br from-purple-400 via-violet-500 to-purple-600 rounded-full p-4">
+                    <BookOpen className="w-16 h-16 text-white animate-bounce" />
+                    <Sparkles className="w-6 h-6 text-purple-200 absolute -top-2 -right-2 animate-pulse" />
+                </div>
+            </div>
+
+            <h1 className="text-4xl font-bold text-center mb-6 bg-gradient-to-r from-purple-500 via-violet-500 to-purple-400 bg-clip-text text-transparent">
+                Create Your Account
+            </h1>
+
+            <div className="flex flex-row items-center justify-center w-full max-w-4xl">
+                <div className="hidden md:flex p-8">
+                    <Image
+                        src="/studyGuy.jpeg"
+                        width={400}
+                        height={400}
+                        alt="guy studying on a laptop"
+                        className="rounded-lg shadow-xl"
+                    />
+                </div>
+                <div className="w-full md:w-96 p-8">
+                    <Form {...signUpform}>
+                        <form onSubmit={signUpform.handleSubmit(onSubmit)} className="space-y-6">
+                            <div className="grid grid-cols-2 gap-4">
+                                <FormField
+                                    control={signUpform.control}
+                                    name="firstName"
+                                    render={({field}) => (<FormItem>
+                                        <FormLabel className="text-foreground">First Name</FormLabel>
+                                        <FormControl>
+                                            <Input
+                                                className="border-purple-200 focus:border-purple-500"
+                                                {...field}
+                                                autoComplete="given-name"
+                                            />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>)}
+                                />
+                                <FormField
+                                    control={signUpform.control}
+                                    name="lastName"
+                                    render={({field}) => (<FormItem>
+                                        <FormLabel className="text-foreground">Last Name</FormLabel>
+                                        <FormControl>
+                                            <Input
+                                                className="border-purple-200 focus:border-purple-500"
+                                                {...field}
+                                                autoComplete="family-name"
+                                            />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>)}
+                                />
+                            </div>
+
+                            <FormField
+                                control={signUpform.control}
+                                name="username"
+                                render={({field}) => (<FormItem>
+                                    <FormLabel className="text-foreground">Username</FormLabel>
+                                    <FormControl>
+                                        <Input
+                                            className="border-purple-200 focus:border-purple-500"
+                                            {...field}
+                                            autoComplete="username"
+                                        />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>)}
+                            />
+
+                            <FormField
+                                control={signUpform.control}
+                                name="emailAddress"
+                                render={({field}) => (<FormItem>
+                                    <FormLabel className="text-foreground">Email Address</FormLabel>
+                                    <FormControl>
+                                        <Input
+                                            className="border-purple-200 focus:border-purple-500"
+                                            {...field}
+                                            autoComplete="email"
+                                        />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>)}
+                            />
+
+                            <FormField
+                                control={signUpform.control}
+                                name="password"
+                                render={({field}) => (<FormItem>
+                                    <FormLabel className="text-foreground">Password</FormLabel>
+                                    <FormControl>
+                                        <Input
+                                            type="password"
+                                            className="border-purple-200 focus:border-purple-500"
+                                            {...field}
+                                            autoComplete="new-password"
+                                        />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>)}
+                            />
+
+                            <div className="flex items-center space-x-2">
+                                <Checkbox
+                                    id="instructor"
+                                    checked={isInstructor}
+                                    onCheckedChange={setIsInstructor}
+                                    className="border-purple-200 data-[state=checked]:bg-purple-500 data-[state=checked]:border-purple-500"
+                                />
+                                <label
+                                    htmlFor="instructor"
+                                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                                >
+                                    I am an instructor
+                                </label>
+                            </div>
+
+                            {clerkError && (<p className="text-red-500 text-sm">{clerkError}</p>)}
+
+                            <Button
+                                type="submit"
+                                className="w-full bg-gradient-to-r from-purple-500 to-violet-500 hover:from-purple-600 hover:to-violet-600 text-white"
                             >
-                                <div className="flex flex-auto gap-6 w-full">
-                                    <FormField
-                                        control={signUpform.control}
-                                        name="firstName"
-                                        render={({field}) => (
-                                            <FormItem>
-                                                <FormLabel>First Name</FormLabel>
-                                                <FormControl>
-                                                    <Input {...field} autoComplete="given-name" />
-                                                </FormControl>
-                                                <FormMessage />
-                                            </FormItem>
-                                        )}
-                                    />
-                                    <FormField
-                                        control={signUpform.control}
-                                        name="lastName"
-                                        render={({field}) => (
-                                            <FormItem>
-                                                <FormLabel>Last Name</FormLabel>
-                                                <FormControl>
-                                                    <Input {...field} autoComplete="family-name" />
-                                                </FormControl>
-                                                <FormMessage />
-                                            </FormItem>
-                                        )}
-                                    />
-                                </div>
-                                <FormField
-                                    control={signUpform.control}
-                                    name="username"
-                                    render={({field}) => (
-                                        <FormItem>
-                                            <FormLabel>Username</FormLabel>
-                                            <FormControl>
-                                                <Input {...field} autoComplete="username" />
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-                                <FormField
-                                    control={signUpform.control}
-                                    name="emailAddress"
-                                    render={({field}) => (
-                                        <FormItem>
-                                            <FormLabel>Email Address</FormLabel>
-                                            <FormControl>
-                                                <Input {...field} autoComplete="email" />
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-                                <div className={"flex flex-row items-center justify-between"}>
-                                    <FormField
-                                        control={signUpform.control}
-                                        name="password"
-                                        render={({field}) => (
-                                            <FormItem>
-                                                <FormLabel>Password</FormLabel>
-                                                <FormControl>
-                                                    <Input {...field} autoComplete="new-password" />
-                                                </FormControl>
-                                            </FormItem>
-                                        )}
-                                    />
+                                Create Account
+                            </Button>
+                        </form>
+                    </Form>
 
-                                    <FormField
-                                        control={signUpform.control}
-                                        name="mobile"
-                                        render={({field}) => (
-                                            <FormItem
-                                                className="flex flex-col space-x-3 space-y-0  p-4">
-                                                <FormLabel>Instructor</FormLabel>
-                                                <div className="flex flex-row space-x-3 space-y-0  p-4">
-                                                    <FormControl>
-                                                        <Checkbox
-                                                            checked={isInstructor}
-                                                            onCheckedChange={(val) => {
-                                                                setIsInstructor(val)
-                                                            }}
-                                                        />
-                                                    </FormControl>
-                                                    <div className="space-y-1 leading-none">
-                                                        <FormLabel>
-                                                            Yes, I am an instructor
-                                                        </FormLabel>
-                                                    </div>
-                                                </div>
-                                            </FormItem>
-                                        )}
-                                    />
-
-                                </div>
-                                {clerkError && <p className="text-red-500 text-sm">{clerkError}</p>}
-                                <Button type="submit">Create Account</Button>
-                            </form>
-                        </Form>
+                    <div className="mt-6">
                         <Button
-                            variant="none"
-                            className={"w-full"}
+                            variant="ghost"
+                            className="w-full text-purple-600 hover:text-purple-700 hover:bg-purple-50"
                             onClick={() => router.push("/signin")}
                         >
-                            Got an account already?
-                            <div className="underline">Signin</div>
+                            Already have an account? <span className="ml-1 font-semibold">Sign In</span>
                         </Button>
                     </div>
                 </div>
-
             </div>
-    )
-        ;
+        </div>
+    </div>);
 }
-
-
