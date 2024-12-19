@@ -4,7 +4,6 @@ import { Admin, Resource, ListGuesser, EditGuesser } from "react-admin";
 import { useAlert } from "@/components/alert-context";
 import { fetchUtils } from "react-admin";
 import Loader from "@/components/Loader";
-
 export default function adminPage() {
   const { showAlert } = useAlert();
   const apiUrl = "/api/";
@@ -62,18 +61,26 @@ export default function adminPage() {
       const url = `${apiUrl}/${resource}?${fetchUtils.queryParameters(query)}`;
       const { json } = await httpClient(url);
 
+      const updatedJson = json.map((obj) => {
+        const { user_id, ...rest } = obj; // Destructure to exclude user_id
+        return { ...rest, id: user_id }; // Add "id" with the value of "user_id"
+      });
+
+      console.log(json);
       return {
-        data: json.map((user) => ({
-          ...user,
-          id: user.user_id, // Map user_id to id
-        })),
-        total: parseInt(json.length, 10),
+        // data: json.map((user) => ({
+        //   ...user,
+        //   id: user.user_id, // Map user_id to id
+        // })),
+
+        data: updatedJson,
+        total: parseInt(updatedJson.length, 10),
       };
     },
     getOne: async (resource, params) => {
       const identifier = getIdentifier(params);
-      console.log(params);
-      const url = `${apiUrl}/${resource}/${params}`;
+      console.log(params.id);
+      const url = `${apiUrl}/${resource}/${params.id}`;
       const { json } = await httpClient(url);
 
       return { data: json };
