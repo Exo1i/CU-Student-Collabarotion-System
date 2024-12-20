@@ -12,7 +12,7 @@ export default function GradesSection({ userId }) {
     useEffect(() => {
         const fetchGrades = async () => {
             try {
-                const response = await fetch('/api/students/${userId}/grades')
+                const response = await fetch(`/api/students/${userId}/grades`)
                 if (!response.ok) {
                     throw new Error(`Failed to fetch grades: ${response.statusText}`)
                 }
