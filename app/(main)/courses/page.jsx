@@ -98,7 +98,7 @@ export default function CoursesPage() {
                             className="group overflow-hidden bg-white dark:bg-gray-800 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 ease-in-out transform hover:-translate-y-2">
                             <CardHeader className="p-0 relative">
                                 <Image
-                                    src={course.course_img}
+                                    src={course.course_img || '/courseImg/coursetest1.jpg'}
                                     alt={course.course_name}
                                     width={400}
                                     height={225}
@@ -115,7 +115,7 @@ export default function CoursesPage() {
                                 <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">Instructor:</p>
                                 <div className="flex items-center gap-4">
                                     <Image
-                                        src={course.img_url}
+                                        src={course.img_url || '/public/courseImg/instructortest1.jpg'}
                                         alt={course.full_name}
                                         width={40}
                                         height={40}

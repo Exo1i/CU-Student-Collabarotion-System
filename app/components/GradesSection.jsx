@@ -64,8 +64,8 @@ export default function GradesSection({ userId }) {
                             <div>
                                 <h3 className="font-semibold mb-2">Assignments</h3>
                                 {course.assignmentsGrades.assignments.length > 0 ? (
-                                    course.assignmentsGrades.assignments.map((assignment) => (
-                                        <div key={assignment.assignment_id} className="mb-2">
+                                    course.assignmentsGrades.assignments.map((assignment , index) => (
+                                        <div key={index} className="mb-2">
                                             <div className="flex justify-between text-sm">
                                                 <span>{assignment.title}</span>
                                                 <span>{assignment.grade}/{assignment.max_grade}</span>
@@ -80,8 +80,8 @@ export default function GradesSection({ userId }) {
                             <div>
                                 <h3 className="font-semibold mb-2">Project</h3>
                                 {course.projectGrades.phases.length > 0 ? (
-                                    course.projectGrades.phases.map((phase) => (
-                                        <div key={phase.phase_num} className="mb-2">
+                                    course.projectGrades.phases.map((phase , index) => (
+                                        <div key={index} className="mb-2">
                                             <div className="flex justify-between text-sm">
                                                 <span>{phase.title}</span>
                                                 <span>{phase.grade}/{course.projectGrades.max_grade}</span>

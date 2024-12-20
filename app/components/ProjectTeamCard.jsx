@@ -36,9 +36,12 @@ export default function ProjectTeamCard({ userid, Team, projectID, currentuserda
     const [selectedMember, setSelectedMember] = useState(null);
 
     console.log(currentuserdata + Team);
-
     const handleJoin = async () => {
-        const res = await Participation(userid, projectID, Team.team_num, false);
+        let leader = false;
+        if(Team.teamMembers.length === 0) {
+            leader = true;
+        }
+        const res = await Participation(userid, projectID, Team.team_num, leader);
         console.log(res);
         router.refresh();
         onRefresh();
@@ -76,7 +79,7 @@ export default function ProjectTeamCard({ userid, Team, projectID, currentuserda
                 <CardTitle className="text-2xl text-center font-bold">
                     {Team.team_name}
                 </CardTitle>
-                {isUserInThisTeam && (
+                {isUserInThisTeam && isUserLeader && (
                     <div className="text-center">
                         <CustomLink className="text-center" href={`${currentRoute}/phases`}>
                             View phases

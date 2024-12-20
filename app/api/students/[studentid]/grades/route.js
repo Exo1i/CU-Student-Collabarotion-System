@@ -1,5 +1,5 @@
 import pool from "@/lib/db";
-import {NextResponse} from "next/server";
+import { NextResponse } from "next/server";
 
 export async function GET(request, { params }) {
   try {
@@ -8,12 +8,9 @@ export async function GET(request, { params }) {
     // Fetch courses the student is enrolled in
     const courses = await pool.query(
       `
-      SELECT Enrollment.course_code, Course.course_name, max_grade
-      FROM Enrollment
-      JOIN Course ON Enrollment.course_code = Course.course_code
-      WHERE Enrollment.student_id = $1;
-    `,
-      [par.studentid]
+      SELECT course.course_code, Course.course_name, max_grade
+      FROM Course      
+    `
     );
 
     // Fetch grades for assignments and projects

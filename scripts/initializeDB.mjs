@@ -151,25 +151,13 @@ async function initializeDB() {
     await pool.query(`
       CREATE TABLE IF NOT EXISTS public.submission (
         submission_id INTEGER NOT NULL DEFAULT nextval('submission_submission_id_seq') PRIMARY KEY,
+        URL TEXT, 
         type TEXT NOT NULL,
         student_id VARCHAR(32) NOT NULL,
         grade INTEGER,
         submission_date DATE DEFAULT NOW(),
         FOREIGN KEY (student_id) REFERENCES public.users (user_id) ON DELETE CASCADE ON UPDATE CASCADE
       );
-    `);
-
-    // Create attachment table
-    await pool.query(`
-      CREATE TABLE IF NOT EXISTS public.attachment (
-        attachment_id INTEGER NOT NULL DEFAULT nextval('attachment_attachment_id_seq') PRIMARY KEY,
-        url TEXT NOT NULL,
-        format TEXT
-      );
-    `);
-
-    await pool.query(`
-      CREATE UNIQUE INDEX IF NOT EXISTS public_attachment_pkey ON public.attachment (attachment_id);
     `);
 
     // Create badge table
@@ -215,28 +203,6 @@ async function initializeDB() {
         PRIMARY KEY (lastmessageread_id, user_id),
         FOREIGN KEY (lastmessageread_id) REFERENCES public.message (message_id) ON DELETE SET NULL ON UPDATE CASCADE,
         FOREIGN KEY (user_id) REFERENCES public.users (user_id) ON DELETE CASCADE ON UPDATE CASCADE
-      );
-    `);
-
-    // Create messageAttachment table
-    await pool.query(`
-      CREATE TABLE IF NOT EXISTS public.messageattachment (
-        message_id INTEGER,
-        attachment_id INTEGER,
-        PRIMARY KEY (message_id, attachment_id),
-        FOREIGN KEY (message_id) REFERENCES public.message (message_id) ON DELETE CASCADE ON UPDATE CASCADE,
-        FOREIGN KEY (attachment_id) REFERENCES public.attachment (attachment_id) ON DELETE CASCADE ON UPDATE CASCADE
-      );
-    `);
-
-    // Create submission attachment table
-    await pool.query(`
-      CREATE TABLE IF NOT EXISTS public.submissionattachment (
-        attachment_id INTEGER,
-        submission_id INTEGER,
-        PRIMARY KEY (attachment_id, submission_id),
-        FOREIGN KEY (attachment_id) REFERENCES public.attachment (attachment_id) ON DELETE CASCADE ON UPDATE CASCADE,
-        FOREIGN KEY (submission_id) REFERENCES public.submission (submission_id) ON DELETE CASCADE ON UPDATE CASCADE
       );
     `);
 

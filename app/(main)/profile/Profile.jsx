@@ -16,7 +16,7 @@ const ProfileHeader = ({ imageUrl, fullName }) => (
         <div className="absolute -bottom-16 left-1/2 transform -translate-x-1/2">
             <div className="rounded-full border-4 border-white shadow-lg overflow-hidden">
                 <Image
-                    src={imageUrl}
+                    src={imageUrl || '/courseImg/student.jpg'}
                     alt={fullName}
                     width={128}
                     height={128}
@@ -126,38 +126,39 @@ export default function Profile({ userID, role, myprofile }) {
                     />
                 </div>
             </div>
+            {role === 'student' && <>
+                <div className="bg-white rounded-lg shadow-lg p-6">
+                    <div className="flex items-center">
+                        <CodeIcon className="mr-2" />
+                        <h1 className="font-bold text-2xl">Current Teams</h1>
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        {userData.teams.map((team) => (
+                            <TeamCard key={team.team_num} team={team} />
+                        ))}
+                    </div>
+                </div>
 
-            <div className="bg-white rounded-lg shadow-lg p-6">
-                <div className="flex items-center">
-                    <CodeIcon className="mr-2" />
-                    <h1 className="font-bold text-2xl">Current Teams</h1>
+                <div className="bg-white rounded-lg shadow-lg p-6">
+                    <h2 className="text-2xl font-bold mb-4 text-gray-800 flex items-center">
+                        <AwardIcon className="w-6 h-6 mr-2 text-purple-500" />
+                        Reviews
+                    </h2>
+                    <div className="space-y-4">
+                        {userData.reviews.map((review, index) => (
+                            <ProfileReview
+                                key={index}
+                                review={review}
+                                reviewee_ID={userID}
+                                role={role}
+                            />
+                        ))}
+                    </div>
                 </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    {userData.teams.map((team) => (
-                        <TeamCard key={team.team_num} team={team} />
-                    ))}
-                </div>
-            </div>
-
-            <div className="bg-white rounded-lg shadow-lg p-6">
-                <h2 className="text-2xl font-bold mb-4 text-gray-800 flex items-center">
-                    <AwardIcon className="w-6 h-6 mr-2 text-purple-500" />
-                    Reviews
-                </h2>
-                <div className="space-y-4">
-                    {userData.reviews.map((review, index) => (
-                        <ProfileReview
-                            key={index}
-                            review={review}
-                            reviewee_ID={userID}
-                            role={role}
-                        />
-                    ))}
-                </div>
-            </div>
-            {
-                myprofile && <GradesSection userId={userID} />
-            }
+                {
+                    myprofile && <GradesSection userId={userID} />
+                }
+            </>}
         </div>
     )
 }
