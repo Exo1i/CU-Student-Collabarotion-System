@@ -26,10 +26,10 @@ export async function GET(request, { params }) {
         SELECT PhaseSubmission.submission_id, COUNT(PhaseSubmission.submission_id)
         FROM Submission
         JOIN PhaseSubmission ON Submission.submission_id = PhaseSubmission.submission_id
-        WHERE phase_num = $1 AND student_id = $2
+        WHERE phase_num = $1 AND student_id = $2 AND PhaseSubmission.project_id = $3
         GROUP BY PhaseSubmission.submission_id
        `,
-          [phase.phase_num, stud_id]
+          [phase.phase_num, stud_id, par.projectid]
         );
 
         const status = phasess.rowCount > 0 ? "submitted" : "not_submitted";
