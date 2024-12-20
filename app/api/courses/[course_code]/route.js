@@ -1,12 +1,12 @@
 import pool from "@/lib/db";
-import {NextResponse} from "next/server";
+import { NextResponse } from "next/server";
 
 // Get a course and its projects given course code
 export async function GET(request, { params }) {
   try {
     const par = await params;
     const courseinfo = await pool.query(
-      `SELECT course_code, course_name, course_img, COALESCE(course_description, '') AS course_description, max_grade, instructor_id, CONCAT(fname,' ',lname) AS full_name, img_url
+      `SELECT course_code, course_name, course_img, COALESCE(description, '') AS course_description, max_grade, instructor_id, CONCAT(fname,' ',lname) AS full_name, img_url
        FROM course, users
        WHERE instructor_id = user_id AND course_code = $1`,
       [par.course_code]
