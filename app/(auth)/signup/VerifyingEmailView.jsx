@@ -7,7 +7,7 @@ import {Button} from "@/components/ui/button";
 import {Alert, AlertDescription, AlertTitle} from "@/components/ui/alert";
 import {AlertCircle} from "lucide-react";
 
-export default function VerifyingEmailView({signUp, isInstructor, setActive}) {
+export default function VerifyingEmailView({signUp, setActive}) {
     const [value, setValue] = useState("");
     const [error, setError] = useState(null);
     const [isLoading, setIsLoading] = useState(false);

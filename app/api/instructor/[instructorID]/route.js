@@ -9,7 +9,7 @@ export async function GET(request, { params }) {
     // Fetch instructor and course details
     const instructor = await pool.query(
       `
-      SELECT c.course_code, c.course_name, c.course_img, COALESCE(c.course_description, '') AS course_description, 
+      SELECT c.course_code, c.course_name, c.course_img, COALESCE(c.description, '') AS course_description, 
              COALESCE(c.max_grade, 0) AS max_grade, c.instructor_id, CONCAT(u.fname, ' ', u.lname) AS full_name, u.img_url
       FROM Course c
       JOIN Users u ON c.instructor_id = u.user_id

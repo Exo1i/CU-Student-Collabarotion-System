@@ -7,17 +7,18 @@ import {CalendarDays, Notebook} from "lucide-react";
 import {getUser} from "@/hooks/get-userID";
 import {useAlert} from "@/components/alert-context";
 import Loading from "@/app/(main)/loading";
+import {useAuth} from "@clerk/nextjs";
 
 export default function StudentPage() {
   const { showAlert } = useAlert();
   const [assignData, setassigndata] = useState([]);
   const [loading, setloading] = useState(true);
-  const user = getUser();
+  const {userId,isSignedIn,isLoaded} = useAuth();
 
   useEffect(() => {
     async function fetchStudentData() {
       try {
-        const res = await fetch(`/api/students/user002/calendar`); //TODO ${user.id}
+        const res = await fetch(`/api/students/${userId}/calendar`);
         if (!res.ok) {
           throw new Error(`Failed to fetch: ${res.status} ${res.statusText}`);
         }
@@ -33,8 +34,9 @@ export default function StudentPage() {
         setloading(false);
       }
     }
+    if(userId && isLoaded && isSignedIn)
     fetchStudentData();
-  }, [user]);
+  }, [userId]);
   if (loading) return <Loading />;
   return (
     <div>
@@ -70,7 +72,7 @@ export default function StudentPage() {
           </div>
            <div className="container mx-auto py-10 rounded">
             <DataTable columns={columns} data={assignData} />
-          </div> 
+          </div>
         </section> */}
       </div>
     </div>

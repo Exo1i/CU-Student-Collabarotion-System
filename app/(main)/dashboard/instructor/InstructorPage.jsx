@@ -12,6 +12,7 @@ import CreateAssignment from "@/components/CreateAssignment";
 import AssignmentList from "@/components/AssignmentList";
 import {useAlert} from "@/components/alert-context";
 import Loading from "@/app/(main)/loading";
+import {useAuth} from "@clerk/nextjs";
 
 export default function InstructorPage({params}) {
     const {showAlert} = useAlert();
@@ -27,13 +28,12 @@ export default function InstructorPage({params}) {
     const [error, seterror] = useState(null);
     const [loading, setloading] = useState(true);
     const [courseCode, setCourseCode] = useState("");
-    // const user = getUser(); TODO wait till i get my hands on user/pass for other instructors
-    const userID = "user005";
+    const {userId, isSignedIn, isLoaded} = useAuth(); // TODO wait till i get my hands on user/pass for other instructors
     useEffect(() => {
         // if (!user) return;
         async function fetchCourseData() {
             try {
-                let res = await fetch(`http://localhost:3000/api/instructor/${userID}`);
+                let res = await fetch(`http://localhost:3000/api/instructor/${userId}`);
                 if (!res.ok) {
                     throw new Error(`Failed to fetch: ${res.status} ${res.statusText}`);
                 }
@@ -59,8 +59,9 @@ export default function InstructorPage({params}) {
             }
         }
 
-        fetchCourseData();
-    }, [userID]);
+        if (isLoaded && isSignedIn && userId)
+            fetchCourseData();
+    }, [userId]);
     if (loading) return <Loading />;
     if (error) return <div>Error...</div>;
 
@@ -142,7 +143,3 @@ export default function InstructorPage({params}) {
         </div>
     );
 }
-// if (window) {
-//   window.addAssignmentGrade = addAssignmentGrade;
-//   window.addAssignment = addAssignment;
-// }
