@@ -29,7 +29,6 @@ const fetcher = (url) => fetch(url).then((res) => res.json());
 const Chat = ({disableInput, userRole}) => {
     const {showAlert} = useAlert();
     const {user} = useUser();
-
     // Chat store state
     const {
         selectedGroupID,

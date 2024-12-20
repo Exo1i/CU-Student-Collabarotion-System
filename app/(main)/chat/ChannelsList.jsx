@@ -144,7 +144,7 @@ export const ChannelsList = ({
     }, [channels, searchTerm]);
 
     // Only show management options for admins
-    const canManageChannels = userRole === 'admin';
+    const canManageChannels = userRole === 'admin' || userRole === 'instructor';
 
 
     return (<div className={'flex flex-col space-y-4'}>
