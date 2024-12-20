@@ -1,10 +1,11 @@
 'use client'
 
-import { useEffect, useState } from 'react'
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Progress } from "@/components/ui/progress"
+import {useEffect, useState} from 'react'
+import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card"
+import {Progress} from "@/components/ui/progress"
 import Loading from '../(main)/loading'
-export default function GradesSection({ userId }) {
+
+export default function GradesSection({userId}) {
     const [grades, setGrades] = useState([]);
     const [isLoading, setIsLoading] = useState(true)
     const [error, setError] = useState(null)
@@ -17,6 +18,7 @@ export default function GradesSection({ userId }) {
                     throw new Error(`Failed to fetch grades: ${response.statusText}`)
                 }
                 const data = await response.json()
+                console.log(data)
                 setGrades(data)
             } catch (err) {
                 setError(err instanceof Error ? err.message : 'An error occurred while fetching grades')
@@ -24,7 +26,6 @@ export default function GradesSection({ userId }) {
                 setIsLoading(false)
             }
         }
-
         fetchGrades()
     }, [userId])
 
@@ -63,14 +64,15 @@ export default function GradesSection({ userId }) {
                         <div className="space-y-4">
                             <div>
                                 <h3 className="font-semibold mb-2">Assignments</h3>
-                                {course.assignmentsGrades.assignments.length > 0 ? (
-                                    course.assignmentsGrades.assignments.map((assignment , index) => (
+                                {course?.assignmentsGrades?.assignments?.length > 0 ? (
+                                    course.assignmentsGrades.assignments.map((assignment, index) => (
                                         <div key={index} className="mb-2">
                                             <div className="flex justify-between text-sm">
                                                 <span>{assignment.title}</span>
                                                 <span>{assignment.grade}/{assignment.max_grade}</span>
                                             </div>
-                                            <Progress value={(assignment.grade / assignment.max_grade) * 100} className="h-2" />
+                                            <Progress value={(assignment.grade / assignment.max_grade) * 100}
+                                                      className="h-2" />
                                         </div>
                                     ))
                                 ) : (
@@ -80,13 +82,14 @@ export default function GradesSection({ userId }) {
                             <div>
                                 <h3 className="font-semibold mb-2">Project</h3>
                                 {course.projectGrades.phases.length > 0 ? (
-                                    course.projectGrades.phases.map((phase , index) => (
+                                    course.projectGrades.phases.map((phase, index) => (
                                         <div key={index} className="mb-2">
                                             <div className="flex justify-between text-sm">
                                                 <span>{phase.title}</span>
                                                 <span>{phase.grade}/{course.projectGrades.max_grade}</span>
                                             </div>
-                                            <Progress value={(phase.grade / course.projectGrades.max_grade) * 100} className="h-2" />
+                                            <Progress value={(phase.grade / course.projectGrades.max_grade) * 100}
+                                                      className="h-2" />
                                         </div>
                                     ))
                                 ) : (
@@ -96,8 +99,11 @@ export default function GradesSection({ userId }) {
                             <div>
                                 <h3 className="font-semibold">Total Grade</h3>
                                 <div className="flex justify-between items-center">
-                                    <Progress value={(course.total_grade / (course.projectGrades.max_grade + (course.assignmentsGrades.assignments.reduce((sum, a) => sum + a.max_grade, 0)))) * 100} className="h-4 flex-grow mr-4" />
-                                    <span className="font-bold">{course.total_grade}/{course.projectGrades.max_grade + (course.assignmentsGrades.assignments.reduce((sum, a) => sum + a.max_grade, 0))}</span>
+                                    <Progress
+                                        value={(course.total_grade / (course.projectGrades.max_grade + (course.assignmentsGrades.assignments?.reduce((sum, a) => sum + a.max_grade, 0)))) * 100}
+                                        className="h-4 flex-grow mr-4" />
+                                    <span
+                                        className="font-bold">{course.total_grade}/{course.projectGrades.max_grade + (course.assignmentsGrades.assignments?.reduce((sum, a) => sum + a.max_grade, 0))}</span>
                                 </div>
                             </div>
                         </div>
