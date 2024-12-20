@@ -34,7 +34,7 @@ export default function Page({ params }) {
     async function fetchCourseData() {
       try {
         const res = await fetch(
-          `http://localhost:3000/api/instructor/${userID}`
+          `/api/instructor/${userID}`
         );
         if (!res.ok) {
           throw new Error(`Failed to fetch: ${res.status} ${res.statusText}`);
