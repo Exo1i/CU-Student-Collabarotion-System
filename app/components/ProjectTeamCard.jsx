@@ -16,7 +16,7 @@ import {DeleteMember} from '@/actions/DeleteMember'
 import ReviewDialog from './review-dialog'
 import {getRole} from "@/actions/GetRole";
 
-export default function ProjectTeamCard({ userid, Team, projectID, currentuserdata }) {
+export default function ProjectTeamCard({ userid, Team, projectID, currentuserdata , onRefresh }) {
     const [role, setrole] = useState(null);
     useEffect(() => {
         async function getcurrentuserrole() {
@@ -41,6 +41,7 @@ export default function ProjectTeamCard({ userid, Team, projectID, currentuserda
         const res = await Participation(userid, projectID, Team.team_num, false);
         console.log(res);
         router.refresh();
+        onRefresh();
     };
 
     const handleDeleteMember = async (memberUserId) => {
@@ -48,6 +49,7 @@ export default function ProjectTeamCard({ userid, Team, projectID, currentuserda
             const res = await DeleteMember(memberUserId, projectID, currentuserdata?.team_num);
             if (res.status === 200) {
                 router.refresh();
+                onRefresh();
             }
         } catch (error) {
             console.log(error);

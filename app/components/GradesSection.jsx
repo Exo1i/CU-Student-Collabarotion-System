@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
-
+import Loading from '../(main)/loading'
 export default function GradesSection({ userId }) {
     const [grades, setGrades] = useState([]);
     const [isLoading, setIsLoading] = useState(true)
@@ -12,7 +12,7 @@ export default function GradesSection({ userId }) {
     useEffect(() => {
         const fetchGrades = async () => {
             try {
-                const response = await fetch(`${process.env.NEXT_PUBLIC_DEPLOYMENT_URL}/api/students/${userId}/grades`)
+                const response = await fetch('/api/students/${userId}/grades')
                 if (!response.ok) {
                     throw new Error(`Failed to fetch grades: ${response.statusText}`)
                 }
@@ -29,7 +29,7 @@ export default function GradesSection({ userId }) {
     }, [userId])
 
     if (isLoading) {
-        return <div>Loading grades...</div>
+        return <Loading />
     }
 
     if (error) {

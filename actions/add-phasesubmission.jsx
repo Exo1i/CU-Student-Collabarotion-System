@@ -28,10 +28,16 @@ export async function addphaseSubmission(projectID, phaseNum , url) {
             throw new Error('Failed to insert phase submission');
         }
 
-        const attachmentQuery = `INSERT INTO Attachment (URL) VALUES ($1)`;
+        const attachmentQuery = `INSERT INTO Attachment (URL) VALUES ($1) RETURNING attachment_id`;
         const attachmentResult = await pool.query(attachmentQuery, [url]);
         if (attachmentResult.rowCount === 0) {
             throw new Error('Failed to insert attachment');
+        }
+        const attachmentid = attachmentResult.rows[0].attachment_id;
+        const submissionattachmentQuery = `INSERT INTO submissionAttachment (Attachment_ID, Submission_ID) VALUES ($1 , $2) `;
+        const submissionattachmentResult = await pool.query(submissionattachmentQuery, [attachmentid , Submission_ID]);
+        if (submissionattachmentResult.rowCount === 0) {
+            throw new Error('Failed to insert submissionattachment');
         }
 
         return {

@@ -1,15 +1,15 @@
 'use client'
 
-import {useEffect, useState} from 'react'
-import {AnimatePresence, motion} from 'framer-motion'
-import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "@/components/ui/card"
-import {Badge} from "@/components/ui/badge"
-import {Separator} from "@/components/ui/separator"
-import {CalendarIcon, ClockIcon, CodeIcon, UsersIcon} from 'lucide-react'
+import { useEffect, useState } from 'react'
+import { AnimatePresence, motion } from 'framer-motion'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Badge } from "@/components/ui/badge"
+import { Separator } from "@/components/ui/separator"
+import { CalendarIcon, ClockIcon, CodeIcon, UsersIcon } from 'lucide-react'
 import Phasesubmissionbutton from '@/app/components/phasesubmissionbuttom'
-import Loading from "@/app/(main)/loading";
-
-export default function ProjectPhasesPage({params}) {
+import Loading from '@/app/(main)/loading'
+import { getRole } from '@/actions/GetRole'
+export default function ProjectPhasesPage({ params }) {
     const [projectID, setProjectID] = useState(null);
     useEffect(() => {
         params.then(((resolvedparams) => {
@@ -29,7 +29,7 @@ export default function ProjectPhasesPage({params}) {
 
         getcurrentuserrole()
     }, [role])
-    const [project, setproject] = useState({phases: []});
+    const [project, setproject] = useState({ phases: [] });
     const [loading, setLoading] = useState(false);
     const [error, seterror] = useState(null);
     useEffect(() => {
@@ -75,14 +75,14 @@ export default function ProjectPhasesPage({params}) {
         return <div>Error: {error.message}</div>;
     }
     if (!projectID || !project) {
-        return <loading />
+        return <Loading />
     } else {
         return (
             <div className="min-h-screen py-12 px-4 sm:px-6 lg:px-8">
                 <motion.div
-                    initial={{opacity: 0, y: 20}}
-                    animate={{opacity: 1, y: 0}}
-                    transition={{duration: 0.5}}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5 }}
                     className="max-w-4xl mx-auto"
                 >
 
@@ -102,7 +102,7 @@ export default function ProjectPhasesPage({params}) {
                                     className={`text-lg py-1 px-3 text-center ${progress === 100
                                         ? "bg-green-500 text-white"
                                         : "bg-white text-purple-600"
-                                    }`}
+                                        }`}
                                 >
                                     {progress === 100 ? <>Done</> : <>In progress</>}
                                 </Badge>
@@ -128,9 +128,9 @@ export default function ProjectPhasesPage({params}) {
                                 </div>
                             </div>
                             <motion.div
-                                initial={{width: 0}}
-                                animate={{width: `${progress}%`}}
-                                transition={{duration: 0.5}}
+                                initial={{ width: 0 }}
+                                animate={{ width: `${progress}%` }}
+                                transition={{ duration: 0.5 }}
                                 className="h-2 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full mb-8"
                             />
                             <Separator className="my-8" />
@@ -141,9 +141,9 @@ export default function ProjectPhasesPage({params}) {
                                 {project.phases.map((phase) => (
                                     <motion.div
                                         key={phase.phase_num}
-                                        initial={{opacity: 0, x: -20}}
-                                        animate={{opacity: 1, x: 0}}
-                                        transition={{duration: 0.3}}
+                                        initial={{ opacity: 0, x: -20 }}
+                                        animate={{ opacity: 1, x: 0 }}
+                                        transition={{ duration: 0.3 }}
                                     >
                                         <Card className="bg-white hover:shadow-lg transition-shadow duration-300">
                                             <CardContent className="p-6">
@@ -159,9 +159,9 @@ export default function ProjectPhasesPage({params}) {
                                                     </span>
                                                 </div>
                                                 <motion.div
-                                                    initial={{width: 0}}
-                                                    animate={{width: `${phase.phase_load}%`}}
-                                                    transition={{duration: 0.5}}
+                                                    initial={{ width: 0 }}
+                                                    animate={{ width: `${phase.phase_load}%` }}
+                                                    transition={{ duration: 0.5 }}
                                                     className="h-2 bg-gradient-to-r from-blue-300 to-purple-300 rounded-full mb-2"
                                                 />
                                                 <div
@@ -171,15 +171,15 @@ export default function ProjectPhasesPage({params}) {
                                                     </span>
                                                     <AnimatePresence>
                                                         <motion.div
-                                                            initial={{opacity: 0}}
-                                                            animate={{opacity: 1}}
-                                                            exit={{opacity: 0}}
+                                                            initial={{ opacity: 0 }}
+                                                            animate={{ opacity: 1 }}
+                                                            exit={{ opacity: 0 }}
                                                         >
                                                             {
                                                                 role === 'student' &&
                                                                 <Phasesubmissionbutton phase={phase}
-                                                                                       projectID={projectID}
-                                                                                       setsubmittedphases={setsubmittedphases} />
+                                                                    projectID={projectID}
+                                                                    setsubmittedphases={setsubmittedphases} />
                                                             }
                                                         </motion.div>
                                                     </AnimatePresence>
