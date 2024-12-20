@@ -47,8 +47,10 @@ async function initializeDB() {
       CREATE TABLE IF NOT EXISTS public.course (
         course_code VARCHAR(10) PRIMARY KEY,
         course_name TEXT NOT NULL,
+        course_img TEXT,
         instructor_id VARCHAR(32),
         max_grade INTEGER NOT NULL,
+        description TEXT,
         FOREIGN KEY (instructor_id) REFERENCES public.users (user_id) ON DELETE SET NULL ON UPDATE CASCADE
       );
     `);

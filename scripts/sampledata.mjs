@@ -2,17 +2,21 @@ import dotenv from "dotenv";
 import pkg from "pg";
 
 dotenv.config({ path: "./.env.local" });
-const { Pool } = pkg;
-const pool = new Pool({
+const { Client } = pkg;
+const pool = new Client({
   connectionString: process.env.DATABASE_URL,
-  ssl: false,
+  ssl: false, // Adjust based on your database settings
 });
 
-async function insertExtendedSampleData() {
+async function insertSampleData() {
   try {
-    // Users - 30 records (10 instructors, 20 students)
+    console.log("Connecting to database...");
+    await pool.connect();
+    console.log("Connected to database");
+
+    //Users - 30 records (20 instructors, 10 students)
     await pool.query(`
-      INSERT INTO Users (User_ID, Fname, Lname, Role, img_url, username) VALUES 
+      INSERT INTO Users (User_ID, Fname, Lname, Role, img_url, username) VALUES
       ('inst001', 'James', 'Smith', 'instructor', 'https://placeholder.com/inst1.jpg', 'jsmith'),
       ('inst002', 'Maria', 'Garcia', 'instructor', 'https://placeholder.com/inst2.jpg', 'mgarcia'),
       ('inst003', 'Robert', 'Johnson', 'instructor', 'https://placeholder.com/inst3.jpg', 'rjohnson'),
@@ -32,7 +36,7 @@ async function insertExtendedSampleData() {
       ('inst017', 'Brian', 'Zhang', 'instructor', 'https://placeholder.com/inst17.jpg', 'bzhang'),
       ('inst018', 'Rachel', 'Kumar', 'instructor', 'https://placeholder.com/inst18.jpg', 'rkumar'),
       ('inst019', 'Justin', 'Nguyen', 'instructor', 'https://placeholder.com/inst19.jpg', 'jnguyen'),
-      ('inst020', 'Sophia', 'Santos', 'instructor', 'https://placeholder.com/inst20.jpg', 'ssantos');
+      ('inst020', 'Sophia', 'Santos', 'instructor', 'https://placeholder.com/inst20.jpg', 'ssantos'),
       ('stud001', 'John', 'Doe', 'student', 'https://placeholder.com/stud1.jpg', 'jdoe'),
       ('stud002', 'Jane', 'Smith', 'student', 'https://placeholder.com/stud2.jpg', 'jsmith2'),
       ('stud003', 'Alex', 'Johnson', 'student', 'https://placeholder.com/stud3.jpg', 'ajohnson'),
@@ -47,13 +51,11 @@ async function insertExtendedSampleData() {
       ('stud012', 'Sophia', 'Moore', 'student', 'https://placeholder.com/stud12.jpg', 'smoore'),
       ('stud013', 'James', 'Jackson', 'student', 'https://placeholder.com/stud13.jpg', 'jjackson'),
       ('stud014', 'Isabella', 'White', 'student', 'https://placeholder.com/stud14.jpg', 'iwhite'),
-      ('stud015', 'Ethan', 'Harris', 'student', 'https://placeholder.com/stud15.jpg', 'eharris'),
-      
+      ('stud015', 'Ethan', 'Harris', 'student', 'https://placeholder.com/stud15.jpg', 'eharris');
     `);
 
-    // Courses - 20 records
     await pool.query(`
-      INSERT INTO Course (Course_Code, Course_Name, Course_img, course_description, Instructor_ID, max_Grade) VALUES 
+      INSERT INTO Course (Course_Code, Course_Name, Course_img, description, Instructor_ID, max_Grade) VALUES
       ('CS101', 'Introduction to Programming', 'cs101.jpg', 'Basic programming concepts and principles', 'inst001', 100),
       ('CS102', 'Data Structures', 'cs102.jpg', 'Fundamental data structures and algorithms', 'inst002', 100),
       ('CS201', 'Database Systems', 'cs201.jpg', 'Database design and management', 'inst003', 100),
@@ -78,7 +80,7 @@ async function insertExtendedSampleData() {
 
     // Projects - 20 records
     await pool.query(`
-      INSERT INTO Project (Project_Name, Course_Code, Start_Date, End_Date, Description, Max_team_size, max_grade) VALUES 
+      INSERT INTO Project (Project_Name, Course_Code, Start_Date, End_Date, Description, Max_team_size, max_grade) VALUES
       ('Web Portfolio', 'CS202', '2024-01-01', '2024-02-01', 'Create a personal portfolio website', 4, 20),
       ('Database Design', 'CS201', '2024-01-15', '2024-02-15', 'Design and implement a database system', 3, 20),
       ('Mobile App', 'CS502', '2024-02-01', '2024-03-01', 'Develop a mobile application', 4, 15),
@@ -103,7 +105,7 @@ async function insertExtendedSampleData() {
 
     // Teams - 20 records
     await pool.query(`
-      INSERT INTO Team (Project_ID, Team_Num, Team_Name) VALUES 
+      INSERT INTO Team (Project_ID, Team_Num, Team_Name) VALUES
       (1, 1, 'Web Warriors'),
       (1, 2, 'Code Crafters'),
       (2, 1, 'Data Miners'),
@@ -128,7 +130,7 @@ async function insertExtendedSampleData() {
 
     // Assignments - 20 records
     await pool.query(`
-      INSERT INTO Assignment (Title, Max_grade, Description, Due_Date, Course_Code) VALUES 
+      INSERT INTO Assignment (Title, Max_grade, Description, Due_Date, Course_Code) VALUES
       ('HTML Basics', 5, 'Create a basic HTML webpage', '2024-01-15', 'CS202'),
       ('SQL Queries', 5, 'Write complex SQL queries', '2024-01-30', 'CS201'),
       ('Mobile UI Design', 5, 'Design a mobile app interface', '2024-02-15', 'CS502'),
@@ -153,7 +155,7 @@ async function insertExtendedSampleData() {
 
     // Chat Groups - 20 records
     await pool.query(`
-      INSERT INTO Chat_Group (Group_Name) VALUES 
+      INSERT INTO Chat_Group (Group_Name) VALUES
       ('Web Development Team'),
       ('Database Group'),
       ('Mobile Dev Team'),
@@ -178,7 +180,7 @@ async function insertExtendedSampleData() {
 
     // Channels - 40 records (2 channels per group)
     await pool.query(`
-      INSERT INTO Channel (Channel_Name, Channel_Num, Group_ID, Channel_Type) VALUES 
+      INSERT INTO Channel (Channel_Name, Channel_Num, Group_ID, Channel_Type) VALUES
       ('General', 1, 1, 'open'),
       ('Resources', 2, 1, 'open'),
       ('Announcements', 1, 2, 'restricted'),
@@ -223,7 +225,7 @@ async function insertExtendedSampleData() {
 
     // Messages - 20 records
     await pool.query(`
-      INSERT INTO Message (Channel_Num, Group_ID, Time_Stamp, Type, Content, sender_ID) VALUES 
+      INSERT INTO Message (Channel_Num, Group_ID, Time_Stamp, Type, Content, sender_ID) VALUES
       (1, 1, '2024-01-01 10:00:00', 'announcement', 'Welcome to Web Development!', 'inst001'),
       (2, 1, '2024-01-01 10:30:00', 'message', 'Here are some useful resources', 'inst001'),
       (1, 2, '2024-01-02 09:00:00', 'announcement', 'Database project starting today', 'inst002'),
@@ -252,7 +254,7 @@ async function insertExtendedSampleData() {
       ('top_project_performer.png', 'Top Project Performer', 'Achieved the highest rates in a project'),
       ('project_excellence.png', 'Project Excellence Award Gold', 'Achieved the highest rates across all projects'),
       ('project_excellence.png', 'Project Excellence Award Silver', 'Achieved the second highest rates across all projects'),
-      ('course_champion.png', 'Course Champion Gold', 'Achieved the highest grades in a course'), 
+      ('course_champion.png', 'Course Champion Gold', 'Achieved the highest grades in a course'),
       ('academic_all_star.png', 'Academic All-Star Gold', 'Achieved the highest grades across all courses'),
       ('academic_all_star.png', 'Academic All-Star Silver', 'Achieved the second highest grades across all courses'),
       ('instructor_choice.png', 'Instructor Choice', 'A special badge awarded to a student chosen by an instructor');
@@ -261,21 +263,21 @@ async function insertExtendedSampleData() {
     // Enrollments
     await pool.query(`
       INSERT INTO enrollment (student_ID, Course_Code)
-      SELECT 
+      SELECT
         u.user_id,
         c.course_code
-      FROM 
+      FROM
         users u
         CROSS JOIN course c
-      WHERE 
+      WHERE
         u.role = 'student'
-      ORDER BY 
+      ORDER BY
         u.user_id, c.course_code;
     `);
 
-    // Participation - 20 records
+    Participation - 20 records
     await pool.query(`
-      INSERT INTO participation (student_ID, Project_ID, Team_Num, Leader) VALUES 
+      INSERT INTO participation (student_ID, Project_ID, Team_Num, Leader) VALUES
       ('stud001', 1, 1, true),
       ('stud002', 1, 1, false),
       ('stud003', 2, 1, true),
@@ -291,16 +293,6 @@ async function insertExtendedSampleData() {
       ('stud013', 7, 1, true),
       ('stud014', 7, 1, false),
       ('stud015', 8, 1, true),
-      ('stud016', 8, 1, false),
-      ('stud017', 9, 1, true),
-      ('stud018', 9, 1, false),
-      ('stud019', 10, 1, true),
-      ('stud020', 10, 1, false),
-      ('stud016', 1, 2, true),
-      ('stud017', 2, 2, true),
-      ('stud018', 3, 2, true),
-      ('stud019', 4, 2, true),
-      ('stud020', 5, 2, true),
       ('stud011', 6, 2, true),
       ('stud012', 7, 2, true),
       ('stud013', 8, 2, true),
@@ -310,7 +302,7 @@ async function insertExtendedSampleData() {
 
     //Attachments - 10 records
     await pool.query(`
-      INSERT INTO Attachment (URL, Format) VALUES 
+      INSERT INTO Attachment (URL, Format) VALUES
       ('https://storage.com/doc1.pdf', 'PDF'),
       ('https://storage.com/presentation.pptx', 'PPTX'),
       ('https://storage.com/code.zip', 'ZIP'),
@@ -325,7 +317,7 @@ async function insertExtendedSampleData() {
 
     // Submissions - 10 records
     await pool.query(`
-      INSERT INTO Submission (Type, Student_ID, Grade, Submission_date) VALUES 
+      INSERT INTO Submission (Type, Student_ID, Grade, Submission_date) VALUES
       ('assignment', 'stud001', 95, '2024-01-15'),
       ('phase', 'stud002', 88, '2024-01-20'),
       ('assignment', 'stud003', 92, '2024-01-25'),
@@ -340,7 +332,7 @@ async function insertExtendedSampleData() {
 
     // Phase - 10 records (for different projects)
     await pool.query(`
-      INSERT INTO Phase (Project_ID, Phase_Num, Phase_Name, Phase_load, deadline, description) VALUES 
+      INSERT INTO Phase (Project_ID, Phase_Num, Phase_Name, Phase_load, deadline, description) VALUES
       (1, 1, 'Planning', 20, '2024-02-01', 'Initial planning and requirements gathering'),
       (1, 2, 'Development', 40, '2024-03-01', 'Core development phase'),
       (2, 1, 'Design', 30, '2024-02-15', 'Database design and architecture'),
@@ -355,7 +347,7 @@ async function insertExtendedSampleData() {
 
     // SubmissionAttachment - 10 records
     await pool.query(`
-      INSERT INTO SubmissionAttachment (Attachment_ID, Submission_ID) VALUES 
+      INSERT INTO SubmissionAttachment (Attachment_ID, Submission_ID) VALUES
       (1, 1),
       (2, 2),
       (3, 3),
@@ -370,7 +362,7 @@ async function insertExtendedSampleData() {
 
     // PhaseSubmission - 5 records
     await pool.query(`
-      INSERT INTO PhaseSubmission (Submission_ID, Project_ID, Phase_Num) VALUES 
+      INSERT INTO PhaseSubmission (Submission_ID, Project_ID, Phase_Num) VALUES
       (2, 1, 1),
       (4, 1, 2),
       (6, 2, 1),
@@ -380,17 +372,17 @@ async function insertExtendedSampleData() {
 
     // AssignmentSubmission - 5 records
     await pool.query(`
-      INSERT INTO AssignmentSubmission (Submission_ID, Assignment_ID) VALUES 
+      INSERT INTO AssignmentSubmission (Submission_ID, Assignment_ID) VALUES
       (1, 1),
       (3, 2),
       (5, 3),
       (7, 4),
-      (9, 5),      
+      (9, 5);
     `);
 
     // Review - 10 records
     await pool.query(`
-      INSERT INTO Review (Reviewer_ID, Reviewee_ID, Project_ID, Content, Rating) VALUES 
+      INSERT INTO Review (Reviewer_ID, Reviewee_ID, Project_ID, Content, Rating) VALUES
       ('stud001', 'stud002', 1, 'Great teamwork and communication skills', 5),
       ('stud002', 'stud003', 1, 'Excellent technical contributions', 4),
       ('stud003', 'stud004', 2, 'Very helpful and knowledgeable', 3),
@@ -405,7 +397,7 @@ async function insertExtendedSampleData() {
 
     // MessageRead - 10 records
     await pool.query(`
-      INSERT INTO MessageRead (LastMessageRead_ID, User_ID, ReadAt) VALUES 
+      INSERT INTO MessageRead (LastMessageRead_ID, User_ID, ReadAt) VALUES
       (1, 'stud001', '2024-01-01 12:00:00'),
       (2, 'stud002', '2024-01-02 13:00:00'),
       (3, 'stud003', '2024-01-03 14:00:00'),
@@ -420,7 +412,7 @@ async function insertExtendedSampleData() {
 
     // MessageAttachment - 10 records
     await pool.query(`
-      INSERT INTO MessageAttachment (Message_ID, Attachment_ID) VALUES 
+      INSERT INTO MessageAttachment (Message_ID, Attachment_ID) VALUES
       (1, 1),
       (2, 2),
       (3, 3),
@@ -442,7 +434,7 @@ async function insertExtendedSampleData() {
       ('stud004', 4, '2024-02-01'),
       ('stud005', 5, '2024-02-05'),
       ('stud006', 6, '2024-02-10'),
-      ('stud007', 7, '2024-02-15'),      
+      ('stud007', 7, '2024-02-15');      
     `);
 
     //Adding relevant technologies for each team based on their project context
@@ -531,8 +523,9 @@ async function insertExtendedSampleData() {
 
     await pool.end();
     console.log("Disconnected from database");
-    console.log("Sample data part 2 inserted successfully");
+    console.log("Sample data inserted successfully");
   } catch (err) {
-    console.error("Error inserting sample data part 2:", err);
+    console.error("Error inserting sample data:", err);
   }
 }
+insertSampleData();
