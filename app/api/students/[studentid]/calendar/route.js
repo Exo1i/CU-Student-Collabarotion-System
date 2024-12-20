@@ -1,5 +1,5 @@
 import pool from "@/lib/db";
-import {NextResponse} from "next/server";
+import { NextResponse } from "next/server";
 
 export async function GET(request, { params }) {
   try {
@@ -38,8 +38,13 @@ export async function GET(request, { params }) {
         }
 
         let status;
-        if (!submissionDate) {
+        if (!submissionDate && new Date() > new Date(assignment.due_date)) {
           status = "missed";
+        } else if (
+          !submissionDate &&
+          new Date() <= new Date(assignment.due_date)
+        ) {
+          status = "in progress";
         } else if (new Date(submissionDate) <= new Date(assignment.due_date)) {
           status = "done";
         } else {
