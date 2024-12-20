@@ -1,6 +1,5 @@
-'use client';
-
-import React, {useEffect, useState} from 'react';
+'use client'
+import React, {useState} from 'react';
 import {ArrowRight, BookOpen, GraduationCap, Loader2, Sparkles, Users} from 'lucide-react';
 import {Button} from "@/components/ui/button";
 import {Card, CardContent} from "@/components/ui/card";
@@ -10,9 +9,13 @@ import {Textarea} from "@/components/ui/textarea";
 import {useRouter} from "next/navigation";
 import {addCourse} from "@/actions/add-course";
 import {useAlert} from "@/components/alert-context";
-import {useAuth} from "@clerk/nextjs";
+import {useAuth, useUser} from "@clerk/nextjs";
 import {Progress} from "@/components/ui/progress";
 import {updateMetadata} from "@/actions/metadata-actions";
+
+const RETRY_DELAY = 1000; // Start with 1 second
+const MAX_RETRIES = 15; // Maximum number of retries
+const PROGRESS_INCREMENT = 100 / (MAX_RETRIES + 1); // Distribute progress across retries
 
 export default function OnboardingPage() {
     const [userType, setUserType] = useState(null);
@@ -25,22 +28,41 @@ export default function OnboardingPage() {
     });
     const [isLoading, setIsLoading] = useState(false);
     const [progress, setProgress] = useState(0);
+    const [retryCount, setRetryCount] = useState(0);
     const router = useRouter();
     const {showAlert} = useAlert();
     const {userId} = useAuth();
+    const {user} = useUser();
 
-    useEffect(() => {
-        if (isLoading) {
-            const interval = setInterval(() => {
-                setProgress(prev => {
-                    if (prev >= 100) return 100;
-                    return prev + 5;
-                });
-            }, 250);
+    const verifyMetadataUpdate = async (expectedRole) => {
+        const currentMetadata = await user.reload();
+        return currentMetadata.publicMetadata?.role === expectedRole &&
+            currentMetadata.publicMetadata?.hasOnBoarded === true;
+    };
 
-            return () => clearInterval(interval);
+    const retryWithBackoff = async (expectedRole) => {
+        let currentRetry = 0;
+
+        while (currentRetry < MAX_RETRIES) {
+            // Update progress based on retry count
+            setProgress(currentRetry * PROGRESS_INCREMENT);
+            setRetryCount(currentRetry + 1);
+
+            // Check if metadata has been updated
+            const isUpdated = await verifyMetadataUpdate(expectedRole);
+            if (isUpdated) {
+                setProgress(100);
+                router.push('/dashboard');
+                return true;
+            }
+
+            // Wait with exponential backoff
+            await new Promise(resolve => setTimeout(resolve, RETRY_DELAY * Math.pow(1.5, currentRetry)));
+            currentRetry++;
         }
-    }, [isLoading]);
+
+        return false;
+    };
 
     const handleInputChange = (e) => {
         const {name, value} = e.target;
@@ -51,6 +73,7 @@ export default function OnboardingPage() {
         e.preventDefault();
         setIsLoading(true);
         setProgress(0);
+        setRetryCount(0);
 
         try {
             if (userType === 'instructor') {
@@ -66,30 +89,26 @@ export default function OnboardingPage() {
                 if (result.status === 200) {
                     showAlert({message: result.message, severity: 'success'});
                     await updateMetadata({role: 'instructor', hasOnBoarded: true});
+                    const verified = await retryWithBackoff('instructor');
+                    if (!verified) {
+                        showAlert({
+                            message: 'Failed to verify account setup. Please refresh the page.',
+                            severity: 'error'
+                        });
+                        setIsLoading(false);
+                    }
                 } else {
                     showAlert({message: result.message, severity: 'error'});
                     setIsLoading(false);
-                    return;
                 }
             } else {
                 await updateMetadata({role: 'student', hasOnBoarded: true});
-            }
-
-            const redirectInterval = setInterval(() => {
-                router.push('/dashboard');
-            }, 500);
-
-            setTimeout(() => {
-                clearInterval(redirectInterval);
-                if (isLoading) {
+                const verified = await retryWithBackoff('student');
+                if (!verified) {
+                    showAlert({message: 'Failed to verify account setup. Please refresh the page.', severity: 'error'});
                     setIsLoading(false);
-                    showAlert({
-                        message: 'Taking longer than expected. Please refresh the page.',
-                        severity: 'warning'
-                    });
                 }
-            }, 10000);
-
+            }
         } catch (error) {
             showAlert({message: 'An error occurred during onboarding', severity: 'error'});
             setIsLoading(false);
@@ -104,10 +123,8 @@ export default function OnboardingPage() {
                     <h2 className="text-2xl font-semibold text-foreground mb-4">Setting up your account...</h2>
                     <Progress value={progress} className="mb-2 h-2" />
                     <p className="text-sm text-foreground/60">
-                        {progress < 30 && "Updating your profile..."}
-                        {progress >= 30 && progress < 60 && "Almost there..."}
-                        {progress >= 60 && progress < 90 && "Preparing your dashboard..."}
-                        {progress >= 90 && "Redirecting you..."}
+                        {retryCount > 0 && `Verifying account setup (Attempt ${retryCount}/${MAX_RETRIES})...`}
+                        {retryCount === 0 && "Initializing setup..."}
                     </p>
                 </div>
             </div>

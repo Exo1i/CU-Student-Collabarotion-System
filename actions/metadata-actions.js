@@ -10,7 +10,7 @@ export const updateMetadata = async (metadata) => {
     }
 
     const client = await clerkClient()
-    let newRole;
+    let newRole = metadata?.role;
     if (metadata?.role === "admin")
         newRole = "student"
     try {
