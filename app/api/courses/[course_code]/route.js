@@ -41,18 +41,20 @@ export async function GET(request, { params }) {
       courseassignments.rows.map(async (assignment) => {
         const submissions = await pool.query(
           `
-           SELECT count(AssignmentSubmission.submission_id)
+           SELECT AssignmentSubmission.submission_id, COUNT(AssignmentSubmission.submission_id)
            FROM Submission
            JOIN AssignmentSubmission ON Submission.Submission_id = AssignmentSubmission.Submission_id
-           WHERE AssignmentSubmission.assignment_id = $1 AND submission.student_id = $2;
+           WHERE AssignmentSubmission.assignment_id = $1 AND submission.student_id = $2
+           GROUP BY AssignmentSubmission.submission_id
         `,
           [assignment.assignment_id, stud_id]
         );
 
-        const status =
-          submissions.rows[0].count > 0 ? "submitted" : "not_submitted";
+        const status = submissions.rowCount > 0 ? "submitted" : "not_submitted";
+        const id =
+          submissions.rowCount > 0 ? submissions.rows[0].submission_id : null;
         //console.log(submissions.rows[0].count);
-        return { ...assignment, status: status };
+        return { ...assignment, status: status, submissionID: id };
       })
     );
 
