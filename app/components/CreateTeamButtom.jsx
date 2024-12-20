@@ -17,7 +17,7 @@ import {Alert, AlertDescription, AlertTitle} from "@/components/ui/alert"
 import {CheckCircledIcon, CrossCircledIcon} from "@radix-ui/react-icons"
 import {useRouter} from "next/navigation"
 
-export default function CreateTeamButton({ userid , projectID , TeamNum }) {
+export default function CreateTeamButton({ userid , projectID , TeamNum , onRefresh }) {
     const [teamName, setTeamName] = useState("")
     const [isOpen, setIsOpen] = useState(false)
     const [notification, setNotification] = useState(null);
@@ -47,6 +47,7 @@ export default function CreateTeamButton({ userid , projectID , TeamNum }) {
                 setIsOpen(false);
                 setTeamName("");
                 router.refresh();
+                onRefresh();
             } else {
                 setNotification({
                     type: "error",

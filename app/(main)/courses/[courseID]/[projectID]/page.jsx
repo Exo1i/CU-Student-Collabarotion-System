@@ -97,7 +97,7 @@ export default function ProjectPage({ params }) {
             <div className="flex justify-center gap-6 items-center mb-8">
                 <h1 className="text-3xl font-bold">Project Teams</h1>
                 {Teams.length < parseInt(project.max_teams) && !currentuserdata && role === 'student' ?
-                    <CreateTeamButton projectID={projectID} userid={user.id} TeamNum={Teams.length + 1} />
+                    <CreateTeamButton projectID={projectID} userid={user.id} TeamNum={Teams.length + 1} onRefresh={handleRefresh} />
                     : null}
                 {role !== 'student' ?
                     <CustomLink className="text-center" href={`/courses/${courseID}/${projectID}/phases`}>

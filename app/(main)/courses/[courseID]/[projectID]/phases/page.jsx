@@ -9,7 +9,14 @@ import { CalendarIcon, ClockIcon, CodeIcon, UsersIcon } from 'lucide-react'
 import Phasesubmissionbutton from '@/app/components/phasesubmissionbuttom'
 import Loading from '@/app/(main)/loading'
 import { getRole } from '@/actions/GetRole'
+import { useUser } from '@clerk/nextjs';
 export default function ProjectPhasesPage({ params }) {
+    const [refreshKey, setRefreshKey] = useState(0);
+    const handleRefresh = () => {
+        console.log("handleRefresh");
+        setRefreshKey((prev) => prev + 1);
+    };
+    const { user, isLoaded, isSignedIn } = useUser();
     const [projectID, setProjectID] = useState(null);
     useEffect(() => {
         params.then(((resolvedparams) => {
@@ -37,7 +44,7 @@ export default function ProjectPhasesPage({ params }) {
             if (!projectID) return;
             console.log(projectID);
             try {
-                const res = await fetch(`/api/projects/${projectID}/phases`);
+                const res = await fetch(`/api/projects/${projectID}/phases?stud=${user.id}`);
                 if (!res.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
@@ -55,26 +62,27 @@ export default function ProjectPhasesPage({ params }) {
                 setLoading(false);
             }
         }
-
-        fetchprojectdata();
+        if (projectID && isLoaded && isSignedIn) {
+            fetchprojectdata();
+        }
         console.log(project)
-    }, [projectID])
+    }, [projectID, isLoaded, , refreshKey])
     const [progress, setProgress] = useState(0);
-    const [submittedphases, setsubmittedphases] = useState([]);
 
     useEffect(() => {
-        const completedload = project.phases.filter(phase => submittedphases.includes(phase.phase_num))
-            .reduce((sum, phase) => sum + phase.phase_load, 0)
-        setProgress(completedload);
-    }, [submittedphases])
-
+        if (project && project.phases) {
+            const submittedLoad = project.phases.reduce((sum, phase) =>
+                phase.status === "submitted" ? sum + phase.phase_load : sum, 0);
+            setProgress(submittedLoad);
+        }
+    }, [project , refreshKey]);
     if (loading) {
         return <Loading />
     }
     if (error) {
         return <div>Error: {error.message}</div>;
     }
-    if (!projectID || !project) {
+    if (!projectID || !project || !isLoaded || !isSignedIn) {
         return <Loading />
     } else {
         return (
@@ -179,7 +187,9 @@ export default function ProjectPhasesPage({ params }) {
                                                                 role === 'student' &&
                                                                 <Phasesubmissionbutton phase={phase}
                                                                     projectID={projectID}
-                                                                    setsubmittedphases={setsubmittedphases} />
+                                                                    onRefresh={handleRefresh}
+                                                                />
+
                                                             }
                                                         </motion.div>
                                                     </AnimatePresence>

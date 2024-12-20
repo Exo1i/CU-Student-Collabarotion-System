@@ -54,6 +54,7 @@ async function insertSampleData() {
       ('stud015', 'Ethan', 'Harris', 'student', 'https://placeholder.com/stud15.jpg', 'eharris');
     `);
 
+    //courses - 20 records
     await pool.query(`
       INSERT INTO Course (Course_Code, Course_Name, Course_img, description, Instructor_ID, max_Grade) VALUES
       ('CS101', 'Introduction to Programming', 'cs101.jpg', 'Basic programming concepts and principles', 'inst001', 100),
@@ -275,7 +276,8 @@ async function insertSampleData() {
         u.user_id, c.course_code;
     `);
 
-    // Participation - 20 records
+
+    //Participation - 20 records
     await pool.query(`
       INSERT INTO participation (student_ID, Project_ID, Team_Num, Leader) VALUES
       ('stud001', 1, 1, true),
@@ -298,21 +300,6 @@ async function insertSampleData() {
       ('stud013', 8, 2, true),
       ('stud014', 9, 2, true),
       ('stud015', 10, 2, true);
-    `);
-
-    //Attachments - 10 records
-    await pool.query(`
-      INSERT INTO Attachment (URL, Format) VALUES
-      ('https://storage.com/doc1.pdf', 'PDF'),
-      ('https://storage.com/presentation.pptx', 'PPTX'),
-      ('https://storage.com/code.zip', 'ZIP'),
-      ('https://storage.com/report.docx', 'DOCX'),
-      ('https://storage.com/diagram.png', 'PNG'),
-      ('https://storage.com/dataset.csv', 'CSV'),
-      ('https://storage.com/video.mp4', 'MP4'),
-      ('https://storage.com/audio.mp3', 'MP3'),
-      ('https://storage.com/image.jpg', 'JPG'),
-      ('https://storage.com/archive.rar', 'RAR');
     `);
 
     // Submissions - 10 records
@@ -345,21 +332,6 @@ async function insertSampleData() {
       (5, 2, 'Architecture', 40, '2024-03-25', 'System architecture design');
     `);
 
-    // SubmissionAttachment - 10 records
-    await pool.query(`
-      INSERT INTO SubmissionAttachment (Attachment_ID, Submission_ID) VALUES
-      (1, 1),
-      (2, 2),
-      (3, 3),
-      (4, 4),
-      (5, 5),
-      (6, 6),
-      (7, 7),
-      (8, 8),
-      (9, 9),
-      (10, 10);
-    `);
-
     // PhaseSubmission - 5 records
     await pool.query(`
       INSERT INTO PhaseSubmission (Submission_ID, Project_ID, Phase_Num) VALUES
@@ -368,16 +340,6 @@ async function insertSampleData() {
       (6, 2, 1),
       (8, 2, 2),
       (10, 5, 2);
-    `);
-
-    // AssignmentSubmission - 5 records
-    await pool.query(`
-      INSERT INTO AssignmentSubmission (Submission_ID, Assignment_ID) VALUES
-      (1, 1),
-      (3, 2),
-      (5, 3),
-      (7, 4),
-      (9, 5);
     `);
 
     // Review - 10 records
@@ -408,21 +370,6 @@ async function insertSampleData() {
       (8, 'stud008', '2024-01-08 19:00:00'),
       (9, 'stud009', '2024-01-09 20:00:00'),
       (10, 'stud010', '2024-01-10 21:00:00');
-    `);
-
-    // MessageAttachment - 10 records
-    await pool.query(`
-      INSERT INTO MessageAttachment (Message_ID, Attachment_ID) VALUES
-      (1, 1),
-      (2, 2),
-      (3, 3),
-      (4, 4),
-      (5, 5),
-      (6, 6),
-      (7, 7),
-      (8, 8),
-      (9, 9),
-      (10, 10);
     `);
 
     // EarnedBadges - 10 records

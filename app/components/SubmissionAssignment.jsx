@@ -6,8 +6,10 @@ import {Alert, AlertDescription, AlertTitle} from "@/components/ui/alert"
 import {CheckCircledIcon, CrossCircledIcon} from "@radix-ui/react-icons"
 import {addAssignmentSubmission} from "@/actions/add-assignmentsubmission";
 import {getRole} from "@/actions/GetRole";
-
-export default function SubmissionAssignment({ assignment }) {
+import { updateSubmission } from "@/actions/update-submission";
+import { useRouter } from "next/navigation";
+export default function SubmissionAssignment({ assignment , onRefresh }) {
+    const router = useRouter();
     const [notification, setNotification] = useState(null)
     const [assignmentPath, setassignmentPath] = useState("")
     const [role, setrole] = useState(null);
@@ -33,14 +35,14 @@ export default function SubmissionAssignment({ assignment }) {
     }, [notification])
     const handleAddAssignmentSubmission = async (e) => {
         e.preventDefault();
-        const file = assignmentPath !== "" ? assignmentPath : null;
-        if (file) {
-            console.log(file.name);
+        const url = assignmentPath !== "" ? assignmentPath.name : null;
+        if (url) {
+            console.log(url);
         } else {
             console.log("No file selected.");
         }
         try {
-            const res = await addAssignmentSubmission(assignment.assignment_id, file);
+            const res = await addAssignmentSubmission(assignment.assignment_id, url);
             console.log("response : " + res)
             if (res.status === 201) {
                 setNotification({
@@ -48,10 +50,38 @@ export default function SubmissionAssignment({ assignment }) {
                     title: "Submission added successfully",
                 })
                 router.refresh();
+                onRefresh();
             } else {
                 setNotification({
                     type: "error",
                     title: "Error adding submission",
+                    message: `${res.message}`
+                })
+            }
+        } catch (error) {
+            console.log(error)
+        }
+    }
+    const handleupdateSubmission = async (e) => {
+        e.preventDefault();
+        const url = assignmentPath !== "" ? assignmentPath.name : null;
+        if (url) {
+            console.log(url);
+        } else {
+            console.log("No file selected.");
+        }
+        try {
+            const res = await updateSubmission(assignment.submissionID, url);
+            console.log("response : " + res)
+            if (res.status === 200) {
+                setNotification({
+                    type: "success",
+                    title: "Submission updated successfully",
+                })
+            } else {
+                setNotification({
+                    type: "error",
+                    title: "Error update submission",
                     message: `${res.message}`
                 })
             }
@@ -71,12 +101,19 @@ export default function SubmissionAssignment({ assignment }) {
                             <PaperClipIcon className="h-5 w-5 mr-2" />
                             Add Attachment
                         </label>
-                        <button
+                        {
+                            assignment.status === 'not_submitted' ?                         <button
                             className="px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-md transition-colors duration-300 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                             onClick={handleAddAssignmentSubmission}
                         >
                             Submit
+                        </button> :                         <button
+                            className="px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-md transition-colors duration-300 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                            onClick={handleupdateSubmission}
+                        >
+                            update Submit
                         </button>
+                        }
                     </div>
                 }
                 <Input
