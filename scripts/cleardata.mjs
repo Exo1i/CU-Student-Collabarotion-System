@@ -20,8 +20,6 @@ async function clearDB() {
     await pool.query(`
       TRUNCATE TABLE 
         messageRead,
-        messageAttachment,
-        submissionAttachment,
         phaseSubmission,
         AssignmentSubmission,
         review,
@@ -37,7 +35,6 @@ async function clearDB() {
         Project,
         Assignment,
         Submission,
-        Attachment,
         Badge,
         Course,
         Users 

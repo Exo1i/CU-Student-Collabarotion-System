@@ -5,6 +5,9 @@ import { NextResponse } from "next/server";
 export async function GET(request, { params }) {
   try {
     const par = await params;
+    const { searchParams } = new URL(request.url);
+    const stud_id = searchParams.get("stud");
+
     const courseinfo = await pool.query(
       `SELECT course_code, course_name, course_img, COALESCE(description, '') AS course_description, max_grade, instructor_id, CONCAT(fname,' ',lname) AS full_name, img_url
        FROM course, users
@@ -28,16 +31,35 @@ export async function GET(request, { params }) {
       courseproject.rowCount === 0 ? "theory_only" : "project_based";
 
     const courseassignments = await pool.query(
-      `SELECT assignment_id, title, description, max_grade, due_date
+      `SELECT assignment_id, title, COALESCE(description, '') AS description, max_grade, due_date
        FROM assignment
        WHERE course_code = $1`,
       [par.course_code]
     );
 
+    const assignmentres = await Promise.all(
+      courseassignments.rows.map(async (assignment) => {
+        const submissions = await pool.query(
+          `
+           SELECT count(AssignmentSubmission.submission_id)
+           FROM Submission
+           JOIN AssignmentSubmission ON Submission.Submission_id = AssignmentSubmission.Submission_id
+           WHERE AssignmentSubmission.assignment_id = $1 AND submission.student_id = $2;
+        `,
+          [assignment.assignment_id, stud_id]
+        );
+
+        const status =
+          submissions.rows[0].count > 0 ? "submitted" : "not_submitted";
+        //console.log(submissions.rows[0].count);
+        return { ...assignment, status: status };
+      })
+    );
+
     const resp = {
       ...courseinfo.rows[0],
       project: project,
-      assignments: courseassignments.rows,
+      assignments: assignmentres,
       category: category,
     };
 
