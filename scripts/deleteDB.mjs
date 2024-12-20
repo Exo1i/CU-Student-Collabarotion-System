@@ -19,8 +19,6 @@ async function dropDB() {
     // Drop tables
     await pool.query(`
       DROP TABLE IF EXISTS messageRead;
-      DROP TABLE IF EXISTS messageAttachment;
-      DROP TABLE IF EXISTS submissionAttachment;
       DROP TABLE IF EXISTS phaseSubmission;
       DROP TABLE IF EXISTS AssignmentSubmission;
       DROP TABLE IF EXISTS review;
@@ -36,7 +34,6 @@ async function dropDB() {
       DROP TABLE IF EXISTS Project;
       DROP TABLE IF EXISTS Assignment;
       DROP TABLE IF EXISTS Submission;
-      DROP TABLE IF EXISTS Attachment;
       DROP TABLE IF EXISTS Badge;
       DROP TABLE IF EXISTS Course;
       DROP TABLE IF EXISTS Users;
