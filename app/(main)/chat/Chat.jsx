@@ -5,8 +5,7 @@ import useSWR from 'swr';
 import {useUser} from '@clerk/nextjs';
 import useChatStore from '@/hooks/useChatStore';
 import MessagesList from './MessagesList';
-import {Button} from '@/components/ui/button';
-import {Loader2, Paperclip} from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 import {io} from 'socket.io-client';
 import {useAlert} from '@/components/alert-context';
 import {insertMessage} from '@/actions/message-actions';
@@ -118,8 +117,8 @@ const Chat = ({disableInput, userRole}) => {
     }, [selectedGroupID, selectedChannel]);
 
     // Message sending handler
-    const handleSendMessage = async (message) => {
-        if (!message.trim()) {
+    const handleSendMessage = async ({ content, type }) => {
+        if (!content.trim()) {
             showAlert({message: 'Message cannot be empty.', severity: 'warning'});
             return;
         }
@@ -128,8 +127,8 @@ const Chat = ({disableInput, userRole}) => {
             const newMessage = await insertMessage(
                 selectedGroupID,
                 selectedChannel.channel_num,
-                message,
-                'message'
+                content,
+                type
             );
 
             addToMessagesList([
@@ -186,15 +185,16 @@ const Chat = ({disableInput, userRole}) => {
                 <h2 className="text-xl font-semibold truncate">
                     {selectedChannel.channel_name || 'Select a channel'}
                 </h2>
-                <div className="flex items-center space-x-2">
-                    <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => document.getElementById('file-input').click()}
-                    >
-                        <Paperclip size={20} />
-                    </Button>
-                </div>
+                {/* We're Not Going To Add attachments to messages*/}
+                {/*<div className="flex items-center space-x-2">*/}
+                {/*    <Button*/}
+                {/*        variant="ghost"*/}
+                {/*        size="icon"*/}
+                {/*        onClick={() => document.getElementById('file-input').click()}*/}
+                {/*    >*/}
+                {/*        <Paperclip size={20} />*/}
+                {/*    </Button>*/}
+                {/*</div>*/}
             </div>
 
             {/* Messages container */}
@@ -222,6 +222,7 @@ const Chat = ({disableInput, userRole}) => {
                     disabled={disableInput}
                     onSubmit={handleSendMessage}
                     placeholder={`Message #${selectedChannel.channel_name}`}
+                    userRole={userRole}
                 />
                 <input
                     type="file"
@@ -240,3 +241,4 @@ const Chat = ({disableInput, userRole}) => {
 };
 
 export default Chat;
+
