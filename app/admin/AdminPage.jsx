@@ -21,26 +21,24 @@ import {
   BooleanInput,
 } from "react-admin";
 
-import postgrestRestProvider, {
-  defaultSchema,
-} from "@raphiniert/ra-data-postgrest";
+import postgrestRestProvider, {defaultSchema,} from "@raphiniert/ra-data-postgrest";
 
 const config = {
-  apiUrl: "/api/admin",
-  httpClient: fetchUtils.fetchJson,
-  defaultListOp: "eq",
-  primaryKeys: new Map([
-    ["users", ["user_id"]],
-    ["course", ["course_code"]],
-    ["project", ["project_id"]],
-    ["assignment", ["assignment_id"]],
-    ["enrollment", ["course_code", "student_id"]],
-    ["chat_group", ["group_id"]],
-    ["channel", ["channel_num", "group_id"]],
-    ["message", ["message_id"]],
-    ["participation", ["project_id", "student_id", "team_num"]],
-  ]),
-  schema: defaultSchema,
+    apiUrl: process.env.NEXT_PUBLIC_POSTGREST_URL,
+    httpClient: fetchUtils.fetchJson,
+    defaultListOp: "eq",
+    primaryKeys: new Map([
+        ["users", ["user_id"]],
+        ["course", ["course_code"]],
+        ["project", ["project_id"]],
+        ["assignment", ["assignment_id"]],
+        ["enrollment", ["course_code", "student_id"]],
+        ["chat_group", ["group_id"]],
+        ["channel", ["channel_num", "group_id"]],
+        ["message", ["message_id"]],
+        ["participation", ["project_id", "student_id", "team_num"]],
+    ]),
+    schema: defaultSchema,
 };
 
 export const UserList = () => (
@@ -110,16 +108,16 @@ export const CourseList = () => (
 );
 
 export const CourseEdit = () => (
-  <Edit>
-    <SimpleForm>
-      <TextInput source="course_code" disabled />
-      <TextInput source="course_name" />
-      <ReferenceField source="instructor_id" reference="users">
-        <TextInput source="instructor_id" />
-      </ReferenceField>
-      <NumberInput source="max_grade" />
-    </SimpleForm>
-  </Edit>
+    <Edit>
+        <SimpleForm>
+            <TextInput source="course_code" disabled />
+            <TextInput source="course_name" />
+            <ReferenceInput source="instructor_id" filter={{role: "instructor"}} reference="users">
+                <SelectInput optionText={record => `${record.fname} ${record.lname}`} required />
+            </ReferenceInput>
+            <NumberInput source="max_grade" />
+        </SimpleForm>
+    </Edit>
 );
 
 export const CourseCreate = () => (
