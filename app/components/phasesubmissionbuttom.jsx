@@ -1,13 +1,13 @@
-import {Input} from "@/components/ui/input"
-import {PaperClipIcon} from '@heroicons/react/20/solid'
-import {Button} from "@/components/ui/button"
-import {RocketIcon} from "lucide-react"
-import {addphaseSubmission} from '@/actions/add-phasesubmission'
-import {useEffect, useState} from 'react'
-import {Alert, AlertDescription, AlertTitle} from "@/components/ui/alert"
-import {CheckCircledIcon, CrossCircledIcon} from "@radix-ui/react-icons"
-
-export default function Phasesubmissionbutton({ phase, projectID, setsubmittedphases }) {
+import { Input } from "@/components/ui/input"
+import { PaperClipIcon } from '@heroicons/react/20/solid'
+import { Button } from "@/components/ui/button"
+import { RocketIcon } from "lucide-react"
+import { addphaseSubmission } from '@/actions/add-phasesubmission'
+import { useEffect, useState } from 'react'
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
+import { CheckCircledIcon, CrossCircledIcon } from "@radix-ui/react-icons"
+import { updateSubmission } from "@/actions/update-submission"
+export default function Phasesubmissionbutton({ phase, projectID , onRefresh }) {
     const [notification, setNotification] = useState(null)
 
     useEffect(() => {
@@ -31,7 +31,7 @@ export default function Phasesubmissionbutton({ phase, projectID, setsubmittedph
                 console.log(`status code for phase submisiion :` + res.status);
                 console.log("notification before : " + notification);
                 if (res.status === 201) {
-                    setsubmittedphases(prev => [...prev, phasenum]);
+                    onRefresh();
                 } else {
                     setNotification({
                         type: "error",
@@ -57,6 +57,33 @@ export default function Phasesubmissionbutton({ phase, projectID, setsubmittedph
         }
     }
 
+    const handleupdateSubmission = async (e) => {
+        e.preventDefault();
+        const url = attachmentpath !== "" ? attachmentpath.name : null;
+        if (url) {
+            console.log(url);
+        } else {
+            console.log("No file selected.");
+        }
+        try {
+            const res = await updateSubmission(phase.submissionID, url);
+            console.log("response : " + res)
+            if (res.status === 200) {
+                setNotification({
+                    type: "success",
+                    title: "Submission updated successfully",
+                })
+            } else {
+                setNotification({
+                    type: "error",
+                    title: "Error update submission",
+                    message: `${res.message}`
+                })
+            }
+        } catch (error) {
+            console.log(error)
+        }
+    }
 
     return (
         <>
@@ -76,13 +103,21 @@ export default function Phasesubmissionbutton({ phase, projectID, setsubmittedph
                     className='hidden'
                 />
             </div>
-            <Button
-                onClick={(e) => handellersubmitted(e, phase.phase_num)}
-                className="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white"
-            >
-                <RocketIcon className="w-4 h-4 mr-2" />
-                Submit Phase
-            </Button>
+            {
+                phase.status === 'not_submitted' ? <Button
+                    onClick={(e) => handellersubmitted(e, phase.phase_num)}
+                    className="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white"
+                >
+                    <RocketIcon className="w-4 h-4 mr-2" />
+                    Submit Phase
+                </Button> : <Button
+                    onClick={handleupdateSubmission}
+                    className="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white"
+                >
+                    <RocketIcon className="w-4 h-4 mr-2" />
+                    update Submiting Phase
+                </Button>
+            }
             {
                 notification && (
                     <Alert

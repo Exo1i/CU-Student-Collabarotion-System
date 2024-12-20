@@ -47,7 +47,7 @@ const BadgeItem = ({badge, userId, role, onBadgeDeleted}) => (<TooltipProvider>
             <div
                 className="relative p-3 bg-gradient-to-br from-blue-50 to-purple-50 shadow-md hover:shadow-lg rounded-full transition-transform duration-300 hover:scale-110">
                 <Image
-                    src={badge?.picture}
+                    src={badge.picture || '/courseImg/badge.jpg'}
                     alt={badge.title}
                     width={40}
                     height={40}
