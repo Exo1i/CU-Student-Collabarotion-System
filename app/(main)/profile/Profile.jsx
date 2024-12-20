@@ -1,13 +1,14 @@
 'use client'
-import { useEffect, useState } from 'react'
+import {useEffect, useState} from 'react'
 import Image from 'next/image'
-import { AwardIcon, CodeIcon, CrownIcon, UserIcon } from 'lucide-react'
-import { notFound } from 'next/navigation'
+import {AwardIcon, CodeIcon, CrownIcon, UserIcon} from 'lucide-react'
+import {notFound} from 'next/navigation'
 import ProfileReview from '@/app/components/ProfileReview'
 import Loading from "@/app/(main)/loading";
 import BadgeSection from "@/app/components/Badges";
 import GradesSection from '@/app/components/GradesSection'
-const ProfileHeader = ({ imageUrl, fullName }) => (
+
+const ProfileHeader = ({imageUrl, fullName}) => (
     <div className="h-32 bg-gradient-to-r from-blue-500 to-purple-600 relative">
         <div className="absolute inset-0 bg-black opacity-20" />
         <div className="absolute inset-0 flex items-center justify-center">
@@ -28,10 +29,10 @@ const ProfileHeader = ({ imageUrl, fullName }) => (
     </div>
 )
 
-const TeamCard = ({ team }) => (
+const TeamCard = ({team}) => (
     <div
         className={`p-4 rounded-lg transition-transform duration-300 hover:scale-105 hover:shadow-xl ${team.leader ? 'bg-gradient-to-br from-yellow-100 to-yellow-200' : 'bg-gradient-to-br from-gray-100 to-gray-200'
-            }`}
+        }`}
     >
         <div className="flex justify-between">
             <h2>{team.team_name}</h2>
@@ -39,7 +40,7 @@ const TeamCard = ({ team }) => (
         </div>
         <span
             className={`px-2 py-1 rounded-full text-sm font-medium ${team.leader ? 'bg-yellow-300 text-yellow-800' : 'bg-gray-300 text-gray-800'
-                }`}
+            }`}
         >
             {team.leader ? "leader" : "member"}
         </span>
@@ -76,11 +77,11 @@ const useUserData = (userId) => {
         fetchData()
     }, [userId])
 
-    return { userData, error, loading, setUserData }
+    return {userData, error, loading, setUserData}
 }
 
-export default function Profile({ userID, role, myprofile }) {
-    const { userData, error, loading, setUserData } = useUserData(userID)
+export default function Profile({userID, role, myprofile}) {
+    const {userData, error, loading, setUserData} = useUserData(userID)
 
     const handleBadgeChange = (newBadges) => {
         setUserData((prevData) => ({

@@ -29,7 +29,6 @@ export function NavUser() {
                                 userButtonAvatarBox: "h-[3em] w-[3em] rounded-full",
                             },
                         }}
-                        afterSignOutUrl="/"
                     />
                 </div>
                 <div className="grid flex-1 text-left text-sm leading-tight ml-2">
