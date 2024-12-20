@@ -6,13 +6,14 @@ import {REGEXP_ONLY_DIGITS} from "input-otp";
 import {Button} from "@/components/ui/button";
 import {Alert, AlertDescription, AlertTitle} from "@/components/ui/alert";
 import {AlertCircle} from "lucide-react";
+import {useAlert} from "@/components/alert-context";
 
-export default function VerifyingEmailView({signUp, isInstructor, setActive}) {
+export default function VerifyingEmailView({signUp, setActive}) {
     const [value, setValue] = useState("");
     const [error, setError] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
     const router = useRouter();
-
+    const {showAlert} = useAlert()
     const handleChange = async (newVal) => {
         setValue(newVal);
         setError(null);
@@ -21,9 +22,19 @@ export default function VerifyingEmailView({signUp, isInstructor, setActive}) {
             setIsLoading(true);
             try {
                 await signUp.attemptEmailAddressVerification({code: newVal});
-            } finally {
                 await setActive({session: signUp.createdSessionId});
-                router.push('/dashboard');
+                router.push('/onboarding');
+            } catch (error) {
+                setError(
+                    error instanceof Error
+                        ? error.message
+                        : "Failed to verify email"
+                );
+                showAlert({
+                    message: error instanceof Error ? error.message : "Failed to verify email",
+                    severity: "error",
+                });
+            } finally {
                 setIsLoading(false);
             }
         }
@@ -31,7 +42,10 @@ export default function VerifyingEmailView({signUp, isInstructor, setActive}) {
     const handleResendVerification = async () => {
         try {
             await signUp.prepareEmailAddressVerification();
-            alert("A new OTP has been sent to your inbox");
+            showAlert({
+                message: "Verification email sent successfully",
+                severity: "success",
+            });
         } catch (error) {
             setError(
                 error instanceof Error

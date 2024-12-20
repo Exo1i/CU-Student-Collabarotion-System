@@ -144,14 +144,14 @@ export const ChannelsList = ({
     }, [channels, searchTerm]);
 
     // Only show management options for admins
-    const canManageChannels = userRole === 'admin';
+    const canManageChannels = userRole === 'admin' || userRole === 'instructor';
 
 
-    return (<div className={'flex flex-col space-y-4'}>
+    return (<div className={'flex flex-shrink-0 flex-col space-y-4'}>
         <div className="p-4 border-b">
             <div className="relative flex-grow">
                 <Input
-                    placeholder="Search Channels"
+                    placeholder="Search"
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                 />

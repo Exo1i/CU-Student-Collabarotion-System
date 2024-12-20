@@ -7,7 +7,9 @@ import {Button} from '@/components/ui/button'
 import {Input} from '@/components/ui/input'
 import {deleteMessage, editMessage} from '@/actions/message-actions'
 import {Check, Pencil, Trash2, X} from 'lucide-react'
-import Image from "next/image";
+import Image from "next/image"
+import MessageTypeIndicator from "@/app/(main)/chat/MessageTypeIndicator";
+
 
 const MessagesList = ({messages, onMessageUpdate, userRole}) => {
     const {user} = useUser()
@@ -86,8 +88,9 @@ const MessagesList = ({messages, onMessageUpdate, userRole}) => {
                 <div className="flex flex-col w-full max-w-[80%]">
                     {/* Username for non-current user */}
                     {!isSentByCurrentUser && (
-                        <div className="font-semibold text-sm mb-1">
-                            {message.username || 'Anonymous'}
+                        <div className="flex-col font-semibold text-sm mb-1 flex ">
+                            <MessageTypeIndicator type={message.type} />
+                            <div className="ml-2">{message.username || 'Anonymous'}</div>
                         </div>
                     )}
 
@@ -130,6 +133,11 @@ const MessagesList = ({messages, onMessageUpdate, userRole}) => {
                                         : 'bg-slate-50 rounded-r-xl rounded-bl-xl self-start'
                                 }`}
                             >
+                                {isSentByCurrentUser && (
+                                    <div className="flex justify-end mb-1">
+                                        <MessageTypeIndicator type={message.type} />
+                                    </div>
+                                )}
                                 {message.content}
                             </div>
 
@@ -187,3 +195,4 @@ const MessagesList = ({messages, onMessageUpdate, userRole}) => {
 }
 
 export default MessagesList
+

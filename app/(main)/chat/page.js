@@ -50,6 +50,8 @@ export default function ChatPage() {
         }
 
         if (error) {
+            setSelectedGroupID(null);
+            setSelectedChannel(null);
             setTimeout(() => {
                 showAlert({
                     message: 'Error loading channels. Please try again.', severity: 'error', position: 'bottom-right',
