@@ -30,11 +30,6 @@ export default function AssignmentList({ assignments, onModify }) {
   const { showAlert } = useAlert();
   const [editingAssignment, setEditingAssignment] = useState(null);
 
-  // const refreshPage = () => { TODO: IMPLEMENT IF FOR ASSIGNMENT CREATION
-  //   const router = useRouter();
-  //   router.refresh();
-  // };
-
   const handleEditClick = (assignment) => {
     setEditingAssignment({ ...assignment });
   };
