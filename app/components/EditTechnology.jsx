@@ -9,7 +9,7 @@ import { useRouter } from "next/navigation"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { CheckCircledIcon, CrossCircledIcon } from "@radix-ui/react-icons"
 import { DeleteTechnology } from "@/actions/delete-technology";
-export default function EditTechnology({ technologies, projectId, teamNum, isUserLeader, isUserInThisTeam }) {
+export default function EditTechnology({ technologies, projectId, teamNum, isUserLeader, isUserInThisTeam , onRefresh }) {
     const [newTechnology, setNewTechnology] = useState('');
     const [notification, setNotification] = useState(null);
     const router = useRouter();
@@ -28,7 +28,7 @@ export default function EditTechnology({ technologies, projectId, teamNum, isUse
             try {
                 const res = await AddTechnology(projectId, teamNum, newTechnology);
                 if (res.status === 201) {
-                    router.refresh();
+                    onRefresh();
                 } else {
                     setNotification({
                         type: "error",
@@ -47,7 +47,7 @@ export default function EditTechnology({ technologies, projectId, teamNum, isUse
         try {
             const res = await DeleteTechnology(projectId, teamNum, tech);
             if (res.status === 200) {
-                router.refresh();
+                onRefresh();
             } else {
                 setNotification({
                     type: "error",
@@ -61,8 +61,8 @@ export default function EditTechnology({ technologies, projectId, teamNum, isUse
     return (
         <>
             <div className="flex items-center justify-center flex-wrap gap-2 pt-6 mb-4">
-                {technologies.map((tech) => (
-                    <Badge key={tech} variant="secondary" className="flex items-center gap-1">
+                {technologies.map((tech , index) => (
+                    <Badge key={index} variant="secondary" className="flex items-center gap-1">
                         {tech}
                         {isUserLeader && isUserInThisTeam && (
                             <button
