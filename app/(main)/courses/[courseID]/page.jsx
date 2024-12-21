@@ -1,20 +1,20 @@
 'use client'
-import {notFound, usePathname} from "next/navigation";
-import {UserGroupIcon} from "@heroicons/react/20/solid";
+import { notFound, usePathname } from "next/navigation";
+import { UserGroupIcon } from "@heroicons/react/20/solid";
 import Image from "next/image";
-import {CalendarIcon, ClockIcon} from "lucide-react";
+import { CalendarIcon, ClockIcon } from "lucide-react";
 import CustomLink from "@/app/components/MyCustomLink";
 import SubmissionAssignment from "@/app/components/SubmissionAssignment";
-import {useEffect, useState} from "react";
+import { useEffect, useState } from "react";
 import Loading from "@/app/(main)/loading";
 import { useUser } from '@clerk/nextjs';
 export default function CoursePage() {
     const [refreshKey, setRefreshKey] = useState(0);
     const handleRefresh = () => {
         console.log("handleRefresh");
-        setRefreshKey((prev) => prev + 1); 
+        setRefreshKey((prev) => prev + 1);
     };
-    const { user  , isLoaded , isSignedIn } = useUser();
+    const { user, isLoaded, isSignedIn } = useUser();
     const pathname = usePathname();
     console.log("path : " + pathname);
     const [courseCode, setCourseCode] = useState(null);
@@ -49,8 +49,8 @@ export default function CoursePage() {
         if (courseCode && isLoaded && isSignedIn) {
             fetchCourseData()
         }
-    }, [courseCode , isLoaded , isSignedIn , refreshKey])
-    if (loading || !isLoaded || !isSignedIn ) {
+    }, [courseCode, isLoaded, isSignedIn, refreshKey])
+    if (loading || !isLoaded || !isSignedIn) {
         return <Loading />
     }
     if (error) {
@@ -156,11 +156,13 @@ export default function CoursePage() {
                                 <CalendarIcon className="h-5 w-5 mr-2 text-indigo-500" />
                                 End: {new Date(course.project.end_date).toLocaleDateString()}
                             </div>
-                            <div className="flex items-center">
-                                <CustomLink href={`/courses/${course.course_code}/${course.project.project_id}`}>
-                                    see project teams
-                                </CustomLink>
-                            </div>
+                            {
+                                course?.category === "project_based" && <div className="flex items-center">
+                                    <CustomLink href={`/courses/${course.course_code}/${course.project.project_id}`}>
+                                        see project teams
+                                    </CustomLink>
+                                </div>
+                            }
                         </div>
                     </div>
                 </div>
