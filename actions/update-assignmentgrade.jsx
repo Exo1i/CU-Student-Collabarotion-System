@@ -1,7 +1,7 @@
 "use server";
 import pool from "@/lib/db";
 
-export async function addAssignmentGrade(subID, submittedGrade) {
+export async function AddSubmissionGrade(subID, submittedGrade) {
   submittedGrade = Number(submittedGrade);
 
   // Validate input more rigorously
