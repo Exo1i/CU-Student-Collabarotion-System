@@ -10,7 +10,7 @@ export async function addphaseSubmission(projectID, phaseNum , url) {
     if (!projectID || !phaseNum || !url) {
         return {
             status: 422,
-            message: 'Invalid user data',
+            message: 'Invalid phase submission data',
         };
     }
     try {
