@@ -44,6 +44,8 @@ const config = {
     ["submission", ["submission_id"]],
     ["team", ["project_id", "team_num"]],
     ["review", ["reviewer_id", "reviewee_id", "project_id"]],
+    ["technology", ["project_id", "team_num", "technology"]],
+    ["phase", ["project_id", "phase_num"]],
   ]),
   schema: defaultSchema,
 };
@@ -448,9 +450,6 @@ export const participationCreate = () => (
         <SelectInput optionText="username" />
       </ReferenceInput>
       <NumberInput source="team_num" />
-      {/* <ReferenceInput source="team_num" reference="team">
-        <SelectInput optionText="team_num" />
-      </ReferenceInput> */}
       <BooleanInput source="leader" />
     </SimpleForm>
   </Create>
@@ -662,6 +661,88 @@ export const ReviewCreate = () => (
   </Create>
 );
 
+export const technologyList = () => (
+  <List>
+    <Datagrid rowClick="edit">
+      <ReferenceField source="project_id" reference="project">
+        <TextField source="project_name" />
+      </ReferenceField>
+      <NumberField source="team_num" />
+      <TextField source="technology" />
+    </Datagrid>
+  </List>
+);
+
+export const technologyEdit = () => (
+  <Edit>
+    <SimpleForm>
+      <ReferenceInput source="project_id" reference="project">
+        <SelectInput optionText="project_name" disabled />
+      </ReferenceInput>
+      <NumberInput source="team_num" />
+      <TextInput source="technology" />
+    </SimpleForm>
+  </Edit>
+);
+
+export const technologyCreate = () => (
+  <Create>
+    <SimpleForm>
+      <ReferenceInput source="project_id" reference="project">
+        <SelectInput optionText="project_name" />
+      </ReferenceInput>
+      <NumberInput source="team_num" />
+      <TextInput source="technology" />
+    </SimpleForm>
+  </Create>
+);
+
+export const phaseList = () => (
+  <List>
+    <Datagrid rowClick="edit">
+      <ReferenceField source="project_id" reference="project">
+        <TextField source="project_name" />
+      </ReferenceField>
+      <NumberField source="phase_num" />
+      <TextField source="phase_name" />
+      <TextField source="description" />
+      <NumberField source="phase_load" />
+      <DateField source="deadline" />
+    </Datagrid>
+  </List>
+);
+
+export const phaseEdit = () => (
+  <Edit>
+    <SimpleForm>
+      <ReferenceInput source="project_id" reference="project">
+        <SelectInput optionText="project_name" disabled />
+      </ReferenceInput>
+      <NumberInput source="phase_num" disabled />
+      <TextInput source="phase_name" />
+      <TextInput source="description" />
+      <NumberInput source="phase_load" />
+      <DateInput source="deadline" />
+    </SimpleForm>
+  </Edit>
+);
+
+export const phaseCreate = () => (
+  <Create>
+    <SimpleForm>
+      <ReferenceInput source="project_id" reference="project">
+        <SelectInput optionText="project_name" />
+      </ReferenceInput>
+      <NumberInput source="phase_num" />
+      <TextInput source="phase_name" />
+
+      <TextInput source="description" />
+      <NumberInput source="phase_load" />
+      <DateInput source="deadline" />
+    </SimpleForm>
+  </Create>
+);
+
 export default function AdminPage() {
   const dataProvider = postgrestRestProvider(config);
 
@@ -764,6 +845,20 @@ export default function AdminPage() {
         edit={ReviewEdit}
         create={ReviewCreate}
         recordRepresentation="review"
+      />
+      <Resource
+        name="technology"
+        list={technologyList}
+        edit={technologyEdit}
+        create={technologyCreate}
+        recordRepresentation="technology"
+      />
+      <Resource
+        name="phase"
+        list={phaseList}
+        edit={phaseEdit}
+        create={phaseCreate}
+        recordRepresentation="phase"
       />
     </Admin>
   );
