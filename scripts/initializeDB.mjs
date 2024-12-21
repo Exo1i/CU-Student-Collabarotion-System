@@ -319,6 +319,7 @@ async function initializeDB() {
     } catch (err) {
         console.error("Error initializing database:", err);
     }
+    
 }
 
 initializeDB();
