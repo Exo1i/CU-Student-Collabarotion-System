@@ -38,7 +38,10 @@ export default function StudentSubmissions({ submissions }) {
             severity: "success",
           });
       } catch (e) {
-        console.log(e);
+        showAlert({
+          message: e.message,
+          severity: "error",
+        });
       }
     };
     gradeChange().then(() => {
