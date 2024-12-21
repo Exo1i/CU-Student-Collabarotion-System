@@ -96,8 +96,10 @@ export async function GET(request, { params }) {
         }
 
         let status;
-        if (!submissionDate) {
+        if (!submissionDate && new Date() > new Date(phase.deadline)) {
           status = "missed";
+        } else if (!submissionDate && new Date() <= new Date(phase.deadline)) {
+          status = "in progress";
         } else if (new Date(submissionDate) <= new Date(phase.deadline)) {
           status = "done";
         } else {

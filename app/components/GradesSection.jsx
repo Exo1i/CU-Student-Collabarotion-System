@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
+import React from 'react';
 import Loading from '../(main)/loading'
 
 export default function GradesSection({ userId }) {
@@ -56,59 +57,63 @@ export default function GradesSection({ userId }) {
                 Your Grades
             </h2>
             {grades.map((course) => (
-                <Card key={course.course_code} className="hover:shadow-lg transition-shadow duration-300">
-                    <CardHeader>
-                        <CardTitle>{course.course_name} ({course.course_code})</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        <div className="space-y-4">
-                            <div>
-                                <h3 className="font-semibold mb-2">Assignments</h3>
-                                {course?.assignmentsGrades?.assignments?.length > 0 ? (
-                                    course.assignmentsGrades.assignments.map((assignment, index) => (
-                                        <div key={index} className="mb-2">
-                                            <div className="flex justify-between text-sm">
-                                                <span>{assignment.title}</span>
-                                                <span>{assignment.grade}/{assignment.max_grade}</span>
-                                            </div>
-                                            <Progress value={(assignment.grade / assignment.max_grade) * 100}
-                                                className="h-2" />
+                <React.Fragment key={course.course_code}>
+                    {((course?.assignmentsGrades?.assignments?.length > 0) || (course?.projectGrades?.phases?.length > 0)) && (
+                        <Card className="hover:shadow-lg transition-shadow duration-300">
+                            <CardHeader>
+                                <CardTitle>{course.course_name} ({course.course_code})</CardTitle>
+                            </CardHeader>
+                            <CardContent>
+                                <div className="space-y-4">
+                                    <div>
+                                        <h3 className="font-semibold mb-2">Assignments</h3>
+                                        {course?.assignmentsGrades?.assignments?.length > 0 ? (
+                                            course.assignmentsGrades.assignments.map((assignment, index) => (
+                                                <div key={index} className="mb-2">
+                                                    <div className="flex justify-between text-sm">
+                                                        <span>{assignment.title}</span>
+                                                        <span>{assignment.grade}/{assignment.max_grade}</span>
+                                                    </div>
+                                                    <Progress value={(assignment.grade / assignment.max_grade) * 100}
+                                                        className="h-2" />
+                                                </div>
+                                            ))
+                                        ) : (
+                                            <p className="text-gray-500 italic">No assignments graded yet.</p>
+                                        )}
+                                    </div>
+                                    <div>
+                                        <h3 className="font-semibold mb-2">Project</h3>
+                                        {course.projectGrades.phases.length > 0 ? (
+                                            course.projectGrades.phases.map((phase, index) => (
+                                                <div key={index} className="mb-2">
+                                                    <div className="flex justify-between text-sm">
+                                                        <span>{phase.title}</span>
+                                                        <span>{phase.grade}/{course.projectGrades.max_grade}</span>
+                                                    </div>
+                                                    <Progress value={(phase.grade / course.projectGrades.max_grade) * 100}
+                                                        className="h-2" />
+                                                </div>
+                                            ))
+                                        ) : (
+                                            <p className="text-gray-500 italic">No project phases graded yet.</p>
+                                        )}
+                                    </div>
+                                    <div>
+                                        <h3 className="font-semibold">Total Grade</h3>
+                                        <div className="flex justify-between items-center">
+                                            <Progress
+                                                value={(course.total_grade / (course.projectGrades.max_grade + (course.assignmentsGrades.assignments?.reduce((sum, a) => sum + a.max_grade, 0) || 0))) * 100}
+                                                className="h-4 flex-grow mr-4" />
+                                            <span
+                                                className="font-bold">{course.total_grade}/{course.projectGrades.max_grade + (course.assignmentsGrades.assignments?.reduce((sum, a) => sum + a.max_grade, 0) || 0)}</span>
                                         </div>
-                                    ))
-                                ) : (
-                                    <p className="text-gray-500 italic">No assignments graded yet.</p>
-                                )}
-                            </div>
-                            <div>
-                                <h3 className="font-semibold mb-2">Project</h3>
-                                {course.projectGrades.phases.length > 0 ? (
-                                    course.projectGrades.phases.map((phase, index) => (
-                                        <div key={index} className="mb-2">
-                                            <div className="flex justify-between text-sm">
-                                                <span>{phase.title}</span>
-                                                <span>{phase.grade}/{course.projectGrades.max_grade}</span>
-                                            </div>
-                                            <Progress value={(phase.grade / course.projectGrades.max_grade) * 100}
-                                                className="h-2" />
-                                        </div>
-                                    ))
-                                ) : (
-                                    <p className="text-gray-500 italic">No project phases graded yet.</p>
-                                )}
-                            </div>
-                            <div>
-                                <h3 className="font-semibold">Total Grade</h3>
-                                <div className="flex justify-between items-center">
-                                    <Progress
-                                        value={(course.total_grade / (course.projectGrades.max_grade + (course.assignmentsGrades.assignments?.reduce((sum, a) => sum + a.max_grade, 0)))) * 100}
-                                        className="h-4 flex-grow mr-4" />
-                                    <span
-                                        className="font-bold">{course.total_grade}/{course.projectGrades.max_grade + (course.assignmentsGrades.assignments?.reduce((sum, a) => sum + a.max_grade, 0))}</span>
+                                    </div>
                                 </div>
-                            </div>
-                        </div>
-                    </CardContent>
-                </Card>
+                            </CardContent>
+                        </Card>
+                    )}
+                </React.Fragment>
             ))}
         </div>
     )
