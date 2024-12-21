@@ -22,7 +22,7 @@ const BadgeSection = ({badges, userId, role, onBadgeChange}) => {
                 <h2 className="text-3xl font-bold text-gradient bg-gradient-to-r from-blue-500 to-purple-600 text-transparent bg-clip-text tracking-wide mr-2">
                     Student Badges
                 </h2>)}
-            {role === 'admin' && (<GiveBadgeDialog userId={userId} onBadgeAdded={handleBadgeAdded}>
+            {role !== 'student' && (<GiveBadgeDialog userId={userId} onBadgeAdded={handleBadgeAdded}>
                 <Button variant="outline" size="icon">
                     <PlusCircleIcon className="h-4 w-4" />
                     <span className="sr-only">Give Badge</span>
