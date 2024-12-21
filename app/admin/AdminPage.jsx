@@ -25,6 +25,8 @@ import {
 import postgrestRestProvider, {defaultSchema} from "@raphiniert/ra-data-postgrest";
 import {Button} from "@/components/ui/button";
 import {useRouter} from "next/navigation";
+import {useState} from "react";
+import AddAdminModal from "@/app/admin/AddAdminForm";
 
 // Updated configuration with proper search operator
 const config = {
@@ -34,23 +36,44 @@ const config = {
     primaryKeys: new Map([["users", ["user_id"]], ["course", ["course_code"]], ["project", ["project_id"]], ["assignment", ["assignment_id"]], ["enrollment", ["course_code", "student_id"]], ["chat_group", ["group_id"]], ["channel", ["channel_num", "group_id"]], ["message", ["message_id"]], ["participation", ["project_id", "student_id", "team_num"]]]),
     schema: defaultSchema,
 };
-
 // Users
-export const UserList = () => (<List
-    sort={{field: "user_id", order: "ASC"}}
-    filters={[<SearchInput source="username" placeholder="Search by username" alwaysOn name={"username"}
-                           key={"username"} />]}
->
-    <Datagrid rowClick="edit">
-        <TextField source="user_id" />
-        <TextField source="username" />
-        <TextField source="fname" />
-        <TextField source="lname" />
-        <TextField source="role" />
-        <TextField source="img_url" />
-    </Datagrid>
-</List>);
+export const UserList = () => {
+    const [isModalOpen, setIsModalOpen] = useState(false);
 
+    return (<>
+        <List
+            sort={{field: "user_id", order: "ASC"}}
+            filters={[<SearchInput
+                source="username"
+                placeholder="Search by username"
+                alwaysOn
+                name={"username"}
+                key={"username"}
+            />,]}
+        >
+            <Datagrid rowClick="edit">
+                <TextField source="user_id" label="User ID" />
+                <TextField source="username" label="Username" />
+                <TextField source="fname" label="First Name" />
+                <TextField source="lname" label="Last Name" />
+                <TextField source="role" label="Role" />
+                <TextField source="img_url" label="Image URL" />
+            </Datagrid>
+        </List>
+        <div className="flex justify-center mt-4">
+            <Button
+                onClick={() => setIsModalOpen(true)}
+                className="bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 transition duration-200"
+            >
+                Add Admin
+            </Button>
+        </div>
+        {isModalOpen && (<AddAdminModal
+            isOpen={isModalOpen}
+            onClose={() => setIsModalOpen(false)}
+        />)}
+    </>);
+};
 export const UserEdit = () => (<Edit>
     <SimpleForm>
         <TextInput source="user_id" disabled />
@@ -423,7 +446,7 @@ export default function AdminPage() {
     return (<>
         <Button
             onClick={handleGoBack}
-            className="m-4 fixed left-0 bottom-0 z-50"
+            className="m-4 absolute left-0 bottom-0 z-10"
         >
             Go back to dashboard
         </Button>
@@ -491,3 +514,4 @@ export default function AdminPage() {
         </Admin>
     </>);
 }
+

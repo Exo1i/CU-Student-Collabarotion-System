@@ -115,6 +115,6 @@ async function deleteUserFromDatabase(clerkUserId) {
 
 // Determine user role based on Clerk metadata or email
 function determineUserRole(clerkUser) {
-
-    return clerkUser.publicMetadata?.role ?? 'student'
+    console.log('Clerk user:', clerkUser);
+    return clerkUser.public_metadata?.role ?? 'student'
 }
