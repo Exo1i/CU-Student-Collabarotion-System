@@ -3,17 +3,6 @@ import pool from "@/lib/db";
 import { NextResponse } from "next/server";
 
 // Query functions
-async function getspeakingalot() {
-  const result = await pool.query(`
-    SELECT username , COUNT(*) AS message_count 
-    FROM message 
-    JOIN users ON users.user_id = message.sender_id 
-    GROUP BY username 
-    ORDER BY message_count DESC 
-    LIMIT 1;
-`)
-  return result.rows;
-}
 async function getAllProjects() {
   const result = await pool.query(`
     SELECT project_id, project_name
@@ -236,13 +225,12 @@ async function getTopStudentForCourse(courseCode) {
 export async function GET(request) {
   try {
     // Get all stats in parallel
-    const [topRatedOverall, projects, topGradesOverall, courses , toptalking] =
+    const [topRatedOverall, projects, topGradesOverall, courses] =
       await Promise.all([
         getTopRatedOverall(),
         getAllProjects(),
         getTopGradesOverall(),
         getAllCourses(),
-        getspeakingalot()
       ]);
 
     // Get top students for each project
@@ -280,11 +268,8 @@ export async function GET(request) {
         overall: topGradesOverall,
         byCourse: filteredCourses,
       },
-      topchatterbox: {
-        overall: toptalking[0]
-      }
     };
-    console.log("chatterbox student: " + JSON.stringify(toptalking));
+
     return NextResponse.json(resp, { status: 200 });
   } catch (error) {
     console.error("Error fetching student performance statistics:", error);
