@@ -15,7 +15,11 @@ import {
 import { useAlert } from "./alert-context";
 import { addAssignment } from "@/actions/add-assignment";
 
-export default function CreateAssignment({ onCreateAssignment, courseCode }) {
+export default function CreateAssignment({
+  onCreateAssignment,
+  courseCode,
+  onrefresh,
+}) {
   const [isOpen, setIsOpen] = useState(false);
   const { showAlert } = useAlert();
   const [assignment, setAssignment] = useState({
@@ -64,6 +68,7 @@ export default function CreateAssignment({ onCreateAssignment, courseCode }) {
         description: "",
         course_code: courseCode,
       });
+      onrefresh();
       setIsOpen(false);
     });
   };
