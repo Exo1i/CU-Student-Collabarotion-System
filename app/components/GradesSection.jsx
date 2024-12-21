@@ -1,11 +1,11 @@
 'use client'
 
-import {useEffect, useState} from 'react'
-import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card"
-import {Progress} from "@/components/ui/progress"
+import { useEffect, useState } from 'react'
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Progress } from "@/components/ui/progress"
 import Loading from '../(main)/loading'
 
-export default function GradesSection({userId}) {
+export default function GradesSection({ userId }) {
     const [grades, setGrades] = useState([]);
     const [isLoading, setIsLoading] = useState(true)
     const [error, setError] = useState(null)
@@ -72,7 +72,7 @@ export default function GradesSection({userId}) {
                                                 <span>{assignment.grade}/{assignment.max_grade}</span>
                                             </div>
                                             <Progress value={(assignment.grade / assignment.max_grade) * 100}
-                                                      className="h-2" />
+                                                className="h-2" />
                                         </div>
                                     ))
                                 ) : (
@@ -89,7 +89,7 @@ export default function GradesSection({userId}) {
                                                 <span>{phase.grade}/{course.projectGrades.max_grade}</span>
                                             </div>
                                             <Progress value={(phase.grade / course.projectGrades.max_grade) * 100}
-                                                      className="h-2" />
+                                                className="h-2" />
                                         </div>
                                     ))
                                 ) : (

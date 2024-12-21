@@ -134,8 +134,8 @@ export default function Profile({userID, role, myprofile}) {
                         <h1 className="font-bold text-2xl">Current Teams</h1>
                     </div>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        {userData.teams.map((team) => (
-                            <TeamCard key={team.team_num} team={team} />
+                        {userData.teams.map((team , index) => (
+                            <TeamCard key={index} team={team} />
                         ))}
                     </div>
                 </div>

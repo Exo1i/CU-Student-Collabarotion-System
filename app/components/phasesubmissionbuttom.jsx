@@ -7,7 +7,7 @@ import { useEffect, useState } from 'react'
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { CheckCircledIcon, CrossCircledIcon } from "@radix-ui/react-icons"
 import { updateSubmission } from "@/actions/update-submission"
-export default function Phasesubmissionbutton({ phase, projectID , onRefresh }) {
+export default function Phasesubmissionbutton({ phase, projectID, onRefresh }) {
     const [notification, setNotification] = useState(null)
 
     useEffect(() => {
@@ -22,37 +22,31 @@ export default function Phasesubmissionbutton({ phase, projectID , onRefresh }) 
     const [attachmentpath, setattachmentPath] = useState(null)
     const handellersubmitted = async (e, phasenum) => {
         e.preventDefault();
-        const file = attachmentpath !== "" ? attachmentpath : null;
-        if (file) {
-            console.log("current path :" + file.name);
-            try {
-                console.log("attachmentpath :" + file);
-                const res = await addphaseSubmission(projectID, phasenum, file.name)
-                console.log(`status code for phase submisiion :` + res.status);
-                console.log("notification before : " + notification);
-                if (res.status === 201) {
-                    onRefresh();
-                } else {
-                    setNotification({
-                        type: "error",
-                        title: "Error adding submission",
-                        message: `${res.message}`
-                    })
-                }
-            } catch (error) {
-                console.log(error)
-                setNotification({
-                    type: "error",
-                    title: "Error submitting phase",
-                    message: "There was a problem submitting the phase. Please try again."
-                })
-            }
+        const url = attachmentpath !== "" ? attachmentpath.name : null;
+        if (url) {
+            console.log(url);
         } else {
             console.log("No file selected.");
+        }
+        try {
+            const res = await addphaseSubmission(projectID, phasenum, url)
+            console.log(`status code for phase submisiion :` + res.status);
+            console.log("notification before : " + notification);
+            if (res.status === 201) {
+                onRefresh();
+            } else {
+                setNotification({
+                    type: "error",
+                    title: "Error adding submission",
+                    message: `${res.message}`
+                })
+            }
+        } catch (error) {
+            console.log(error)
             setNotification({
                 type: "error",
                 title: "Error submitting phase",
-                message: "No file selected."
+                message: "There was a problem submitting the phase. Please try again."
             })
         }
     }
