@@ -1,5 +1,5 @@
 import pool from "@/lib/db";
-import {NextResponse} from "next/server";
+import { NextResponse } from "next/server";
 
 // get a Project and all its teams given its id
 export async function GET(request, { params }) {
@@ -46,13 +46,15 @@ export async function GET(request, { params }) {
     // console.log("Team Availability:", teamAvailability.rows);
 
     const teamProgress = await pool.query(
-      `SELECT Team_Num, COALESCE(SUM(Phase_load), 0) AS Progress
-       FROM PhaseSubmission
-       JOIN Phase ON PhaseSubmission.Project_ID = Phase.Project_ID AND PhaseSubmission.Phase_Num = Phase.Phase_Num
-       JOIN Submission ON PhaseSubmission.Submission_ID = Submission.Submission_ID
-       JOIN participation ON Submission.Student_ID = participation.student_ID AND participation.Leader = TRUE
-       WHERE PhaseSubmission.Project_ID = $1 
-       GROUP BY Team_Num;`,
+      `SELECT t.team_num, COALESCE(SUM(DISTINCT ph.phase_load), 0) as progress
+FROM team t
+LEFT JOIN participation p ON t.team_num = p.team_num AND t.project_id = p.project_id AND p.leader = TRUE
+LEFT JOIN submission s ON p.student_id = s.student_id
+LEFT JOIN phasesubmission ps ON s.submission_id = ps.submission_id AND ps.project_id = t.project_id
+LEFT JOIN phase ph ON ps.project_id = ph.project_id AND ps.phase_num = ph.phase_num
+WHERE t.project_id = $1
+GROUP BY t.team_num
+ORDER BY t.team_num;`,
       [par.projectid]
     );
 
