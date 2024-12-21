@@ -28,7 +28,7 @@ export default function Page({ params }) {
   const [loading, setloading] = useState(true);
   const [courseCode, setCourseCode] = useState("");
   // const user = getUser(); TODO wait till i get my hands on user/pass for other instructors
-  const userID = "user005";
+  const userID = "inst005";
   useEffect(() => {
     // if (!user) return;
     async function fetchCourseData() {

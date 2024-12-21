@@ -11,6 +11,6 @@ export default async function Page() {
   } else if (role === "admin") {
     return redirect("/admin");
   } else if (role === "instructor") {
-    return <InstructorPage />;
+    return redirect("/dashboard/instructor");
   } else return <StudentPage />;
 }
