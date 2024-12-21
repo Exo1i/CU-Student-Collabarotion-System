@@ -50,7 +50,7 @@ async function initializeDB() {
         instructor_id VARCHAR(32),
         max_grade INTEGER NOT NULL,
         description TEXT,
-        FOREIGN KEY (instructor_id) REFERENCES public.users (user_id) ON DELETE SET NULL ON UPDATE CASCADE
+        FOREIGN KEY (instructor_id) REFERENCES public.users (user_id) ON DELETE CASCADE ON UPDATE CASCADE
       );
     `);
 
@@ -65,7 +65,7 @@ async function initializeDB() {
         description TEXT,
         max_team_size INTEGER,
         max_grade INTEGER,
-        FOREIGN KEY (course_code) REFERENCES public.course (course_code) ON DELETE SET NULL ON UPDATE CASCADE
+        FOREIGN KEY (course_code) REFERENCES public.course (course_code) ON DELETE CASCADE ON UPDATE CASCADE
       );
     `);
 
@@ -178,7 +178,7 @@ async function initializeDB() {
         leader BOOLEAN,
         PRIMARY KEY (student_id, project_id, team_num),
         FOREIGN KEY (project_id, team_num) REFERENCES public.team (project_id, team_num) ON DELETE CASCADE ON UPDATE CASCADE,
-        FOREIGN KEY (student_id) REFERENCES public.users (user_id) ON DELETE SET NULL ON UPDATE CASCADE
+        FOREIGN KEY (student_id) REFERENCES public.users (user_id) ON DELETE CASCADE ON UPDATE CASCADE
       );
     `);
 
@@ -394,6 +394,56 @@ async function initializeDB() {
                 FOR EACH ROW
                 EXECUTE FUNCTION sync_team_phase_grades();
     `)
+
+        await pool.query(`
+                  CREATE OR REPLACE FUNCTION delete_team_on_leader_leave()
+            RETURNS TRIGGER AS $$
+            DECLARE
+                team_members VARCHAR(32)[];
+            BEGIN
+                IF OLD.leader = true THEN
+                    -- First capture all team members' IDs before deletion cascades
+                    SELECT ARRAY_AGG(student_id)
+                    INTO team_members
+                    FROM public.participation
+                    WHERE project_id = OLD.project_id 
+                    AND team_num = OLD.team_num;
+            
+                    -- Delete all related phase submissions first
+                    DELETE FROM public.phasesubmission
+                    WHERE project_id = OLD.project_id
+                    AND submission_id IN (
+                        SELECT submission_id 
+                        FROM public.submission 
+                        WHERE student_id = ANY(team_members)
+                    );
+            
+                    -- Delete all submissions from team members for this project
+                    DELETE FROM public.submission
+                    WHERE student_id = ANY(team_members)
+                    AND submission_id IN (
+                        SELECT submission_id
+                        FROM public.phasesubmission
+                        WHERE project_id = OLD.project_id
+                    );
+            
+                    -- No need to delete the team or participation records
+                    -- They will be handled by the cascade from the DELETE operation
+                    -- that triggered this function
+                END IF;
+                
+                RETURN OLD;
+            END;
+            $$ LANGUAGE plpgsql;
+            
+            -- Drop and recreate the trigger
+            DROP TRIGGER IF EXISTS delete_team_on_leader_leave_trigger ON public.participation;
+            CREATE TRIGGER delete_team_on_leader_leave_trigger
+                BEFORE DELETE ON public.participation
+                FOR EACH ROW
+                EXECUTE FUNCTION delete_team_on_leader_leave();
+    `)
+
         console.log('Triggers created');
         await pool.end();
         console.log("Disconnected from database.");
