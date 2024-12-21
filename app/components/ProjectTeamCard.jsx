@@ -15,7 +15,7 @@ import {Participation} from '@/actions/Participation'
 import {DeleteMember} from '@/actions/DeleteMember'
 import ReviewDialog from './review-dialog'
 import {getRole} from "@/actions/GetRole";
-
+import EditTechnology from './EditTechnology'
 export default function ProjectTeamCard({ userid, Team, projectID, currentuserdata , onRefresh }) {
     const [role, setrole] = useState(null);
     useEffect(() => {
@@ -137,11 +137,14 @@ export default function ProjectTeamCard({ userid, Team, projectID, currentuserda
                         </div>
                     </div>
                 </div>
-                <div className="flex items-center justify-center flex-wrap gap-2 pt-6 mb-4">
-                    {Team.technologies.map((tech) => (
-                        <Badge key={tech} variant="secondary">{tech}</Badge>
-                    ))}
-                </div>
+                <EditTechnology
+                technologies={Team.technologies}
+                projectId={projectID}
+                teamNum={Team.team_num}
+                isUserLeader={isUserLeader}
+                isUserInThisTeam={isUserInThisTeam}
+                onRefresh={onRefresh}
+                />
                 <div className="flex flex-wrap justify-center gap-4 mb-4">
                     {Team.teamMembers.map((member) => (
                         <TooltipProvider key={member.full_name}>
