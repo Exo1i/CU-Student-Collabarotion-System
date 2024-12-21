@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
+import Loading from '../(main)/loading'
 
 export default function GradesSection({ userId }) {
     const [grades, setGrades] = useState([]);
@@ -12,11 +13,12 @@ export default function GradesSection({ userId }) {
     useEffect(() => {
         const fetchGrades = async () => {
             try {
-                const response = await fetch(`${process.env.NEXT_PUBLIC_DEPLOYMENT_URL}/api/students/${userId}/grades`)
+                const response = await fetch(`/api/students/${userId}/grades`)
                 if (!response.ok) {
                     throw new Error(`Failed to fetch grades: ${response.statusText}`)
                 }
                 const data = await response.json()
+                console.log(data)
                 setGrades(data)
             } catch (err) {
                 setError(err instanceof Error ? err.message : 'An error occurred while fetching grades')
@@ -24,12 +26,11 @@ export default function GradesSection({ userId }) {
                 setIsLoading(false)
             }
         }
-
         fetchGrades()
     }, [userId])
 
     if (isLoading) {
-        return <div>Loading grades...</div>
+        return <Loading />
     }
 
     if (error) {
@@ -63,14 +64,15 @@ export default function GradesSection({ userId }) {
                         <div className="space-y-4">
                             <div>
                                 <h3 className="font-semibold mb-2">Assignments</h3>
-                                {course.assignmentsGrades.assignments.length > 0 ? (
-                                    course.assignmentsGrades.assignments.map((assignment) => (
-                                        <div key={assignment.assignment_id} className="mb-2">
+                                {course?.assignmentsGrades?.assignments?.length > 0 ? (
+                                    course.assignmentsGrades.assignments.map((assignment, index) => (
+                                        <div key={index} className="mb-2">
                                             <div className="flex justify-between text-sm">
                                                 <span>{assignment.title}</span>
                                                 <span>{assignment.grade}/{assignment.max_grade}</span>
                                             </div>
-                                            <Progress value={(assignment.grade / assignment.max_grade) * 100} className="h-2" />
+                                            <Progress value={(assignment.grade / assignment.max_grade) * 100}
+                                                className="h-2" />
                                         </div>
                                     ))
                                 ) : (
@@ -80,13 +82,14 @@ export default function GradesSection({ userId }) {
                             <div>
                                 <h3 className="font-semibold mb-2">Project</h3>
                                 {course.projectGrades.phases.length > 0 ? (
-                                    course.projectGrades.phases.map((phase) => (
-                                        <div key={phase.phase_num} className="mb-2">
+                                    course.projectGrades.phases.map((phase, index) => (
+                                        <div key={index} className="mb-2">
                                             <div className="flex justify-between text-sm">
                                                 <span>{phase.title}</span>
                                                 <span>{phase.grade}/{course.projectGrades.max_grade}</span>
                                             </div>
-                                            <Progress value={(phase.grade / course.projectGrades.max_grade) * 100} className="h-2" />
+                                            <Progress value={(phase.grade / course.projectGrades.max_grade) * 100}
+                                                className="h-2" />
                                         </div>
                                     ))
                                 ) : (
@@ -96,8 +99,11 @@ export default function GradesSection({ userId }) {
                             <div>
                                 <h3 className="font-semibold">Total Grade</h3>
                                 <div className="flex justify-between items-center">
-                                    <Progress value={(course.total_grade / (course.projectGrades.max_grade + (course.assignmentsGrades.assignments.reduce((sum, a) => sum + a.max_grade, 0)))) * 100} className="h-4 flex-grow mr-4" />
-                                    <span className="font-bold">{course.total_grade}/{course.projectGrades.max_grade + (course.assignmentsGrades.assignments.reduce((sum, a) => sum + a.max_grade, 0))}</span>
+                                    <Progress
+                                        value={(course.total_grade / (course.projectGrades.max_grade + (course.assignmentsGrades.assignments?.reduce((sum, a) => sum + a.max_grade, 0)))) * 100}
+                                        className="h-4 flex-grow mr-4" />
+                                    <span
+                                        className="font-bold">{course.total_grade}/{course.projectGrades.max_grade + (course.assignmentsGrades.assignments?.reduce((sum, a) => sum + a.max_grade, 0))}</span>
                                 </div>
                             </div>
                         </div>

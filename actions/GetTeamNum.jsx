@@ -4,12 +4,7 @@ import pool from "@/lib/db";
 export async function getUserTeamNum(student_ID, Project_ID) {
     
 
-    if (student_ID <= 0 || Project_ID <= 0) {
-        console.error("Invalid ID values");
-        return {
-            status: 400, message: "ID values must be positive numbers.",
-        };
-    }
+console.log("getUserTeamNum data " + student_ID + " project " + Project_ID);
 
     try {
         const result = await pool.query(`SELECT team_num , leader FROM PARTICIPATION WHERE student_id = $1 AND project_id = $2`, [student_ID, Project_ID]);

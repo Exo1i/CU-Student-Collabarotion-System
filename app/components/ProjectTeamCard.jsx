@@ -16,7 +16,7 @@ import {DeleteMember} from '@/actions/DeleteMember'
 import ReviewDialog from './review-dialog'
 import {getRole} from "@/actions/GetRole";
 
-export default function ProjectTeamCard({ userid, Team, projectID, currentuserdata }) {
+export default function ProjectTeamCard({ userid, Team, projectID, currentuserdata , onRefresh }) {
     const [role, setrole] = useState(null);
     useEffect(() => {
         async function getcurrentuserrole() {
@@ -36,11 +36,15 @@ export default function ProjectTeamCard({ userid, Team, projectID, currentuserda
     const [selectedMember, setSelectedMember] = useState(null);
 
     console.log(currentuserdata + Team);
-
     const handleJoin = async () => {
-        const res = await Participation(userid, projectID, Team.team_num, false);
+        let leader = false;
+        if(Team.teamMembers.length === 0) {
+            leader = true;
+        }
+        const res = await Participation(userid, projectID, Team.team_num, leader);
         console.log(res);
         router.refresh();
+        onRefresh();
     };
 
     const handleDeleteMember = async (memberUserId) => {
@@ -48,6 +52,7 @@ export default function ProjectTeamCard({ userid, Team, projectID, currentuserda
             const res = await DeleteMember(memberUserId, projectID, currentuserdata?.team_num);
             if (res.status === 200) {
                 router.refresh();
+                onRefresh();
             }
         } catch (error) {
             console.log(error);
@@ -67,14 +72,12 @@ export default function ProjectTeamCard({ userid, Team, projectID, currentuserda
 
     return (
         <Card className="w-full max-w-2xl mx-auto overflow-hidden transition-all duration-300 hover:shadow-xl relative">
-            <div className="absolute top-4 right-4 bg-gradient-to-r from-yellow-400 to-orange-500 text-white rounded-full w-12 h-12 flex items-center justify-center font-bold text-lg shadow-lg">
-                #{Team.team_num}
-            </div>
+            
             <CardHeader className="bg-gradient-to-r from-purple-500 to-pink-500 text-white">
                 <CardTitle className="text-2xl text-center font-bold">
                     {Team.team_name}
                 </CardTitle>
-                {isUserInThisTeam && (
+                {isUserInThisTeam && isUserLeader && (
                     <div className="text-center">
                         <CustomLink className="text-center" href={`${currentRoute}/phases`}>
                             View phases

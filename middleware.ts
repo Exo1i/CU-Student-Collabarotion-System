@@ -1,27 +1,45 @@
 import {clerkMiddleware, createRouteMatcher} from "@clerk/nextjs/server";
 import {NextResponse} from "next/server";
 
-const authRoutes = ["/reset-password", "/signin(.*)", "/signup(.*)"];
-const isAuthRoute = createRouteMatcher(authRoutes);
-const isPublicRoute = createRouteMatcher(['/', '/api/webhooks(.*)', ...authRoutes])
+interface SessionMetadata {
+    metadata?: {
+        hasOnBoarded?: boolean;
+    };
+}
 
-const isDevelopment = process.env.NODE_ENV === "development";
+const onBoardingRoute = ["/onboarding"];
+const authRoutes = ["/reset-password", "/signin(.*)", "/signup(.*)", ...onBoardingRoute];
+const isAuthRoute = createRouteMatcher(authRoutes);
+const isOnboardingRoute = createRouteMatcher(onBoardingRoute);
+const isPublicRoute = createRouteMatcher(['/', '/api/webhooks(.*)', ...authRoutes]);
 
 export default clerkMiddleware(async (auth, request) => {
-    const {userId} = await auth();
-    if (userId && isAuthRoute(request))
-        return NextResponse.redirect(new URL('/dashboard', request.url))
+    const {userId, sessionClaims} = await auth();
 
-    if (!isPublicRoute(request) && !userId && !isDevelopment) {
+    // 1. First check - protect non-public routes
+    if (!userId && !isPublicRoute(request)) {
         await auth.protect();
     }
-    // Store current request url in a custom header, which you can read later
+
+    // 2. If user is authenticated but hasn't onboarded
+    if (userId &&
+        (sessionClaims as SessionMetadata)?.metadata?.hasOnBoarded === undefined &&
+        !isOnboardingRoute(request)) {
+        return NextResponse.redirect(new URL('/onboarding', request.url));
+    }
+
+    // 3. If user is authenticated and tries to access auth routes
+    if (userId &&
+        isAuthRoute(request) &&
+        (sessionClaims as SessionMetadata)?.metadata?.hasOnBoarded) {
+        return NextResponse.redirect(new URL('/dashboard', request.url));
+    }
+
     const requestHeaders = new Headers(request.headers);
     requestHeaders.set('x-url', request.url);
 
     return NextResponse.next({
         request: {
-            // Apply new request headers
             headers: requestHeaders,
         }
     });
@@ -29,9 +47,7 @@ export default clerkMiddleware(async (auth, request) => {
 
 export const config = {
     matcher: [
-        // Skip Next.js internals and all static files, unless found in search params
         "/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)",
-        // Always run for API routes
         "/(api|trpc)(.*)",
         "/dashboard/(.*)",
     ],

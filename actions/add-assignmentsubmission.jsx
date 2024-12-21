@@ -1,24 +1,23 @@
 'use server';
-import {auth} from '@clerk/nextjs/server';
+import { auth } from '@clerk/nextjs/server';
 import pool from "@/lib/db";
-import {redirect} from 'next/navigation';
+import { redirect } from 'next/navigation';
 
 
-export async function addAssignmentSubmission(assignmentID, file) {
+export async function addAssignmentSubmission(assignmentID, url) {
     const { userId } = await auth();
-    console.log(`Data for assignment submission: assignmentID=${assignmentID}, userId=${userId}, file=${file}`);
-    
+    console.log(`Data for assignment submission: assignmentID=${assignmentID}, userId=${userId}, url=${url}`);
+
     if (!userId) redirect('/signin');
-    if (!assignmentID || !file) {
+    if (!assignmentID || !url) {
         return {
             status: 422,
-            message: 'Invalid user data',
+            message: 'Invalid assignment submission data',
         };
     }
-    const url = file.name
     try {
-        const submissionQuery = `INSERT INTO Submission (Type, Student_ID) VALUES ('assignment', $1) RETURNING submission_id`;
-        const submissionResult = await pool.query(submissionQuery, [userId]);
+        const submissionQuery = `INSERT INTO Submission (Type, Student_ID , submissionurl ) VALUES ('assignment', $1 , $2) RETURNING submission_id`;
+        const submissionResult = await pool.query(submissionQuery, [userId , url]);
         if (submissionResult.rowCount === 0) {
             throw new Error('Failed to insert submission');
         }
@@ -31,11 +30,17 @@ export async function addAssignmentSubmission(assignmentID, file) {
             throw new Error('Failed to insert assignment submission');
         }
 
-        const attachmentQuery = `INSERT INTO Attachment (URL) VALUES ($1)`;
-        const attachmentResult = await pool.query(attachmentQuery, [url]);
-        if (attachmentResult.rowCount === 0) {
-            throw new Error('Failed to insert attachment');
-        }
+        // const attachmentQuery = `INSERT INTO Attachment (URL) VALUES ($1) RETURNING attachment_id`;
+        // const attachmentResult = await pool.query(attachmentQuery, [url]);
+        // if (attachmentResult.rowCount === 0) {
+        //     throw new Error('Failed to insert attachment');
+        // }
+        // const attachmentid = attachmentResult.rows[0].attachment_id;
+        // const submissionattachmentQuery = `INSERT INTO submissionAttachment (Attachment_ID, Submission_ID) VALUES ($1 , $2) `;
+        // const submissionattachmentResult = await pool.query(submissionattachmentQuery, [attachmentid, Submission_ID]);
+        // if (submissionattachmentResult.rowCount === 0) {
+        //     throw new Error('Failed to insert submissionattachment');
+        // }
 
         return {
             status: 201,

@@ -3,7 +3,8 @@ import {auth} from "@clerk/nextjs/server";
 import {getRole} from "@/lib/role";
 
 export default async function Page({params}) {
-    const {userId,} = await auth()
+    const {userId} = await auth()
+    console.log(userId)
     const role = await getRole();
-    return <Profile userID={userId} role={role} />;
+    return <Profile userID={userId} role={role} myprofile={true} />;
 }

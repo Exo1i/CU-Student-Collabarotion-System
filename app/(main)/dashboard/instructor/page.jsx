@@ -1,7 +1,6 @@
 "use client";
 
-import { useState } from "react";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import Course from "@/components/Course";
@@ -12,8 +11,10 @@ import CurrentProject from "@/components/CurrentProject";
 import CreateAssignment from "@/components/CreateAssignment";
 import AssignmentList from "@/components/AssignmentList";
 import { useAlert } from "@/components/alert-context";
-import Loader from "@/components/Loader";
-export default function Page({ params }) {
+import Loading from "@/app/(main)/loading";
+import { useAuth } from "@clerk/nextjs";
+
+export default function InstructorPage({ params }) {
   const { showAlert } = useAlert();
   const [currentProject, setCurrentProject] = useState({
     name: "",
@@ -27,19 +28,16 @@ export default function Page({ params }) {
   const [error, seterror] = useState(null);
   const [loading, setloading] = useState(true);
   const [courseCode, setCourseCode] = useState("");
-  // const user = getUser(); TODO wait till i get my hands on user/pass for other instructors
-  const userID = "inst005";
+  const { userId, isSignedIn, isLoaded } = useAuth(); // TODO wait till i get my hands on user/pass for other instructors
   useEffect(() => {
     // if (!user) return;
     async function fetchCourseData() {
       try {
-        const res = await fetch(
-          `http://localhost:3000/api/instructor/${userID}`
-        );
+        let res = await fetch(`/api/instructor/${userId}`);
         if (!res.ok) {
           throw new Error(`Failed to fetch: ${res.status} ${res.statusText}`);
         }
-        const data = await res.json();
+        let data = await res.json();
         setInstructorData(data);
         setCourseCode(data.course.course_code);
         setAssignments(
@@ -60,9 +58,10 @@ export default function Page({ params }) {
         setloading(false);
       }
     }
-    fetchCourseData();
-  }, [userID]);
-  if (loading) return <Loader />;
+
+    if (isLoaded && isSignedIn && userId) fetchCourseData();
+  }, [userId]);
+  if (loading) return <Loading />;
   if (error) return <div>Error...</div>;
 
   const handleCreateProject = (project) => {
@@ -143,7 +142,3 @@ export default function Page({ params }) {
     </div>
   );
 }
-// if (window) {
-//   window.addAssignmentGrade = addAssignmentGrade;
-//   window.addAssignment = addAssignment;
-// }

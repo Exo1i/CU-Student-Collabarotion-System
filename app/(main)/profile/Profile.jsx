@@ -1,5 +1,4 @@
 'use client'
-
 import {useEffect, useState} from 'react'
 import Image from 'next/image'
 import {AwardIcon, CodeIcon, CrownIcon, UserIcon} from 'lucide-react'
@@ -7,6 +6,7 @@ import {notFound} from 'next/navigation'
 import ProfileReview from '@/app/components/ProfileReview'
 import Loading from "@/app/(main)/loading";
 import BadgeSection from "@/app/components/Badges";
+import GradesSection from '@/app/components/GradesSection'
 
 const ProfileHeader = ({imageUrl, fullName}) => (
     <div className="h-32 bg-gradient-to-r from-blue-500 to-purple-600 relative">
@@ -17,7 +17,7 @@ const ProfileHeader = ({imageUrl, fullName}) => (
         <div className="absolute -bottom-16 left-1/2 transform -translate-x-1/2">
             <div className="rounded-full border-4 border-white shadow-lg overflow-hidden">
                 <Image
-                    src={imageUrl}
+                    src={imageUrl || '/courseImg/student.jpg'}
                     alt={fullName}
                     width={128}
                     height={128}
@@ -31,8 +31,7 @@ const ProfileHeader = ({imageUrl, fullName}) => (
 
 const TeamCard = ({team}) => (
     <div
-        className={`p-4 rounded-lg transition-transform duration-300 hover:scale-105 hover:shadow-xl ${
-            team.leader ? 'bg-gradient-to-br from-yellow-100 to-yellow-200' : 'bg-gradient-to-br from-gray-100 to-gray-200'
+        className={`p-4 rounded-lg transition-transform duration-300 hover:scale-105 hover:shadow-xl ${team.leader ? 'bg-gradient-to-br from-yellow-100 to-yellow-200' : 'bg-gradient-to-br from-gray-100 to-gray-200'
         }`}
     >
         <div className="flex justify-between">
@@ -40,12 +39,11 @@ const TeamCard = ({team}) => (
             {team.leader && <CrownIcon className="w-6 h-6 text-yellow-500 animate-pulse" />}
         </div>
         <span
-            className={`px-2 py-1 rounded-full text-sm font-medium ${
-                team.leader ? 'bg-yellow-300 text-yellow-800' : 'bg-gray-300 text-gray-800'
+            className={`px-2 py-1 rounded-full text-sm font-medium ${team.leader ? 'bg-yellow-300 text-yellow-800' : 'bg-gray-300 text-gray-800'
             }`}
         >
-      {team.leader ? "leader" : "member"}
-    </span>
+            {team.leader ? "leader" : "member"}
+        </span>
     </div>
 )
 
@@ -82,7 +80,7 @@ const useUserData = (userId) => {
     return {userData, error, loading, setUserData}
 }
 
-export default function Profile({userID, role}) {
+export default function Profile({userID, role, myprofile}) {
     const {userData, error, loading, setUserData} = useUserData(userID)
 
     const handleBadgeChange = (newBadges) => {
@@ -129,35 +127,39 @@ export default function Profile({userID, role}) {
                     />
                 </div>
             </div>
+            {role === 'student' && <>
+                <div className="bg-white rounded-lg shadow-lg p-6">
+                    <div className="flex items-center">
+                        <CodeIcon className="mr-2" />
+                        <h1 className="font-bold text-2xl">Current Teams</h1>
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        {userData.teams.map((team , index) => (
+                            <TeamCard key={index} team={team} />
+                        ))}
+                    </div>
+                </div>
 
-            <div className="bg-white rounded-lg shadow-lg p-6">
-                <div className="flex items-center">
-                    <CodeIcon className="mr-2" />
-                    <h1 className="font-bold text-2xl">Current Teams</h1>
+                <div className="bg-white rounded-lg shadow-lg p-6">
+                    <h2 className="text-2xl font-bold mb-4 text-gray-800 flex items-center">
+                        <AwardIcon className="w-6 h-6 mr-2 text-purple-500" />
+                        Reviews
+                    </h2>
+                    <div className="space-y-4">
+                        {userData.reviews.map((review, index) => (
+                            <ProfileReview
+                                key={index}
+                                review={review}
+                                reviewee_ID={userID}
+                                role={role}
+                            />
+                        ))}
+                    </div>
                 </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    {userData.teams.map((team) => (
-                        <TeamCard key={team.team_num} team={team} />
-                    ))}
-                </div>
-            </div>
-
-            <div className="bg-white rounded-lg shadow-lg p-6">
-                <h2 className="text-2xl font-bold mb-4 text-gray-800 flex items-center">
-                    <AwardIcon className="w-6 h-6 mr-2 text-purple-500" />
-                    Reviews
-                </h2>
-                <div className="space-y-4">
-                    {userData.reviews.map((review, index) => (
-                        <ProfileReview
-                            key={index}
-                            review={review}
-                            reviewee_ID={userID}
-                            role={role}
-                        />
-                    ))}
-                </div>
-            </div>
+                {
+                    myprofile && <GradesSection userId={userID} />
+                }
+            </>}
         </div>
     )
 }

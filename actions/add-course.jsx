@@ -2,7 +2,7 @@
 import pool from "@/lib/db";
 
 export async function addCourse(course_code, course_name, instructor_id, max_grade, course_img, description) {
-    console.log('Received parameters:', { course_code, course_name, instructor_id, max_grade, course_img, description });
+    console.log('Received parameters:', {course_code, course_name, instructor_id, max_grade, course_img, description});
 
     // Validate input more rigorously
     if (!course_code || !course_name || !max_grade) {
@@ -16,9 +16,7 @@ export async function addCourse(course_code, course_name, instructor_id, max_gra
         const instructor = await pool.query(`select role from users where user_id = $1`, [instructor_id]);
 
         if (instructor.rowCount === 0)
-            return { message: 'instructor does not exist' }
-        if (instructor.rows[0].role != 'instructor')
-            return { message: 'user_id does not belong to an Instructor' }
+            return {message: 'instructor does not exist'}
 
     } catch (err) {
         console.error('Detailed error:', {
@@ -28,7 +26,7 @@ export async function addCourse(course_code, course_name, instructor_id, max_gra
 
     try {
         const result = await pool.query(`
-           INSERT INTO Course (Course_Code, Course_Name, Instructor_ID, max_Grade, course_pic, description) VALUES ($1, $2, $3, $4, $5, $6);
+           INSERT INTO Course (Course_Code, Course_Name, Instructor_ID, max_Grade, course_img, description) VALUES ($1, $2, $3, $4, $5, $6);
         `, [course_code, course_name, instructor_id, max_grade, course_img, description]);
 
         console.log('Database insertion result:', result);

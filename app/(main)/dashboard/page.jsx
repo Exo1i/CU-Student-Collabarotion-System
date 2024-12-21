@@ -5,12 +5,11 @@ import StudentPage from "@/app/(main)/dashboard/student/StudentPage";
 
 export default async function Page() {
   const role = await getRole();
-
   if (role === "guest") {
-    redirect("/admin");
+    redirect("/");
   } else if (role === "admin") {
     return redirect("/admin");
   } else if (role === "instructor") {
-    return redirect("/dashboard/instructor");
+    return <InstructorPage />;
   } else return <StudentPage />;
 }

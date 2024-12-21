@@ -1,20 +1,15 @@
 import pool from "@/lib/db";
-import {NextResponse} from "next/server";
+import { NextResponse } from "next/server";
 
 export async function GET(request, { params }) {
   try {
     const par = await params;
 
     // Fetch courses the student is enrolled in
-    const courses = await pool.query(
-      `
-      SELECT Enrollment.course_code, Course.course_name, max_grade
-      FROM Enrollment
-      JOIN Course ON Enrollment.course_code = Course.course_code
-      WHERE Enrollment.student_id = $1;
-    `,
-      [par.studentid]
-    );
+    const courses = await pool.query(`
+      SELECT course.course_code, Course.course_name, max_grade
+      FROM Course      
+    `);
 
     // Fetch grades for assignments and projects
     const coursesWithGrades = await Promise.all(
@@ -22,11 +17,11 @@ export async function GET(request, { params }) {
         // Fetch assignment grades
         const assignments = await pool.query(
           `
-        SELECT Assignment.assignment_id, Assignment.title, COALESCE(Submission.grade, 0) AS grade, Assignment.max_grade
+        SELECT Assignment.assignment_id, Assignment.title, Submission.grade AS grade, Assignment.max_grade
         FROM Assignment
         LEFT JOIN Assignmentsubmission ON Assignment.assignment_id = Assignmentsubmission.assignment_id
         LEFT JOIN Submission ON Assignmentsubmission.Submission_id = Submission.Submission_id AND Submission.student_id = $2
-        WHERE Assignment.course_code = $1;
+        WHERE Assignment.course_code = $1 AND grade IS NOT NULL;
       `,
           [course.course_code, par.studentid]
         );
@@ -35,15 +30,14 @@ export async function GET(request, { params }) {
         if (assignments.rowCount > 0) {
           const total_assignments = await pool.query(
             `
-             SELECT SUM(COALESCE(Submission.grade, 0)) AS total_assign
+             SELECT SUM(Submission.grade) AS total_assign
              FROM Assignment
              LEFT JOIN Assignmentsubmission ON Assignment.assignment_id = Assignmentsubmission.assignment_id
              LEFT JOIN Submission ON Assignmentsubmission.Submission_id = Submission.Submission_id AND Submission.student_id = $2
-             WHERE Assignment.course_code = $1;
+             WHERE Assignment.course_code = $1 AND Submission.grade IS NOT NULL;
             `,
             [course.course_code, par.studentid]
           );
-
           assignmentsGrades = {
             assignments: assignments.rows,
             ...total_assignments.rows[0],
@@ -68,12 +62,12 @@ export async function GET(request, { params }) {
           // Fetch project phases grades
           const projectPhases = await pool.query(
             `
-              SELECT Phase.phase_num, Phase.phase_name AS title, COALESCE(Submission.grade, 0) AS grade, Phase.phase_load,
+              SELECT Phase.phase_num, Phase.phase_name AS title, Submission.grade AS grade, Phase.phase_load,
               (Phase.phase_load * $3 /100) AS max_grade_per_phase
               FROM Phase
               LEFT JOIN phasesubmission ON Phase.phase_num = phasesubmission.phase_num AND Phase.project_id = phasesubmission.project_id
               LEFT JOIN Submission ON phasesubmission.Submission_id = Submission.Submission_id AND Submission.student_id = $1
-              WHERE Phase.project_id = $2;
+              WHERE Phase.project_id = $2 AND grade IS NOT NULL;
             `,
             [par.studentid, project.project_id, project.max_grade]
           );
@@ -84,7 +78,7 @@ export async function GET(request, { params }) {
               FROM Phase
               LEFT JOIN phasesubmission ON Phase.phase_num = phasesubmission.phase_num AND Phase.project_id = phasesubmission.project_id
               LEFT JOIN Submission ON phasesubmission.Submission_id = Submission.Submission_id AND Submission.student_id = $1
-              WHERE Phase.project_id = $2;
+              WHERE Phase.project_id = $2 AND Submission.grade IS NOT NULL;
             `,
             [par.studentid, project.project_id]
           );

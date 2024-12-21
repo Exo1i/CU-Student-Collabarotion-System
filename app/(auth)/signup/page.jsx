@@ -1,5 +1,4 @@
 'use client'
-import {Checkbox} from "@/components/ui/checkbox";
 import VerifyingEmailView from "@/app/(auth)/signup/VerifyingEmailView";
 import {Button} from "@/components/ui/button";
 import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from "@/components/ui/form";
@@ -22,7 +21,6 @@ const signUpFormSchema = z.object({
 });
 
 export default function SignUpPage() {
-    const [isInstructor, setIsInstructor] = useState(false);
     const {isLoaded, signUp, setActive} = useSignUp();
     const [clerkError, setClerkError] = useState("");
     const router = useRouter();
@@ -68,7 +66,7 @@ export default function SignUpPage() {
     }
 
     if (isWaitingForCode) {
-        return <VerifyingEmailView signUp={signUp} isInstructor={isInstructor} setActive={setActive} />;
+        return <VerifyingEmailView signUp={signUp} setActive={setActive} />;
     }
 
     return (<div className="min-h-screen bg-background">
@@ -179,20 +177,6 @@ export default function SignUpPage() {
                                 </FormItem>)}
                             />
 
-                            <div className="flex items-center space-x-2">
-                                <Checkbox
-                                    id="instructor"
-                                    checked={isInstructor}
-                                    onCheckedChange={setIsInstructor}
-                                    className="border-purple-200 data-[state=checked]:bg-purple-500 data-[state=checked]:border-purple-500"
-                                />
-                                <label
-                                    htmlFor="instructor"
-                                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                                >
-                                    I am an instructor
-                                </label>
-                            </div>
 
                             {clerkError && (<p className="text-red-500 text-sm">{clerkError}</p>)}
 
