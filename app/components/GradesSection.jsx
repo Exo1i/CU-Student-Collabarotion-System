@@ -84,7 +84,7 @@ export default function GradesSection({ userId }) {
                                     </div>
                                     <div>
                                         <h3 className="font-semibold mb-2">Project</h3>
-                                        {course.projectGrades.phases.length > 0 ? (
+                                        {course?.projectGrades?.phases?.length > 0 ? (
                                             course.projectGrades.phases.map((phase, index) => (
                                                 <div key={index} className="mb-2">
                                                     <div className="flex justify-between text-sm">
@@ -106,7 +106,7 @@ export default function GradesSection({ userId }) {
                                                 value={(course.total_grade / (course.projectGrades.max_grade + (course.assignmentsGrades.assignments?.reduce((sum, a) => sum + a.max_grade, 0) || 0))) * 100}
                                                 className="h-4 flex-grow mr-4" />
                                             <span
-                                                className="font-bold">{course.total_grade}/{course.projectGrades.max_grade + (course.assignmentsGrades.assignments?.reduce((sum, a) => sum + a.max_grade, 0) || 0)}</span>
+                                                className="font-bold">{course.total_grade}/{course.course_max_grade}</span>
                                         </div>
                                     </div>
                                 </div>
