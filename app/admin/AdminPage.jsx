@@ -21,24 +21,29 @@ import {
   BooleanInput,
 } from "react-admin";
 
-import postgrestRestProvider, {defaultSchema,} from "@raphiniert/ra-data-postgrest";
+import postgrestRestProvider, {
+  defaultSchema,
+} from "@raphiniert/ra-data-postgrest";
 
 const config = {
-    apiUrl: process.env.NEXT_PUBLIC_POSTGREST_URL,
-    httpClient: fetchUtils.fetchJson,
-    defaultListOp: "eq",
-    primaryKeys: new Map([
-        ["users", ["user_id"]],
-        ["course", ["course_code"]],
-        ["project", ["project_id"]],
-        ["assignment", ["assignment_id"]],
-        ["enrollment", ["course_code", "student_id"]],
-        ["chat_group", ["group_id"]],
-        ["channel", ["channel_num", "group_id"]],
-        ["message", ["message_id"]],
-        ["participation", ["project_id", "student_id", "team_num"]],
-    ]),
-    schema: defaultSchema,
+  apiUrl: process.env.NEXT_PUBLIC_POSTGREST_URL,
+  httpClient: fetchUtils.fetchJson,
+  defaultListOp: "eq",
+  primaryKeys: new Map([
+    ["users", ["user_id"]],
+    ["course", ["course_code"]],
+    ["project", ["project_id"]],
+    ["assignment", ["assignment_id"]],
+    ["enrollment", ["course_code", "student_id"]],
+    ["chat_group", ["group_id"]],
+    ["channel", ["channel_num", "group_id"]],
+    ["message", ["message_id"]],
+    ["participation", ["project_id", "student_id", "team_num"]],
+    ["badge", ["badge_id"]],
+    ["earnedbadges", ["badge_id", "student_id"]],
+    ["submission", ["submission_id"]],
+  ]),
+  schema: defaultSchema,
 };
 
 export const UserList = () => (
@@ -109,17 +114,24 @@ export const CourseList = () => (
 );
 
 export const CourseEdit = () => (
-    <Edit>
-        <SimpleForm>
-            <TextInput source="course_code" disabled />
-            <TextInput source="course_name" />
-            <TextInput source="course_img" />
-            <ReferenceInput source="instructor_id" filter={{role: "instructor"}} reference="users">
-                <SelectInput optionText={record => `${record.fname} ${record.lname}`} required />
-            </ReferenceInput>
-            <NumberInput source="max_grade" />
-        </SimpleForm>
-    </Edit>
+  <Edit>
+    <SimpleForm>
+      <TextInput source="course_code" disabled />
+      <TextInput source="course_name" />
+      <TextInput source="course_img" />
+      <ReferenceInput
+        source="instructor_id"
+        filter={{ role: "instructor" }}
+        reference="users"
+      >
+        <SelectInput
+          optionText={(record) => `${record.fname} ${record.lname}`}
+          required
+        />
+      </ReferenceInput>
+      <NumberInput source="max_grade" />
+    </SimpleForm>
+  </Edit>
 );
 
 export const CourseCreate = () => (
@@ -439,6 +451,122 @@ export const participationCreate = () => (
   </Create>
 );
 
+export const BadgeList = () => (
+  <List>
+    <Datagrid rowClick="edit">
+      <NumberField source="badge_id" />
+      <TextField source="picture" />
+      <TextField source="title" />
+      <TextField source="description" />
+    </Datagrid>
+  </List>
+);
+
+export const BadgeEdit = () => (
+  <Edit>
+    <SimpleForm>
+      <NumberInput source="badge_id" disabled />
+      <TextInput source="picture" />
+      <TextInput source="title" />
+      <TextInput source="description" />
+    </SimpleForm>
+  </Edit>
+);
+
+export const BadgeCreate = () => (
+  <Create>
+    <SimpleForm>
+      <NumberInput source="badge_id" />
+      <TextInput source="picture" />
+      <TextInput source="title" />
+      <TextInput source="description" />
+    </SimpleForm>
+  </Create>
+);
+
+export const EarnedBadgeList = () => (
+  <List>
+    <Datagrid rowClick="edit">
+      <ReferenceField source="badge_id" reference="badge">
+        <TextField source="title" />
+      </ReferenceField>
+      <ReferenceField source="student_id" reference="users">
+        <TextField source="username" />
+      </ReferenceField>
+    </Datagrid>
+  </List>
+);
+
+export const EarnedBadgeEdit = () => (
+  <Edit>
+    <SimpleForm>
+      <ReferenceInput source="badge_id" reference="badge">
+        <SelectInput optionText="title" />
+      </ReferenceInput>
+      <ReferenceInput source="student_id" reference="users">
+        <SelectInput optionText="username" />
+      </ReferenceInput>
+    </SimpleForm>
+  </Edit>
+);
+export const EarnedBadgeCreate = () => (
+  <Create>
+    <SimpleForm>
+      <ReferenceInput source="badge_id" reference="badge">
+        <SelectInput optionText="title" />
+      </ReferenceInput>
+      <ReferenceInput source="student_id" reference="users">
+        <SelectInput optionText="username" />
+      </ReferenceInput>
+    </SimpleForm>
+  </Create>
+);
+
+export const SubmissionList = () => (
+  <List>
+    <Datagrid rowClick="edit">
+      <NumberField source="submission_id" />
+      <ReferenceField source="student_id" reference="users">
+        <TextField source="username" />
+      </ReferenceField>
+      <TextField source="type" />
+      <NumberField source="grade" />
+      <DateField source="submission_date" />
+      <TextField source="submissionurl" />
+    </Datagrid>
+  </List>
+);
+
+export const SubmissionEdit = () => (
+  <Edit>
+    <SimpleForm>
+      <NumberInput source="submission_id" disabled />
+      <ReferenceInput source="student_id" reference="users">
+        <SelectInput optionText="username" />
+      </ReferenceInput>
+      <TextInput source="type" />
+      <NumberInput source="grade" />
+      <DateInput source="submission_date" />
+      <TextInput source="submissionurl" />
+    </SimpleForm>
+  </Edit>
+);
+
+export const SubmissionCreate = () => (
+  <Create>
+    <SimpleForm>
+      <NumberInput source="submission_id" />
+      <ReferenceInput source="student_id" reference="users">
+        <SelectInput optionText="username" />
+      </ReferenceInput>
+      <TextInput source="type" />
+      <NumberInput source="grade" />
+      <DateInput source="submission_date" />
+      <TextInput source="submissionurl" />
+    </SimpleForm>
+  </Create>
+);
+
 export default function AdminPage() {
   const dataProvider = postgrestRestProvider(config);
 
@@ -506,6 +634,27 @@ export default function AdminPage() {
         edit={participationEdit}
         create={participationCreate}
         recordRepresentation="participation"
+      />
+      <Resource
+        name="badge"
+        list={BadgeList}
+        edit={BadgeEdit}
+        create={BadgeCreate}
+        recordRepresentation="badge"
+      />
+      <Resource
+        name="earnedbadges"
+        list={EarnedBadgeList}
+        edit={EarnedBadgeEdit}
+        create={EarnedBadgeCreate}
+        recordRepresentation="earnedbadges"
+      />
+      <Resource
+        name="submission"
+        list={SubmissionList}
+        edit={SubmissionEdit}
+        create={SubmissionCreate}
+        recordRepresentation="submission"
       />
     </Admin>
   );
