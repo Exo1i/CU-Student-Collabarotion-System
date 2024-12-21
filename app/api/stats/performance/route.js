@@ -3,30 +3,6 @@ import pool from "@/lib/db";
 import { NextResponse } from "next/server";
 
 // Query functions
-async function getTopRatedOverall() {
-  const result = await pool.query(
-    `
-    SELECT 
-      u.user_id,
-      CONCAT(u.fname, ' ', u.lname) as name,
-      ROUND(AVG(r.rating)::numeric, 2) as average_rating,
-      COUNT(DISTINCT r.project_id) as projects_reviewed
-    FROM users u
-    JOIN review r ON u.user_id = r.reviewee_id
-    WHERE u.role = 'student'
-    GROUP BY u.user_id, name
-    HAVING COUNT(DISTINCT r.project_id) > 0
-    ORDER BY average_rating DESC
-    LIMIT 3;
-  `
-  );
-
-  // Filter out students with an average rating of zero
-  const students = result.rows.filter((student) => student.average_rating > 0);
-
-  return students;
-}
-
 async function getAllProjects() {
   const result = await pool.query(`
     SELECT project_id, project_name
@@ -45,6 +21,42 @@ async function getAllCourses() {
   return result.rows;
 }
 
+async function getTopRatedOverall() {
+  const result = await pool.query(
+    `
+    SELECT 
+      u.user_id,
+      CONCAT(u.fname, ' ', u.lname) as name,
+      ROUND(AVG(r.rating)::numeric, 2) as average_rating,
+      COUNT(DISTINCT r.project_id) as projects_reviewed
+    FROM users u
+    JOIN review r ON u.user_id = r.reviewee_id
+    WHERE u.role = 'student'
+    GROUP BY u.user_id, name
+    HAVING COUNT(DISTINCT r.project_id) > 0
+    ORDER BY average_rating DESC;
+  `
+  );
+
+  // Filter out students with an average rating of zero
+  const studentsWithRatings = result.rows.filter(
+    (student) => student.average_rating > 0
+  );
+
+  // Get the maximum rating from the first student in the sorted list
+  const maxRating =
+    studentsWithRatings.length > 0 ? studentsWithRatings[0].average_rating : 0;
+
+  // Filter students who have the maximum rating
+  const topStudents = studentsWithRatings.filter(
+    (student) => student.average_rating === maxRating
+  );
+
+  console.log(`Top rated students overall:`, topStudents);
+
+  return topStudents;
+}
+
 async function getTopStudentForProject(projectId) {
   const result = await pool.query(
     `
@@ -58,15 +70,28 @@ async function getTopStudentForProject(projectId) {
     WHERE u.role = 'student'
     AND r.project_id = $1
     GROUP BY u.user_id, u.fname, u.lname
-    ORDER BY average_rating DESC
-    LIMIT 1;
+    ORDER BY average_rating DESC;
   `,
     [projectId]
   );
 
-  const student = result.rows[0];
-  // Ensure we only return the student if their average rating is greater than zero
-  return student && student.average_rating > 0 ? student : null;
+  // Filter out students with an average rating of zero
+  const studentsWithRatings = result.rows.filter(
+    (student) => student.average_rating > 0
+  );
+
+  // Get the maximum rating from the first student in the sorted list
+  const maxRating =
+    studentsWithRatings.length > 0 ? studentsWithRatings[0].average_rating : 0;
+
+  // Filter students who have the maximum rating
+  const topStudents = studentsWithRatings.filter(
+    (student) => student.average_rating === maxRating
+  );
+
+  console.log(`Top students for project ${projectId}:`, topStudents);
+
+  return topStudents;
 }
 
 async function getTopGradesOverall() {
@@ -99,15 +124,27 @@ async function getTopGradesOverall() {
     JOIN enrollment e ON u.user_id = e.student_id
     WHERE u.role = 'student'
     GROUP BY u.user_id, u.fname, u.lname, e.course_code
-    ORDER BY total_grade DESC
-    LIMIT 3;
+    ORDER BY total_grade DESC;
   `
   );
 
-  // Filter out students with an average total grade of zero
-  const students = result.rows.filter((student) => student.total_grade > 0);
+  // Filter out students with a total grade of zero
+  const studentsWithGrades = result.rows.filter(
+    (student) => student.total_grade > 0
+  );
 
-  return students;
+  // Get the maximum grade from the first student in the sorted list
+  const maxGrade =
+    studentsWithGrades.length > 0 ? studentsWithGrades[0].total_grade : 0;
+
+  // Filter students who have the maximum grade
+  const topStudents = studentsWithGrades.filter(
+    (student) => student.total_grade === maxGrade
+  );
+
+  console.log(`Top graded students overall:`, topStudents);
+
+  return topStudents;
 }
 
 async function getTopStudentForCourse(courseCode) {
@@ -156,23 +193,32 @@ async function getTopStudentForCourse(courseCode) {
         WHERE s2.student_id = u.user_id 
         AND p.course_code = $1
       ), 0)
-    ) DESC
-    LIMIT 1;
+    ) DESC;
   `,
     [courseCode]
   );
 
-  const student = result.rows[0];
-  if (student) {
-    student.total_grade =
-      student.assignment_grades && student.phase_grades
-        ? Number(student.assignment_grades) + Number(student.phase_grades)
-        : null;
+  // Calculate total grades and filter out students with a total grade of zero
+  const studentsWithGrades = result.rows
+    .map((student) => ({
+      ...student,
+      total_grade:
+        Number(student.assignment_grades) + Number(student.phase_grades),
+    }))
+    .filter((student) => student.total_grade > 0);
 
-    // Ensure we only return the student if their total grade is greater than zero
-    return student.total_grade > 0 ? student : null;
-  }
-  return null;
+  // Get the maximum grade from the first student in the sorted list
+  const maxGrade =
+    studentsWithGrades.length > 0 ? studentsWithGrades[0].total_grade : 0;
+
+  // Filter students who have the maximum grade
+  const topStudents = studentsWithGrades.filter(
+    (student) => student.total_grade === maxGrade
+  );
+
+  console.log(`Top students for course ${courseCode}:`, topStudents);
+
+  return topStudents;
 }
 
 // Main route handler
@@ -192,7 +238,7 @@ export async function GET(request) {
       projects.map(async (project) => ({
         project_id: project.project_id,
         project_name: project.project_name,
-        top_student: await getTopStudentForProject(project.project_id),
+        top_students: await getTopStudentForProject(project.project_id),
       }))
     );
 
@@ -201,16 +247,16 @@ export async function GET(request) {
       courses.map(async (course) => ({
         course_code: course.course_code,
         course_name: course.course_name,
-        top_student: await getTopStudentForCourse(course.course_code),
+        top_students: await getTopStudentForCourse(course.course_code),
       }))
     );
 
     // Filter out items with no data
     const filteredProjects = topRatedByProject.filter(
-      (p) => p.top_student !== null
+      (p) => p.top_students.length > 0
     );
     const filteredCourses = topGradesByCourse.filter(
-      (c) => c.top_student !== null
+      (c) => c.top_students.length > 0
     );
 
     const resp = {
