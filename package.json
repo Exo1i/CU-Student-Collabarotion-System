@@ -49,6 +49,7 @@
     "next": "15.0.3",
     "next-postgrest": "^0.1.9",
     "pg": "^8.13.1",
+    "prop-types": "^15.8.1",
     "ra-data-json-server": "^5.4.3",
     "ra-ui-materialui": "^5.4.3",
     "radix-ui": "^1.0.1",

@@ -7,10 +7,16 @@ const useChatStore = create(persist(combine({
     selectedGroupID: null, selectedChannel: null, inputMessage: "", messagesList: [],
 }, (set, get) => ({
     setSelectedGroupID: (newlySelectedGroupID) => {
-        if (!!!get().selectedGroupID || newlySelectedGroupID !== get().selectedGroupID) set((state) => ({
-            selectedGroupID: newlySelectedGroupID, // Reset messages when changing group
-            selectedChannel: null, inputMessage: "", messagesList: [],
-        }));
+        if (newlySelectedGroupID === null) {
+            // Clear both from localStorage directly
+            localStorage.removeItem('chat-storage');
+        }
+
+        if (!!!get().selectedGroupID || newlySelectedGroupID !== get().selectedGroupID) {
+            set((state) => ({
+                selectedGroupID: newlySelectedGroupID, selectedChannel: null, inputMessage: "", messagesList: [],
+            }));
+        }
     },
 
     setSelectedChannel: (newChannel) => {

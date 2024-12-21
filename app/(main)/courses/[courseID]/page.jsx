@@ -7,8 +7,14 @@ import CustomLink from "@/app/components/MyCustomLink";
 import SubmissionAssignment from "@/app/components/SubmissionAssignment";
 import {useEffect, useState} from "react";
 import Loading from "@/app/(main)/loading";
-
+import { useUser } from '@clerk/nextjs';
 export default function CoursePage() {
+    const [refreshKey, setRefreshKey] = useState(0);
+    const handleRefresh = () => {
+        console.log("handleRefresh");
+        setRefreshKey((prev) => prev + 1); 
+    };
+    const { user  , isLoaded , isSignedIn } = useUser();
     const pathname = usePathname();
     console.log("path : " + pathname);
     const [courseCode, setCourseCode] = useState(null);
@@ -23,7 +29,7 @@ export default function CoursePage() {
         async function fetchCourseData() {
             try {
                 console.log(`Fetching course data for courseCode: ${courseCode}`);
-                let res = await fetch(`/api/courses/${courseCode}`);
+                let res = await fetch(`/api/courses/${courseCode}?stud=${user.id}`);
                 console.log(res);
                 if (!res.ok) {
                     throw new Error(`Failed to fetch: ${res.status} ${res.statusText}`)
@@ -40,11 +46,11 @@ export default function CoursePage() {
             }
         }
 
-        if (courseCode) {
+        if (courseCode && isLoaded && isSignedIn) {
             fetchCourseData()
         }
-    }, [courseCode])
-    if (loading) {
+    }, [courseCode , isLoaded , isSignedIn , refreshKey])
+    if (loading || !isLoaded || !isSignedIn ) {
         return <Loading />
     }
     if (error) {
@@ -66,7 +72,7 @@ export default function CoursePage() {
                     {/* Course Image */}
                     <div className="w-full md:w-1/3 aspect-video relative overflow-hidden rounded-2xl shadow-lg">
                         <Image
-                            src={course.course_img}
+                            src={course.course_img || '/courseImg/coursetest1.jpg'}
                             alt={`${course.course_name} thumbnail`}
                             layout="fill"
                             objectFit="cover"
@@ -79,7 +85,7 @@ export default function CoursePage() {
                         <p className="text-xl text-indigo-100">{course.course_description}</p>
                         <div className="flex items-center space-x-4">
                             <Image
-                                src={course.img_url}
+                                src={course.img_url || '/courseImg/instructortest1.jpg'}
                                 alt={`${course.full_name} photo`}
                                 width={48}
                                 height={48}
@@ -119,7 +125,7 @@ export default function CoursePage() {
                                     </span>
                                 </div>
                             </div>
-                            <SubmissionAssignment assignment={assignment} />
+                            <SubmissionAssignment assignment={assignment} onRefresh={handleRefresh} />
                         </div>
                     ))}
                 </div>

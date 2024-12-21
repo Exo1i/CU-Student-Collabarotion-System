@@ -20,7 +20,8 @@ export default function RootLayout({children}) {
             className={`${geistSans.variable} ${geistMono.variable} antialiased`}
         >
             <AlertProvider>
-                <ClerkProvider>
+                <ClerkProvider afterSignOutUrl={'/'} signInForceRedirectUrl={'/dashboard'}
+                               signUpForceRedirectUrl={'/onboarding'}>
                     {children}
                 </ClerkProvider>
             </AlertProvider>

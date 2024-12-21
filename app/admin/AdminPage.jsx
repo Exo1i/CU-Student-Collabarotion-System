@@ -98,6 +98,7 @@ export const CourseList = () => (
   <List sort={{ field: "course_code", order: "ASC" }}>
     <Datagrid rowClick="edit">
       <TextField source="course_code" />
+      <TextField source="course_img" />
       <TextField source="course_name" />
       <ReferenceField source="instructor_id" reference="users">
         <TextField source="username" />
@@ -112,6 +113,7 @@ export const CourseEdit = () => (
         <SimpleForm>
             <TextInput source="course_code" disabled />
             <TextInput source="course_name" />
+            <TextInput source="course_img" />
             <ReferenceInput source="instructor_id" filter={{role: "instructor"}} reference="users">
                 <SelectInput optionText={record => `${record.fname} ${record.lname}`} required />
             </ReferenceInput>

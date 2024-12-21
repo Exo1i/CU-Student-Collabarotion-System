@@ -276,6 +276,7 @@ async function insertSampleData() {
         u.user_id, c.course_code;
     `);
 
+
     //Participation - 20 records
     await pool.query(`
       INSERT INTO participation (student_ID, Project_ID, Team_Num, Leader) VALUES
