@@ -11,8 +11,7 @@ const onBoardingRoute = ["/onboarding"];
 const authRoutes = ["/reset-password", "/signin(.*)", "/signup(.*)"];
 const isAuthRoute = createRouteMatcher([...authRoutes, ...onBoardingRoute]);
 const isOnboardingRoute = createRouteMatcher(onBoardingRoute);
-const isPublicRoute = createRouteMatcher(['/', '/api/webhooks(.*)', ...authRoutes]);
-const isApiRoute = createRouteMatcher(['/api(.*)']);
+const isPublicRoute = createRouteMatcher(['/', '/api/(.*)', ...authRoutes]);
 const isDevelopment = process.env.NODE_ENV === "development";
 
 
@@ -21,8 +20,7 @@ export default clerkMiddleware(async (auth, request) => {
 
         // 1. First check - protect non-public routes
         if (!userId && !isPublicRoute(request)) {
-            if (!isApiRoute(request) || !isDevelopment)
-                await auth.protect();
+            await auth.protect();
         }
 
         // 2. If user is authenticated but hasn't onboarded

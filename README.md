@@ -65,7 +65,7 @@ POST /api/projects
 GET /api/projects/:id/phases
 ```
 
-[View full API documentation](./docs/api.md)
+[View full API documentation](./API_DOCUMENTATION.md)
  
 ## 🗂️ Project Structure
 
