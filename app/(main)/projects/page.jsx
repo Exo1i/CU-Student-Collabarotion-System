@@ -24,9 +24,9 @@ export default function ProjectDashboard() {
                 setLoading(false);
             }
         }
-        // fetchprojectsdata();
+        fetchprojectsdata();
     }, []);
-    if (!loading) {
+    if (loading) {
         return <Loading />
     }
     if (error) {
