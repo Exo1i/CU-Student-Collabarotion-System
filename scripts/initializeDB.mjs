@@ -313,7 +313,88 @@ async function initializeDB() {
             FOR EACH ROW
             EXECUTE FUNCTION enroll_all_students_in_new_course();
     `)
-        console.log('Procedure created');
+        await pool.query(`
+                    
+                    -- Create trigger function for syncing team grades
+            CREATE OR REPLACE FUNCTION sync_team_phase_grades()
+            RETURNS TRIGGER AS $$
+            DECLARE
+                v_project_id INTEGER;
+                v_team_num INTEGER;
+                v_phase_num INTEGER;
+                v_student_id VARCHAR(32);
+            BEGIN
+                -- Only proceed if grade has been updated
+                IF NEW.grade IS NOT NULL AND (OLD.grade IS NULL OR NEW.grade != OLD.grade) THEN
+                    -- Get project_id and phase_num from phasesubmission
+                    SELECT project_id, phase_num 
+                    INTO v_project_id, v_phase_num
+                    FROM public.phasesubmission 
+                    WHERE submission_id = NEW.submission_id;
+            
+                    IF v_project_id IS NOT NULL THEN  -- Only proceed if this is a phase submission
+                        -- Get team_num for the student who submitted
+                        SELECT team_num 
+                        INTO v_team_num
+                        FROM public.participation 
+                        WHERE student_id = NEW.student_id
+                        AND project_id = v_project_id;
+            
+                        -- Update or create submissions for all team members
+                        FOR v_student_id IN (
+                            SELECT student_id 
+                            FROM public.participation
+                            WHERE project_id = v_project_id 
+                            AND team_num = v_team_num
+                            AND student_id != NEW.student_id
+                        ) LOOP
+                            -- Try to update existing submission first
+                            UPDATE public.submission s
+                            SET grade = NEW.grade
+                            FROM public.phasesubmission ps
+                            WHERE s.submission_id = ps.submission_id
+                            AND ps.project_id = v_project_id
+                            AND ps.phase_num = v_phase_num
+                            AND s.student_id = v_student_id;
+                            
+                            -- If no submission exists, create one
+                            IF NOT FOUND THEN
+                                WITH new_submission AS (
+                                    INSERT INTO public.submission (
+                                        submissionurl,
+                                        type,
+                                        student_id,
+                                        grade,
+                                        submission_date
+                                    )
+                                    VALUES (
+                                        NEW.submissionurl,
+                                        NEW.type,
+                                        v_student_id,
+                                        NEW.grade,
+                                        NEW.submission_date
+                                    )
+                                    RETURNING submission_id
+                                )
+                                INSERT INTO public.phasesubmission (submission_id, project_id, phase_num)
+                                SELECT submission_id, v_project_id, v_phase_num
+                                FROM new_submission;
+                            END IF;
+                        END LOOP;
+                    END IF;
+                END IF;
+                RETURN NEW;
+            END;
+            $$ LANGUAGE plpgsql;
+            
+            -- Create the trigger
+            DROP TRIGGER IF EXISTS sync_phase_grades_trigger ON public.submission;
+            CREATE TRIGGER sync_phase_grades_trigger
+                AFTER UPDATE ON public.submission
+                FOR EACH ROW
+                EXECUTE FUNCTION sync_team_phase_grades();
+    `)
+        console.log('Triggers created');
         await pool.end();
         console.log("Disconnected from database.");
     } catch (err) {
