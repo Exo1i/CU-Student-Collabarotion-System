@@ -132,41 +132,41 @@ export default function CoursePage() {
             </section>
 
             {/* Project Section */}
-            <section>
-                <h2 className="text-3xl font-bold text-gray-800 mb-6">
-                    Project
-                </h2>
-                <div
-                    className="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-100 transition-all duration-300 hover:shadow-xl hover:border-indigo-300">
-                    <div className="p-8 space-y-6">
-                        <h3 className="text-2xl font-semibold text-gray-900">
-                            {course.project.project_name}
-                        </h3>
-                        <p className="text-gray-600">{course.project.description}</p>
-                        <div className="grid grid-cols-2 gap-4 text-sm text-gray-500">
-                            <div className="flex items-center">
-                                <UserGroupIcon className="h-5 w-5 mr-2 text-indigo-500" />
-                                Team Size: {course.project.max_team_size}
-                            </div>
-                            <div className="flex items-center">
-                                <CalendarIcon className="h-5 w-5 mr-2 text-indigo-500" />
-                                Start: {new Date(course.project.start_date).toLocaleDateString()}
-                            </div>
-                            <div className="flex items-center">
-                                <CalendarIcon className="h-5 w-5 mr-2 text-indigo-500" />
-                                End: {new Date(course.project.end_date).toLocaleDateString()}
-                            </div>
-                            {
-                                course?.category === "project_based" && <div className="flex items-center">
+            {
+                course?.category === "project_based" && <section>
+                    <h2 className="text-3xl font-bold text-gray-800 mb-6">
+                        Project
+                    </h2>
+                    <div
+                        className="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-100 transition-all duration-300 hover:shadow-xl hover:border-indigo-300">
+                        <div className="p-8 space-y-6">
+                            <h3 className="text-2xl font-semibold text-gray-900">
+                                {course.project.project_name}
+                            </h3>
+                            <p className="text-gray-600">{course.project.description}</p>
+                            <div className="grid grid-cols-2 gap-4 text-sm text-gray-500">
+                                <div className="flex items-center">
+                                    <UserGroupIcon className="h-5 w-5 mr-2 text-indigo-500" />
+                                    Team Size: {course.project.max_team_size}
+                                </div>
+                                <div className="flex items-center">
+                                    <CalendarIcon className="h-5 w-5 mr-2 text-indigo-500" />
+                                    Start: {new Date(course.project.start_date).toLocaleDateString()}
+                                </div>
+                                <div className="flex items-center">
+                                    <CalendarIcon className="h-5 w-5 mr-2 text-indigo-500" />
+                                    End: {new Date(course.project.end_date).toLocaleDateString()}
+                                </div>
+                                <div className="flex items-center">
                                     <CustomLink href={`/courses/${course.course_code}/${course.project.project_id}`}>
                                         see project teams
                                     </CustomLink>
                                 </div>
-                            }
+                            </div>
                         </div>
                     </div>
-                </div>
-            </section>
+                </section>
+            }
         </div>
     );
 }

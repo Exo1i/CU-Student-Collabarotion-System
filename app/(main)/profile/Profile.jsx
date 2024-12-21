@@ -140,7 +140,6 @@ export default function Profile({ userID, role, myprofile }) {
                             ))}
                         </div>
                     </div>
-
                     <div className="bg-white rounded-lg shadow-lg p-6">
                         <h2 className="text-2xl font-bold mb-4 text-gray-800 flex items-center">
                             <AwardIcon className="w-6 h-6 mr-2 text-purple-500" />
@@ -158,6 +157,24 @@ export default function Profile({ userID, role, myprofile }) {
                         </div>
                     </div>
                 </>
+            }
+            {
+                role === 'admin' && <div className="bg-white rounded-lg shadow-lg p-6">
+                    <h2 className="text-2xl font-bold mb-4 text-gray-800 flex items-center">
+                        <AwardIcon className="w-6 h-6 mr-2 text-purple-500" />
+                        Reviews
+                    </h2>
+                    <div className="space-y-4">
+                        {userData.reviews.map((review, index) => (
+                            <ProfileReview
+                                key={index}
+                                review={review}
+                                reviewee_ID={userID}
+                                role={role}
+                            />
+                        ))}
+                    </div>
+                </div>
             }
             {
                 role === 'student' && myprofile && <GradesSection userId={userID} />
