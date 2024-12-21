@@ -1,5 +1,5 @@
 import pool from "@/lib/db";
-import {NextResponse} from "next/server";
+import { NextResponse } from "next/server";
 
 // Get course details including instructor, the single project with phases and submissions, and assignments with submissions
 export async function GET(request, { params }) {
@@ -55,7 +55,7 @@ export async function GET(request, { params }) {
           // Fetch submissions for each phase
           const submissionsResult = await pool.query(
             `
-            SELECT s.submission_id, COALESCE(s.submission_date::TEXT, '') AS submission_date, 
+            SELECT s.submission_id, COALESCE(s.submission_date::TEXT, '') AS submission_date, s.submissionurl,
                    COALESCE(s.grade, 0) AS grade, s.student_id, CONCAT(u.fname, ' ', u.lname) AS student_name
             FROM Submission s
             JOIN PhaseSubmission ps ON s.submission_id = ps.submission_id
@@ -89,7 +89,7 @@ export async function GET(request, { params }) {
         // Fetch submissions for each assignment
         const submissionsResult = await pool.query(
           `
-          SELECT s.submission_id, COALESCE(s.submission_date::TEXT, '') AS submission_date, 
+          SELECT s.submission_id, COALESCE(s.submission_date::TEXT, '') AS submission_date, s.submissionurl,
                  COALESCE(s.grade, 0) AS grade, s.student_id, CONCAT(u.fname, ' ', u.lname) AS student_name
           FROM Submission s
           JOIN AssignmentSubmission asub ON s.submission_id = asub.submission_id
