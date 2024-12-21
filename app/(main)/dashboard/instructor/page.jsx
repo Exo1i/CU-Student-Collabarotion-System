@@ -30,7 +30,6 @@ export default function InstructorPage({ params }) {
   const [courseCode, setCourseCode] = useState("");
   const { userId, isSignedIn, isLoaded } = useAuth();
   useEffect(() => {
-    // if (!user) return;
     async function fetchCourseData() {
       try {
         let res = await fetch(`/api/instructor/${userId}`);
