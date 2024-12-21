@@ -28,7 +28,7 @@ import postgrestRestProvider, {
 const config = {
   apiUrl: process.env.NEXT_PUBLIC_POSTGREST_URL,
   httpClient: fetchUtils.fetchJson,
-  defaultListOp: "eq",
+  defaultListOp: "like",
   primaryKeys: new Map([
     ["users", ["user_id"]],
     ["course", ["course_code"]],
@@ -42,6 +42,8 @@ const config = {
     ["badge", ["badge_id"]],
     ["earnedbadges", ["badge_id", "student_id"]],
     ["submission", ["submission_id"]],
+    ["team", ["project_id", "team_num"]],
+    ["review", ["reviewer_id", "reviewee_id", "project_id"]],
   ]),
   schema: defaultSchema,
 };
@@ -260,10 +262,10 @@ export const EnrollmentEdit = () => (
   <Edit>
     <SimpleForm>
       <ReferenceInput source="student_id" reference="users">
-        <SelectInput optionText="user_id" />
+        <SelectInput optionText="user_id" disabled />
       </ReferenceInput>
       <ReferenceInput source="course_code" reference="course">
-        <TextInput source="course_code" />
+        <TextInput source="course_code" disabled />
       </ReferenceInput>
     </SimpleForm>
   </Edit>
@@ -446,6 +448,9 @@ export const participationCreate = () => (
         <SelectInput optionText="username" />
       </ReferenceInput>
       <NumberInput source="team_num" />
+      {/* <ReferenceInput source="team_num" reference="team">
+        <SelectInput optionText="team_num" />
+      </ReferenceInput> */}
       <BooleanInput source="leader" />
     </SimpleForm>
   </Create>
@@ -567,6 +572,96 @@ export const SubmissionCreate = () => (
   </Create>
 );
 
+export const teamList = () => (
+  <List>
+    <Datagrid rowClick="edit">
+      <ReferenceField source="project_id" reference="project">
+        <TextField source="project_name" />
+      </ReferenceField>
+      <NumberField source="team_num" />
+      <TextField source="team_name" />
+    </Datagrid>
+  </List>
+);
+
+export const teamEdit = () => (
+  <Edit>
+    <SimpleForm>
+      <ReferenceInput source="project_id" reference="project">
+        <SelectInput optionText="project_name" disabled />
+      </ReferenceInput>
+      <NumberInput source="team_num" />
+      <TextInput source="team_name" />
+    </SimpleForm>
+  </Edit>
+);
+
+export const teamCreate = () => (
+  <Create>
+    <SimpleForm>
+      <ReferenceInput source="project_id" reference="project">
+        <SelectInput optionText="project_name" />
+      </ReferenceInput>
+      <NumberInput source="team_num" />
+      <TextInput source="team_name" />
+    </SimpleForm>
+  </Create>
+);
+
+export const ReviewList = () => (
+  <List>
+    <Datagrid rowClick="edit">
+      <ReferenceField source="reviewer_id" reference="users">
+        <TextField source="username" />
+      </ReferenceField>
+      <ReferenceField source="reviewee_id" reference="users">
+        <TextField source="username" />
+      </ReferenceField>
+      <ReferenceField source="project_id" reference="project">
+        <TextField source="project_name" />
+      </ReferenceField>
+      <NumberField source="rating" />
+      <TextField source="content" />
+    </Datagrid>
+  </List>
+);
+
+export const ReviewEdit = () => (
+  <Edit>
+    <SimpleForm>
+      <ReferenceInput source="reviewer_id" reference="users">
+        <SelectInput optionText="username" disabled />
+      </ReferenceInput>
+      <ReferenceInput source="reviewee_id" reference="users">
+        <SelectInput optionText="username" disabled />
+      </ReferenceInput>
+      <ReferenceInput source="project_id" reference="project">
+        <SelectInput optionText="project_name" disabled />
+      </ReferenceInput>
+      <NumberInput source="rating" />
+      <TextInput source="content" />
+    </SimpleForm>
+  </Edit>
+);
+
+export const ReviewCreate = () => (
+  <Create>
+    <SimpleForm>
+      <ReferenceInput source="reviewer_id" reference="users">
+        <SelectInput optionText="username" />
+      </ReferenceInput>
+      <ReferenceInput source="reviewee_id" reference="users">
+        <SelectInput optionText="username" />
+      </ReferenceInput>
+      <ReferenceInput source="project_id" reference="project">
+        <SelectInput optionText="project_name" />
+      </ReferenceInput>
+      <NumberInput source="rating" />
+      <TextInput source="content" />
+    </SimpleForm>
+  </Create>
+);
+
 export default function AdminPage() {
   const dataProvider = postgrestRestProvider(config);
 
@@ -655,6 +750,20 @@ export default function AdminPage() {
         edit={SubmissionEdit}
         create={SubmissionCreate}
         recordRepresentation="submission"
+      />
+      <Resource
+        name="team"
+        list={teamList}
+        edit={teamEdit}
+        create={teamCreate}
+        recordRepresentation="team"
+      />
+      <Resource
+        name="review"
+        list={ReviewList}
+        edit={ReviewEdit}
+        create={ReviewCreate}
+        recordRepresentation="review"
       />
     </Admin>
   );
