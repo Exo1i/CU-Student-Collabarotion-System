@@ -28,7 +28,7 @@ export default function InstructorPage({ params }) {
   const [error, seterror] = useState(null);
   const [loading, setloading] = useState(true);
   const [courseCode, setCourseCode] = useState("");
-  const { userId, isSignedIn, isLoaded } = useAuth(); // TODO wait till i get my hands on user/pass for other instructors
+  const { userId, isSignedIn, isLoaded } = useAuth();
   useEffect(() => {
     // if (!user) return;
     async function fetchCourseData() {
@@ -129,10 +129,12 @@ export default function InstructorPage({ params }) {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.2 }}
         >
-          <CurrentProject
-            project={currentProject}
-            onModify={setCurrentProject}
-          />
+          {Object.keys(currentProject).length !== 0 && (
+            <CurrentProject
+              project={currentProject}
+              onModify={setCurrentProject}
+            />
+          )}
         </motion.div>
         <div className="grid grid-cols-2 gap-2">
           <AssignmentList assignments={assignments} onModify={setAssignments} />

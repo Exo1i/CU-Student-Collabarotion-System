@@ -6,7 +6,7 @@ export default function Course({ courseData }) {
       <Card className="w-4\5 shadow-lg hover:shadow-xl transition-shadow duration-300">
         <div className="relative w-full">
           <Image
-            src={courseData.course_img}
+            src={courseData.course_img || "/courseImg/coursetest1.jpg"}
             alt={`${courseData.course_name} thumbnail`}
             layout="responsive"
             width={80}
