@@ -1,26 +1,25 @@
 import dotenv from "dotenv";
 import pkg from "pg";
 
-dotenv.config({ path: "./.env.local" });
-const { Client } = pkg;
+dotenv.config({path: "./.env.local"});
+const {Client} = pkg;
 const pool = new Client({
-  connectionString: process.env.DATABASE_URL,
-  ssl: false, // Adjust based on your database settings
+    connectionString: process.env.DATABASE_URL, ssl: false, // Adjust based on your database settings
 });
 
 console.log("DATABASE_URL:", process.env.DATABASE_URL);
 
 async function initializeDB() {
-  try {
-    console.log("Connecting to database...");
-    await pool.connect();
-    console.log("Connected to database");
+    try {
+        console.log("Connecting to database...");
+        await pool.connect();
+        console.log("Connected to database");
 
-    // Create schema if not exists
-    await pool.query(`CREATE SCHEMA IF NOT EXISTS public;`);
+        // Create schema if not exists
+        await pool.query(`CREATE SCHEMA IF NOT EXISTS public;`);
 
-    // Create sequences if not exists
-    await pool.query(`
+        // Create sequences if not exists
+        await pool.query(`
       CREATE SEQUENCE IF NOT EXISTS message_message_id_seq;
       CREATE SEQUENCE IF NOT EXISTS attachment_attachment_id_seq;
       CREATE SEQUENCE IF NOT EXISTS chat_group_seq;
@@ -30,8 +29,8 @@ async function initializeDB() {
       CREATE SEQUENCE IF NOT EXISTS submission_submission_id_seq;
     `);
 
-    // Create users table
-    await pool.query(`
+        // Create users table
+        await pool.query(`
       CREATE TABLE IF NOT EXISTS public.users (
         user_id VARCHAR(32) PRIMARY KEY,
         username TEXT,
@@ -42,8 +41,8 @@ async function initializeDB() {
       );
     `);
 
-    // Create courses table
-    await pool.query(`
+        // Create courses table
+        await pool.query(`
       CREATE TABLE IF NOT EXISTS public.course (
         course_code VARCHAR(10) PRIMARY KEY,
         course_name TEXT NOT NULL,
@@ -55,8 +54,8 @@ async function initializeDB() {
       );
     `);
 
-    // Create projects table
-    await pool.query(`
+        // Create projects table
+        await pool.query(`
       CREATE TABLE IF NOT EXISTS public.project (
         project_id INTEGER NOT NULL DEFAULT nextval('project_project_id_seq') PRIMARY KEY,
         project_name TEXT NOT NULL,
@@ -70,8 +69,8 @@ async function initializeDB() {
       );
     `);
 
-    // Create phase table
-    await pool.query(`
+        // Create phase table
+        await pool.query(`
       CREATE TABLE IF NOT EXISTS public.phase (
         project_id INTEGER,
         phase_num INTEGER,
@@ -84,8 +83,8 @@ async function initializeDB() {
       );
     `);
 
-    // Create team table
-    await pool.query(`
+        // Create team table
+        await pool.query(`
       CREATE TABLE IF NOT EXISTS public.team (
         project_id INTEGER,
         team_num INTEGER,
@@ -95,16 +94,16 @@ async function initializeDB() {
       );
     `);
 
-    // Create chat_group table
-    await pool.query(`
+        // Create chat_group table
+        await pool.query(`
       CREATE TABLE IF NOT EXISTS public.chat_group (
         group_id INTEGER NOT NULL DEFAULT nextval('chat_group_seq') PRIMARY KEY,
         group_name TEXT NOT NULL
       );
     `);
 
-    // Create channel table
-    await pool.query(`
+        // Create channel table
+        await pool.query(`
       CREATE TABLE IF NOT EXISTS public.channel (
         channel_name TEXT NOT NULL,
         channel_num INTEGER,
@@ -115,8 +114,8 @@ async function initializeDB() {
       );
     `);
 
-    // Create message table
-    await pool.query(`
+        // Create message table
+        await pool.query(`
       CREATE TABLE IF NOT EXISTS public.message (
         message_id INTEGER NOT NULL DEFAULT nextval('message_message_id_seq') PRIMARY KEY,
         channel_num INTEGER,
@@ -130,12 +129,12 @@ async function initializeDB() {
       );
     `);
 
-    await pool.query(`
+        await pool.query(`
       CREATE UNIQUE INDEX IF NOT EXISTS public_message_pkey ON public.message (message_id);
     `);
 
-    // Create assignment table
-    await pool.query(`
+        // Create assignment table
+        await pool.query(`
       CREATE TABLE IF NOT EXISTS public.assignment (
         assignment_id INTEGER NOT NULL DEFAULT nextval('assignment_assignment_id_seq') PRIMARY KEY,
         title TEXT NOT NULL,
@@ -147,8 +146,8 @@ async function initializeDB() {
       );
     `);
 
-    // Create submission table
-    await pool.query(`
+        // Create submission table
+        await pool.query(`
       CREATE TABLE IF NOT EXISTS public.submission (
         submission_id INTEGER NOT NULL DEFAULT nextval('submission_submission_id_seq') PRIMARY KEY,
         URL TEXT, 
@@ -160,8 +159,8 @@ async function initializeDB() {
       );
     `);
 
-    // Create badge table
-    await pool.query(`
+        // Create badge table
+        await pool.query(`
       CREATE TABLE IF NOT EXISTS public.badge (
         badge_id INTEGER NOT NULL DEFAULT nextval('badge_badge_id_seq') PRIMARY KEY,
         picture TEXT NOT NULL,
@@ -170,8 +169,8 @@ async function initializeDB() {
       );
     `);
 
-    // Create participation table
-    await pool.query(`
+        // Create participation table
+        await pool.query(`
       CREATE TABLE IF NOT EXISTS public.participation (
         student_id VARCHAR(32),
         project_id INTEGER,
@@ -183,8 +182,8 @@ async function initializeDB() {
       );
     `);
 
-    // Create enrollment table
-    await pool.query(`
+        // Create enrollment table
+        await pool.query(`
       CREATE TABLE IF NOT EXISTS public.enrollment (
         student_id VARCHAR(32), 
         course_code VARCHAR(10),
@@ -194,8 +193,8 @@ async function initializeDB() {
       );
     `);
 
-    // Create messageRead table
-    await pool.query(`
+        // Create messageRead table
+        await pool.query(`
       CREATE TABLE IF NOT EXISTS public.messageread (
         lastmessageread_id INTEGER,
         user_id VARCHAR(32),
@@ -206,8 +205,8 @@ async function initializeDB() {
       );
     `);
 
-    // Create phaseSubmission table
-    await pool.query(`
+        // Create phaseSubmission table
+        await pool.query(`
       CREATE TABLE IF NOT EXISTS public.phasesubmission (
         submission_id INTEGER,
         project_id INTEGER,
@@ -218,8 +217,8 @@ async function initializeDB() {
       );
     `);
 
-    // Create assignmentSubmission table
-    await pool.query(`
+        // Create assignmentSubmission table
+        await pool.query(`
       CREATE TABLE IF NOT EXISTS public.assignmentsubmission (
         submission_id INTEGER,
         assignment_id INTEGER,
@@ -229,8 +228,8 @@ async function initializeDB() {
       );
     `);
 
-    // Create reviews table
-    await pool.query(`
+        // Create reviews table
+        await pool.query(`
       CREATE TABLE IF NOT EXISTS public.review (
         reviewer_id VARCHAR(32),
         reviewee_id VARCHAR(32),
@@ -244,8 +243,8 @@ async function initializeDB() {
       );
     `);
 
-    // Create earnedbadges table
-    await pool.query(`
+        // Create earnedbadges table
+        await pool.query(`
       CREATE TABLE IF NOT EXISTS public.earnedbadges (
         student_id VARCHAR(32),
         badge_id INTEGER,
@@ -256,8 +255,8 @@ async function initializeDB() {
       );
     `);
 
-    // Create technologies table
-    await pool.query(`
+        // Create technologies table
+        await pool.query(`
       CREATE TABLE IF NOT EXISTS public.technology (
         project_id INTEGER NOT NULL,
         team_num INTEGER NOT NULL,
@@ -267,12 +266,59 @@ async function initializeDB() {
       );
     `);
 
-    console.log("Tables created.");
-    await pool.end();
-    console.log("Disconnected from database.");
-  } catch (err) {
-    console.error("Error initializing database:", err);
-  }
+        console.log("Tables created.");
+
+        await pool.query(`
+            -- First, create trigger function for enrolling new students in all courses
+        CREATE OR REPLACE FUNCTION enroll_new_student()
+        RETURNS TRIGGER AS $$
+        BEGIN
+            -- Check if the new user is a student
+            IF NEW.role = 'student' THEN
+                -- Insert enrollment records for all existing courses
+                INSERT INTO public.enrollment (student_id, course_code)
+                SELECT NEW.user_id, course.course_code
+                FROM public.course
+                ON CONFLICT DO NOTHING; -- Avoid duplicate enrollments
+            END IF;
+            RETURN NEW;
+        END;
+            $$ LANGUAGE plpgsql;
+        
+        -- Create trigger for new student enrollments
+        DROP TRIGGER IF EXISTS student_enrollment_trigger ON public.users;
+        CREATE TRIGGER student_enrollment_trigger
+            AFTER INSERT ON public.users
+            FOR EACH ROW
+            EXECUTE FUNCTION enroll_new_student();
+        
+        -- Create trigger function for enrolling all students in new courses
+        CREATE OR REPLACE FUNCTION enroll_all_students_in_new_course()
+        RETURNS TRIGGER AS $$
+        BEGIN
+            -- Insert enrollment records for all existing students
+            INSERT INTO public.enrollment (student_id, course_code)
+            SELECT users.user_id, NEW.course_code
+            FROM public.users
+            WHERE users.role = 'student'
+            ON CONFLICT DO NOTHING; -- Avoid duplicate enrollments
+            RETURN NEW;
+        END;
+        $$ LANGUAGE plpgsql;
+        
+        -- Create trigger for new course enrollments
+        DROP TRIGGER IF EXISTS course_enrollment_trigger ON public.course;
+        CREATE TRIGGER course_enrollment_trigger
+            AFTER INSERT ON public.course
+            FOR EACH ROW
+            EXECUTE FUNCTION enroll_all_students_in_new_course();
+    `)
+        console.log('Procedure created');
+        await pool.end();
+        console.log("Disconnected from database.");
+    } catch (err) {
+        console.error("Error initializing database:", err);
+    }
 }
 
 initializeDB();
