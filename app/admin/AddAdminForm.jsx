@@ -14,9 +14,10 @@ const AddAdminModal = ({isOpen, onClose}) => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        console.log('Creating admin user:', {email, password, firstName, lastName, username});
         setIsCreatingAdmin(true);
         try {
-            const result = await AddAdmin(email, password, firstName, lastName, username);
+            const result = await AddAdmin(email, password, username, firstName, lastName);
             if (result.status === 201) {
                 showAlert({
                     message: `New admin user created successfully with email ${email}`, severity: "success",
@@ -32,12 +33,12 @@ const AddAdminModal = ({isOpen, onClose}) => {
                     message: result.message ?? "Failed to create admin user", severity: "error",
                 });
                 console.error('Error creating admin user:', result.message);
-                setEmail('');
-                setPassword('');
-                setFirstName('');
-                setLastName('');
-                setUsername('');
-                onClose();
+                // setEmail('');
+                // setPassword('');
+                // setFirstName('');
+                // setLastName('');
+                // setUsername('');
+                // onClose();
             }
         } finally {
             setIsCreatingAdmin(false);
