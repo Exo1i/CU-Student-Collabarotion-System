@@ -1,12 +1,11 @@
 'use client'
 
-import { useEffect, useState } from 'react'
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Progress } from "@/components/ui/progress"
-import React from 'react';
+import React, {useEffect, useState} from 'react'
+import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card"
+import {Progress} from "@/components/ui/progress"
 import Loading from '../(main)/loading'
 
-export default function GradesSection({ userId }) {
+export default function GradesSection({userId}) {
     const [grades, setGrades] = useState([]);
     const [isLoading, setIsLoading] = useState(true)
     const [error, setError] = useState(null)
@@ -75,7 +74,7 @@ export default function GradesSection({ userId }) {
                                                         <span>{assignment.grade}/{assignment.max_grade}</span>
                                                     </div>
                                                     <Progress value={(assignment.grade / assignment.max_grade) * 100}
-                                                        className="h-2" />
+                                                              className="h-2" />
                                                 </div>
                                             ))
                                         ) : (
@@ -91,7 +90,8 @@ export default function GradesSection({ userId }) {
                                                         <span>{phase.title}</span>
                                                         <span>{phase.grade}/{course.projectGrades.max_grade}</span>
                                                     </div>
-                                                    <Progress value={(phase.grade / course.projectGrades.max_grade) * 100}
+                                                    <Progress
+                                                        value={(phase.grade / course.projectGrades.max_grade) * 100}
                                                         className="h-2" />
                                                 </div>
                                             ))
@@ -103,7 +103,7 @@ export default function GradesSection({ userId }) {
                                         <h3 className="font-semibold">Total Grade</h3>
                                         <div className="flex justify-between items-center">
                                             <Progress
-                                                value={(course.total_grade / (course.projectGrades.max_grade + (course.assignmentsGrades.assignments?.reduce((sum, a) => sum + a.max_grade, 0) || 0))) * 100}
+                                                value={(course.total_grade / course.course_max_grade) * 100}
                                                 className="h-4 flex-grow mr-4" />
                                             <span
                                                 className="font-bold">{course.total_grade}/{course.course_max_grade}</span>

@@ -22,7 +22,6 @@ export default clerkMiddleware(async (auth, request) => {
         return NextResponse.next();
     }
 
-    // Your existing middleware logic
     if (!userId && !isPublicRoute(request)) {
         await auth.protect();
     }
