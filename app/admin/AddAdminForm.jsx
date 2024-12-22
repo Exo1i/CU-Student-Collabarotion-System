@@ -32,6 +32,12 @@ const AddAdminModal = ({isOpen, onClose}) => {
                     message: result.message ?? "Failed to create admin user", severity: "error",
                 });
                 console.error('Error creating admin user:', result.message);
+                setEmail('');
+                setPassword('');
+                setFirstName('');
+                setLastName('');
+                setUsername('');
+                onClose();
             }
         } finally {
             setIsCreatingAdmin(false);
