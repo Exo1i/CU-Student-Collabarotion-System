@@ -2,6 +2,8 @@ import localFont from "next/font/local";
 import "./globals.css";
 import {ClerkProvider} from "@clerk/nextjs";
 import {AlertProvider} from "@/components/alert-context";
+import {Analytics} from "@vercel/analytics/next";
+import {SpeedInsights} from "@vercel/speed-insights/next";
 
 const geistSans = localFont({
     src: "./fonts/GeistVF.woff", variable: "--font-geist-sans", weight: "100 900",
@@ -15,16 +17,18 @@ export const metadata = {
 };
 
 export default function RootLayout({children}) {
-    return (<html lang="en">
-        <body
-            className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-        >
-            <AlertProvider>
-                <ClerkProvider afterSignOutUrl={'/'} signInForceRedirectUrl={'/dashboard'}
-                               signUpForceRedirectUrl={'/onboarding'}>
+    return (<ClerkProvider afterSignOutUrl={'/'} signInForceRedirectUrl={'/dashboard'}
+                           signUpForceRedirectUrl={'/onboarding'} signInUrl={'/signin'} signUpUrl={'/signup'}>
+        <html lang="en">
+            <body
+                className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+            >
+                <AlertProvider>
                     {children}
-                </ClerkProvider>
-            </AlertProvider>
-        </body>
-    </html>);
+                    <Analytics />
+                    <SpeedInsights />
+                </AlertProvider>
+            </body>
+        </html>
+    </ClerkProvider>);
 }
