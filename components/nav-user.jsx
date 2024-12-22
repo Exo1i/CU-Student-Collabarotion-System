@@ -1,10 +1,12 @@
 "use client";
 import {SidebarMenu, SidebarMenuItem} from "@/components/ui/sidebar";
-import {SignedIn, UserButton, useUser} from "@clerk/nextjs";
+import {ClerkLoaded, ClerkLoading, UserButton, useUser} from "@clerk/nextjs";
+import * as React from 'react';
 import {useRef} from 'react';
+import {Skeleton} from "@/components/ui/skeleton";
 
 export function NavUser() {
-    const {user, isLoaded, isSignedIn} = useUser();
+    const {user, isLoaded} = useUser();
     const buttonRef = useRef();
 
     const handleClick = () => {
@@ -14,15 +16,23 @@ export function NavUser() {
         }
     };
 
-    if (!isLoaded) return null;
 
     return (<SidebarMenu>
         <SidebarMenuItem
             className="flex flex-row cursor-pointer hover:bg-sidebar-accent/10 transition-colors"
             onClick={handleClick}
         >
-            <SignedIn>
-                <div className="w-full flex items-center p-2">
+            <ClerkLoading>
+                <div className={"flex items-center space-x-4 h-[48px] w-full"}>
+                    <Skeleton className="h-10 w-10 rounded-full" />
+                    <div className={"flex flex-col space-y-2 w-[10rem] items-center"}>
+                        <Skeleton className="h-2 w-full rounded-full" />
+                        <Skeleton className="h-2 w-full rounded-full" />
+                    </div>
+                </div>
+            </ClerkLoading>
+            <ClerkLoaded>
+                {<div className="w-full flex items-center p-2">
                     <div ref={buttonRef}>
                         <UserButton
                             appearance={{
@@ -34,14 +44,14 @@ export function NavUser() {
                     </div>
                     <div className="grid flex-1 text-left text-sm leading-tight ml-2">
                         <span className="truncate font-semibold">
-                            {user.firstName} {user.lastName}
+                            {user?.firstName} {user?.lastName}
                         </span>
                         <span className="truncate text-xs">
-                            {user.emailAddresses[0]?.emailAddress}
+                            {user?.emailAddresses[0]?.emailAddress}
                         </span>
                     </div>
-                </div>
-            </SignedIn>
+                </div>}
+            </ClerkLoaded>
         </SidebarMenuItem>
     </SidebarMenu>);
 }

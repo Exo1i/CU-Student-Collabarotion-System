@@ -14,8 +14,7 @@ import {
     SidebarMenuButton,
     SidebarMenuItem,
 } from "@/components/ui/sidebar";
-import {SignedIn, SignedOut, SignInButton, useUser} from "@clerk/nextjs";
-import {Skeleton} from "@/components/ui/skeleton";
+import {SignedOut, SignInButton, useUser} from "@clerk/nextjs";
 import Link from "next/link";
 import useSWR from "swr";
 import {NavUser} from "@/components/nav-user";
@@ -61,10 +60,7 @@ export function SidebarLeft({...props}) {
             </SidebarMenu>
         </SidebarHeader>
         <SidebarContent>
-            <NavMain items={[
-                ...data.navMain,
-                {title: "Profile", url: `/profile/`, icon: User, items: [],}
-            ]} />
+            <NavMain items={[...data.navMain, {title: "Profile", url: `/profile/`, icon: User, items: [],}]} />
             {isLoading ? <Loader className={"animate-spin"} /> : <NavChat groups={chatsData} />}
             <NavSecondary items={data.navSecondary} className="mt-auto" />
         </SidebarContent>
@@ -72,15 +68,7 @@ export function SidebarLeft({...props}) {
             <SignedOut>
                 <SignInButton />
             </SignedOut>
-            {isLoaded ? (<SignedIn>
-                <NavUser />
-            </SignedIn>) : (<div className={"flex items-center space-x-4 h-[48px] w-full"}>
-                <Skeleton className="h-10 w-10 rounded-full" />
-                <div className={"flex flex-col space-y-2 w-[10rem] items-center"}>
-                    <Skeleton className="h-2 w-full rounded-full" />
-                    <Skeleton className="h-2 w-full rounded-full" />
-                </div>
-            </div>)}
+            <NavUser />
         </SidebarFooter>
     </Sidebar>);
 }
