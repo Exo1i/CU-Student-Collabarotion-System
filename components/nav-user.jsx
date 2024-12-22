@@ -9,44 +9,49 @@ export function NavUser() {
     const {user, isLoaded} = useUser();
     const buttonRef = useRef();
 
-    return (
-        <SidebarMenu>
-            <SidebarMenuItem
-                className="flex flex-row cursor-pointer hover:bg-sidebar-accent/10 transition-colors"
-                // Remove the onClick handler here
-            >
-                <ClerkLoading>
-                    <div className={"flex items-center space-x-4 h-[48px] w-full"}>
-                        <Skeleton className="h-10 w-10 rounded-full" />
-                        <div className={"flex flex-col space-y-2 w-[10rem] items-center"}>
-                            <Skeleton className="h-2 w-full rounded-full" />
-                            <Skeleton className="h-2 w-full rounded-full" />
-                        </div>
+    const handleClick = () => {
+        const button = buttonRef.current?.querySelector('button');
+        if (button) {
+            button.click();
+        }
+    };
+
+
+    return (<SidebarMenu>
+        <SidebarMenuItem
+            className="flex flex-row cursor-pointer hover:bg-sidebar-accent/10 transition-colors"
+            onClick={handleClick}
+        >
+            <ClerkLoading>
+                <div className={"flex items-center space-x-4 h-[48px] w-full"}>
+                    <Skeleton className="h-10 w-10 rounded-full" />
+                    <div className={"flex flex-col space-y-2 w-[10rem] items-center"}>
+                        <Skeleton className="h-2 w-full rounded-full" />
+                        <Skeleton className="h-2 w-full rounded-full" />
                     </div>
-                </ClerkLoading>
-                <ClerkLoaded>
-                    {<div className="w-full flex items-center p-2">
-                        <div ref={buttonRef}>
-                            <UserButton
-                                afterSignOutUrl="/"  // Add this to ensure redirect after sign-out
-                                appearance={{
-                                    elements: {
-                                        userButtonAvatarBox: "h-[3em] w-[3em] rounded-full",
-                                    },
-                                }}
-                            />
-                        </div>
-                        <div className="grid flex-1 text-left text-sm leading-tight ml-2">
-                            <span className="truncate font-semibold">
-                                {user?.firstName} {user?.lastName}
-                            </span>
-                            <span className="truncate text-xs">
-                                {user?.emailAddresses[0]?.emailAddress}
-                            </span>
-                        </div>
-                    </div>}
-                </ClerkLoaded>
-            </SidebarMenuItem>
-        </SidebarMenu>
-    );
+                </div>
+            </ClerkLoading>
+            <ClerkLoaded>
+                {<div className="w-full flex items-center p-2">
+                    <div ref={buttonRef}>
+                        <UserButton
+                            appearance={{
+                                elements: {
+                                    userButtonAvatarBox: "h-[3em] w-[3em] rounded-full",
+                                },
+                            }}
+                        />
+                    </div>
+                    <div className="grid flex-1 text-left text-sm leading-tight ml-2">
+                        <span className="truncate font-semibold">
+                            {user?.firstName} {user?.lastName}
+                        </span>
+                        <span className="truncate text-xs">
+                            {user?.emailAddresses[0]?.emailAddress}
+                        </span>
+                    </div>
+                </div>}
+            </ClerkLoaded>
+        </SidebarMenuItem>
+    </SidebarMenu>);
 }

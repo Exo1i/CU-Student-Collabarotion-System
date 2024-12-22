@@ -1,57 +1,50 @@
 import {clerkMiddleware, createRouteMatcher} from "@clerk/nextjs/server";
 import {NextResponse} from "next/server";
 
-interface SessionMetadata {
-    metadata?: {
-        hasOnBoarded?: boolean;
-    };
-}
+const publicPaths = ['/', '/api/(.*)'];
+const authPaths = ["/reset-password", "/signin(.*)", "/signup(.*)"];
+const onBoardingPath = ["/onboarding"];
 
-const onBoardingRoute = ["/onboarding"];
-const authRoutes = ["/reset-password", "/signin(.*)", "/signup(.*)"];
-const isAuthRoute = createRouteMatcher([...authRoutes, ...onBoardingRoute]);
-const isOnboardingRoute = createRouteMatcher(onBoardingRoute);
-const isPublicRoute = createRouteMatcher(['/', '/api/(.*)', ...authRoutes]);
-const isDevelopment = process.env.NODE_ENV === "development";
-
+const isPublicRoute = createRouteMatcher([...publicPaths, ...authPaths]);
+const isAuthRoute = createRouteMatcher([...authPaths, ...onBoardingPath]);
+const isOnboardingRoute = createRouteMatcher(onBoardingPath);
 
 export default clerkMiddleware(async (auth, request) => {
-        const {userId, sessionClaims} = await auth();
+    const {userId, sessionClaims} = await auth();
 
-        // 1. First check - protect non-public routes
-        if (!userId && !isPublicRoute(request)) {
-            await auth.protect();
-        }
-
-        // 2. If user is authenticated but hasn't onboarded
-        if (userId &&
-            (sessionClaims as SessionMetadata)?.metadata?.hasOnBoarded === undefined &&
-            !isOnboardingRoute(request)) {
-            return NextResponse.redirect(new URL('/onboarding', request.url));
-        }
-
-        // 3. If user is authenticated and tries to access auth routes
-        if (userId &&
-            isAuthRoute(request) &&
-            (sessionClaims as SessionMetadata)?.metadata?.hasOnBoarded) {
-            return NextResponse.redirect(new URL('/dashboard', request.url));
-        }
-
-        const requestHeaders = new Headers(request.headers);
-        requestHeaders.set('x-url', request.url);
-
-        return NextResponse.next({
-            request: {
-                headers: requestHeaders,
-            }
-        });
+    // Early return for sign-out request
+    if (request.method === 'POST' && request.url.includes('/sign-out')) {
+        return NextResponse.next();
     }
-)
-;
+
+    // Handle sign-out redirects
+    if (!userId && request.method === 'POST') {
+        return NextResponse.next();
+    }
+
+    // Your existing middleware logic
+    if (!userId && !isPublicRoute(request)) {
+        await auth.protect();
+    }
+
+    if (userId &&
+        (sessionClaims as any)?.metadata?.hasOnBoarded === undefined &&
+        !isOnboardingRoute(request)) {
+        return NextResponse.redirect(new URL('/onboarding', request.url));
+    }
+
+    if (userId &&
+        isAuthRoute(request) &&
+        (sessionClaims as any)?.metadata?.hasOnBoarded) {
+        return NextResponse.redirect(new URL('/dashboard', request.url));
+    }
+
+    return NextResponse.next();
+});
 
 export const config = {
     matcher: [
-        "/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)",
+        "/((?!_next/static|_next/image|favicon.ico).*)",
         "/(api|trpc)(.*)",
         "/dashboard/(.*)",
     ],
