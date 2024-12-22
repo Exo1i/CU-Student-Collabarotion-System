@@ -16,7 +16,7 @@ export async function AddAdmin(email, password, username, firstName, lastName) {
         return {status: 201, message: 'Admin user created successfully'};
     } catch (error) {
         console.error('Error creating admin user:', error);
-        return {message: `Failed to create admin user,${error}`, status: 500}
+        return {message: `Failed to create admin user`, status: 500}
     }
 }
 

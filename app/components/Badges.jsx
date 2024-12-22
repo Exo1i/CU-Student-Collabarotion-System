@@ -53,7 +53,7 @@ const BadgeItem = ({badge, userId, role, onBadgeDeleted}) => (<TooltipProvider>
                     height={40}
                     className="rounded-full"
                 />
-                {role === 'admin' && (<DeleteBadgeButton
+                {role !== 'student' && (<DeleteBadgeButton
                     userId={userId}
                     badgeId={badge.badge_id}
                     onBadgeDeleted={() => {
