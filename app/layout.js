@@ -23,11 +23,17 @@ export default function RootLayout({children}) {
     console.log('Sign-out URL:', process.env.NEXT_PUBLIC_CLERK_AFTER_SIGN_OUT_URL);
 
     return (<ClerkProvider
-        afterSignOutUrl={process.env.NEXT_PUBLIC_CLERK_AFTER_SIGN_OUT_URL}
-        signInUrl={process.env.NEXT_PUBLIC_CLERK_SIGN_IN_URL}
-        signUpUrl={process.env.NEXT_PUBLIC_CLERK_SIGN_UP_URL}
-        afterSignInUrl={process.env.NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL}
-        afterSignUpUrl={process.env.NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL}
+        afterSignOutUrl="/"
+        signInUrl="/signin"
+        signUpUrl="/signup"
+        afterSignInUrl="/dashboard"
+        afterSignUpUrl="/onboarding"
+        appearance={{
+            baseTheme: undefined,
+            signIn: {baseTheme: undefined},
+            signUp: {baseTheme: undefined},
+            userButton: {baseTheme: undefined}
+        }}
     >
         <html lang="en">
             <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
