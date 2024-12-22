@@ -22,7 +22,7 @@ export default function Phasesubmissionbutton({ phase, projectID, onRefresh }) {
     const [attachmentpath, setattachmentPath] = useState(null)
     const handellersubmitted = async (e, phasenum) => {
         e.preventDefault();
-        const url = attachmentpath !== "" ? attachmentpath.name : null;
+        const url = attachmentpath  ? attachmentpath.name : null;
         if (url) {
             console.log(url);
         } else {
@@ -54,7 +54,7 @@ export default function Phasesubmissionbutton({ phase, projectID, onRefresh }) {
     const handleupdateSubmission = async (e) => {
         e.preventDefault();
         console.log("current attachment" + attachmentpath);
-        const url = attachmentpath !== "" ? attachmentpath.name : null;
+        const url = attachmentpath ? attachmentpath.name : null;
         if (url) {
             console.log(url);
         } else {

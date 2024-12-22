@@ -3,7 +3,6 @@
 A modern, feature-rich learning management system built with Next.js, focusing on collaborative learning and
 project-based education.
 
-
 ## ✨ Features
 
 - **Authentication & User Management**
@@ -65,7 +64,7 @@ POST /api/projects
 GET /api/projects/:id/phases
 ```
 
-[View full API documentation](./docs/api.md)
+[View full API documentation](./API_DOCUMENTATION.md)
  
 ## 🗂️ Project Structure
 

@@ -41,14 +41,14 @@ export default function ReviewDialog({ isOpen, onClose, member, projectID }) {
             else {
                 setNotification({
                     type: "error",
-                    title: "Error adding submission",
+                    title: "Error adding review",
                     message: `${res.message}`
                 })
             }
         } catch (err) {
             setNotification({
                 type: "error",
-                title: "Error adding submission",
+                title: "Error adding review",
                 message: `${res.message}`
             })
             console.log(err)

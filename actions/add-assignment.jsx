@@ -39,6 +39,7 @@ export async function addAssignment(
     return {
       status: 200,
       message: "assignment added successfully",
+      id: result.rows[0].assignment_id,
     };
   } catch (err) {
     console.error("Detailed error:", {

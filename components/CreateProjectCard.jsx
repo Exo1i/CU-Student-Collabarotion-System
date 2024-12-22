@@ -29,16 +29,15 @@ export default function CreateProject({ onCreateProject, courseCode }) {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    console.log(project);
     setProject((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (project.name != "") {
+    if (project.name === "") {
       showAlert({
-        message: "There exists a project for current course",
+        message: "Project name is required",
         severity: "error",
       });
       return;

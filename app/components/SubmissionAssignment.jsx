@@ -35,7 +35,7 @@ export default function SubmissionAssignment({ assignment , onRefresh }) {
     }, [notification])
     const handleAddAssignmentSubmission = async (e) => {
         e.preventDefault();
-        const url = assignmentPath !== "" ? assignmentPath.name : null;
+        const url = assignmentPath  ? assignmentPath.name : null;
         if (url) {
             console.log(url);
         } else {
@@ -64,7 +64,7 @@ export default function SubmissionAssignment({ assignment , onRefresh }) {
     }
     const handleupdateSubmission = async (e) => {
         e.preventDefault();
-        const url = assignmentPath !== "" ? assignmentPath.name : null;
+        const url = assignmentPath  ? assignmentPath.name : null;
         if (url) {
             console.log(url);
         } else {
