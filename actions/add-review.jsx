@@ -10,7 +10,7 @@ export async function GiveReview(revieweeID, projectID, content, rating) {
         console.error("Missing required parameters");
         return {
             status: 422,
-            message: "Invalid Team data",
+            message: "Invalid review data",
         };
     }
 

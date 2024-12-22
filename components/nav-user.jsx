@@ -2,14 +2,10 @@
 import {SidebarMenu, SidebarMenuItem} from "@/components/ui/sidebar";
 import {SignedIn, UserButton, useUser} from "@clerk/nextjs";
 import {useRef} from 'react';
-import {redirect} from "next/navigation";
 
 export function NavUser() {
     const {user, isLoaded, isSignedIn} = useUser();
     const buttonRef = useRef();
-    if (!isSignedIn) {
-        redirect('/');
-    }
 
     const handleClick = () => {
         const button = buttonRef.current?.querySelector('button');
@@ -29,7 +25,6 @@ export function NavUser() {
                 <div className="w-full flex items-center p-2">
                     <div ref={buttonRef}>
                         <UserButton
-                            afterSignOutUrl="/"
                             appearance={{
                                 elements: {
                                     userButtonAvatarBox: "h-[3em] w-[3em] rounded-full",

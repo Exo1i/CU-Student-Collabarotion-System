@@ -127,34 +127,55 @@ export default function Profile({ userID, role, myprofile }) {
                     />
                 </div>
             </div>
-            <div className="bg-white rounded-lg shadow-lg p-6">
-                <div className="flex items-center">
-                    <CodeIcon className="mr-2" />
-                    <h1 className="font-bold text-2xl">Current Teams</h1>
+            {
+                role === 'student' && <>
+                    <div className="bg-white rounded-lg shadow-lg p-6">
+                        <div className="flex items-center">
+                            <CodeIcon className="mr-2" />
+                            <h1 className="font-bold text-2xl">Current Teams</h1>
+                        </div>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            {userData.teams.map((team, index) => (
+                                <TeamCard key={index} team={team} />
+                            ))}
+                        </div>
+                    </div>
+                    <div className="bg-white rounded-lg shadow-lg p-6">
+                        <h2 className="text-2xl font-bold mb-4 text-gray-800 flex items-center">
+                            <AwardIcon className="w-6 h-6 mr-2 text-purple-500" />
+                            Reviews
+                        </h2>
+                        <div className="space-y-4">
+                            {userData.reviews.map((review, index) => (
+                                <ProfileReview
+                                    key={index}
+                                    review={review}
+                                    reviewee_ID={userID}
+                                    role={role}
+                                />
+                            ))}
+                        </div>
+                    </div>
+                </>
+            }
+            {
+                role === 'admin' && <div className="bg-white rounded-lg shadow-lg p-6">
+                    <h2 className="text-2xl font-bold mb-4 text-gray-800 flex items-center">
+                        <AwardIcon className="w-6 h-6 mr-2 text-purple-500" />
+                        Reviews
+                    </h2>
+                    <div className="space-y-4">
+                        {userData.reviews.map((review, index) => (
+                            <ProfileReview
+                                key={index}
+                                review={review}
+                                reviewee_ID={userID}
+                                role={role}
+                            />
+                        ))}
+                    </div>
                 </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    {userData.teams.map((team, index) => (
-                        <TeamCard key={index} team={team} />
-                    ))}
-                </div>
-            </div>
-
-            <div className="bg-white rounded-lg shadow-lg p-6">
-                <h2 className="text-2xl font-bold mb-4 text-gray-800 flex items-center">
-                    <AwardIcon className="w-6 h-6 mr-2 text-purple-500" />
-                    Reviews
-                </h2>
-                <div className="space-y-4">
-                    {userData.reviews.map((review, index) => (
-                        <ProfileReview
-                            key={index}
-                            review={review}
-                            reviewee_ID={userID}
-                            role={role}
-                        />
-                    ))}
-                </div>
-            </div>
+            }
             {
                 role === 'student' && myprofile && <GradesSection userId={userID} />
             }

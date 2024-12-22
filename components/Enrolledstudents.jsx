@@ -11,10 +11,14 @@ import {
 } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import Image from "next/image";
+import { redirect } from "next/navigation";
+import { useAuth } from "@clerk/nextjs";
+import { useAlert } from "@/components/alert-context";
 
 export default function EnrolledStudents() {
   const [isOpen, setIsOpen] = useState(false);
   const [students, setStudents] = useState([]);
+  const { showAlert } = useAlert();
 
   useEffect(() => {
     const getData = async () => {
@@ -25,7 +29,10 @@ export default function EnrolledStudents() {
             setStudents(data.students_list);
           });
       } catch (e) {
-        console.log(e);
+        showAlert({
+          message: e.message,
+          severity: "error",
+        });
       }
     };
     getData();
@@ -46,6 +53,9 @@ export default function EnrolledStudents() {
           <div className="grid gap-4">
             {students.map((student) => (
               <motion.div
+                onClick={() => {
+                  redirect(`/profile/${student.user_id}`);
+                }}
                 key={student.user_id}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -54,7 +64,6 @@ export default function EnrolledStudents() {
               >
                 <div className="h-10 w-10 rounded-full bg-indigo-100 flex items-center justify-center">
                   <span className="text-indigo-600 font-medium">
-                    {console.log(student)}
                     <Image
                       src={
                         student.img_url !== null
@@ -65,7 +74,7 @@ export default function EnrolledStudents() {
                       height={80}
                       className={"rounded-full"}
                       alt={student.fname[0] + student.lname[0]}
-                    />
+                    ></Image>
                   </span>
                 </div>
                 <div className="flex flex-col">
